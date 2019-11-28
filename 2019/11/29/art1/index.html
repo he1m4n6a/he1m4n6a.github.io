@@ -11,7 +11,7 @@
 
     <title>
         
-        
+        art1 - undefined
         
     </title>
 
@@ -65,7 +65,7 @@
                     <span>标签</span>
                 </a>
             </li>
-            <li  class=active >
+            <li >
                 <a href="/archives">
                     <i class="iconfont icon-guidang2"></i>
                     <span>存档</span>
@@ -87,6 +87,10 @@
             
         </ul>
     </div>
+    
+        <div id="toc" class="toc-article">
+    
+</div>
     
 </div>
 
@@ -114,50 +118,31 @@
         
 
 
-<!-- 归档列表 -->
+<div class="post-container">
+    <div class="post-title">
+        art1
+    </div>
 
-<div class="archives-container">
-
-<div class="one-tag-list">
-                <span class="fa fa-calendar-times-o listing-seperator" id="2019">
-                    <span class="tag-text">2019</span>
-                </span>
-    <ul>
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2019-11-29 01:40:13</span></span>
         
-        <!-- <li class="listing-item">
-        <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-        <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-        </li> -->
-        <li >
-            <span>11-29</span>
-            <i class="fa fa-angle-double-right" aria-hidden="true"></i>
-            <a href="/2019/11/29/art1/">
-                        <span>
-                            art1
-                        </span>
-            </a>
-            <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-        </li>
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
         
-        <!-- <li class="listing-item">
-        <time datetime="{{ post.date | date:"%Y-%m-%d" }}">{{ post.date | date:"%Y-%m-%d" }}</time>
-        <a href="{{ post.url }}" title="{{ post.title }}">{{ post.title }}</a>
-        </li> -->
-        <li >
-            <span>11-29</span>
-            <i class="fa fa-angle-double-right" aria-hidden="true"></i>
-            <a href="/2019/11/29/test/">
-                        <span>
-                            JAVA安全教程系列-基础篇
-                        </span>
-            </a>
-            <!-- <p class="post-meta">{{ post.date | date:"%Y-%m-%d" }}</p> -->
-        </li>
         
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
 
-    </ul>
-</div>
+        <div id="lv-container">
+        </div>
 
+    </div>
 </div>
 
     </div>
@@ -198,7 +183,7 @@
     // We expose some of the variables needed by the front end
     window.hexo_search_path = "search.json"
     window.hexo_root = "/"
-    window.isPost = false
+    window.isPost = true
 </script>
 <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
 <script src="/js/index.js"></script>
