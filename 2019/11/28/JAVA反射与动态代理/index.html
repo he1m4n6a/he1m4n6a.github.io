@@ -18,7 +18,7 @@
 <meta property="og:image" content="https:&#x2F;&#x2F;he1m4n6a.git.io&#x2F;images&#x2F;a2&#x2F;1.png">
 <meta property="og:image" content="https:&#x2F;&#x2F;he1m4n6a.git.io&#x2F;images&#x2F;a2&#x2F;2.png">
 <meta property="og:image" content="https:&#x2F;&#x2F;he1m4n6a.git.io&#x2F;images&#x2F;a2&#x2F;3.png">
-<meta property="og:updated_time" content="2019-12-02T01:56:08.962Z">
+<meta property="og:updated_time" content="2019-12-02T02:09:54.020Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:image" content="https:&#x2F;&#x2F;he1m4n6a.git.io&#x2F;images&#x2F;a2&#x2F;1.png">
   
@@ -100,11 +100,12 @@
         <!-- Table of Contents -->
         
         <div id="toc" class="toc-article">
-        <strong class="toc-title">文章目录</strong>
+        // <strong class="toc-title">文章目录</strong>
         <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#JAVA反射"><span class="toc-number">1.</span> <span class="toc-text">JAVA反射</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#什么是Java反射"><span class="toc-number">1.1.</span> <span class="toc-text">什么是Java反射</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#反射的原理"><span class="toc-number">1.2.</span> <span class="toc-text">反射的原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#反射的优缺点"><span class="toc-number">1.3.</span> <span class="toc-text">反射的优缺点</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#反射的用途"><span class="toc-number">1.4.</span> <span class="toc-text">反射的用途</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#反射机制常用的类"><span class="toc-number">1.5.</span> <span class="toc-text">反射机制常用的类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#反射的基本使用"><span class="toc-number">1.6.</span> <span class="toc-text">反射的基本使用</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#JAVA动态代理"><span class="toc-number">2.</span> <span class="toc-text">JAVA动态代理</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#代理模式简介"><span class="toc-number">2.1.</span> <span class="toc-text">代理模式简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#动态代理简介"><span class="toc-number">2.2.</span> <span class="toc-text">动态代理简介</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#JDK动态代理机制的相关类与接口"><span class="toc-number">2.2.1.</span> <span class="toc-text">JDK动态代理机制的相关类与接口</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JDK动态代理的一般步骤"><span class="toc-number">2.2.2.</span> <span class="toc-text">JDK动态代理的一般步骤</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#生活案例"><span class="toc-number">2.2.3.</span> <span class="toc-text">生活案例</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#代码实现"><span class="toc-number">2.2.4.</span> <span class="toc-text">代码实现</span></a></li></ol></li></ol></li></ol>
         </div>
         
         <h1 id="JAVA反射"><a href="#JAVA反射" class="headerlink" title="JAVA反射"></a>JAVA反射</h1><h2 id="什么是Java反射"><a href="#什么是Java反射" class="headerlink" title="什么是Java反射"></a>什么是Java反射</h2><p>反射是Java的特征之一，是一种<strong>间接操作目标对象的机制</strong>，核心是JVM在运行的时候才动态加载类，并且对于任意一个类，都能够知道这个类的所有属性和方法，调用方法/访问属性，不需要提前在编译期知道运行的对象是谁，他允许运行中的Java程序获取类的信息，并且可以操作类或对象内部属性。程序中对象的类型一般都是在编译期就确定下来的，而当我们的程序在运行时，可能需要动态的加载一些类，这些类因为之前用不到，所以没有加载到jvm，这时，使用Java反射机制可以在<strong>运行期动态的创建对象并调用其属性</strong>，它是在运行时根据需要才加载。</p>
+<a id="more"></a>
 <h2 id="反射的原理"><a href="#反射的原理" class="headerlink" title="反射的原理"></a>反射的原理</h2><p><img src="/images/a2/1.png" alt=""></p>
 <h2 id="反射的优缺点"><a href="#反射的优缺点" class="headerlink" title="反射的优缺点"></a>反射的优缺点</h2><p><strong>优点：</strong>使用反射，我们就可以在运行时获得类的各种内容，进行反编译，对于Java这种先编译再运行的语言，能够让我们很方便的创建灵活的代码，这些代码可以在运行时装配，无需在组件之间进行源代码的链接，更加容易实现面向对象。</p>
 <p><strong>缺点：</strong></p>
@@ -206,7 +207,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="https://he1m4n6a.git.io/2019/11/28/JAVA%E5%8F%8D%E5%B0%84%E4%B8%8E%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/" data-id="ck3ndc2u40003ys8zeqqh8uez" class="article-share-link">Share</a>
+      <a data-url="https://he1m4n6a.git.io/2019/11/28/JAVA%E5%8F%8D%E5%B0%84%E4%B8%8E%E5%8A%A8%E6%80%81%E4%BB%A3%E7%90%86/" data-id="ck3nsqgmf00036v8zarlwa2i8" class="article-share-link">Share</a>
       
       
   <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JAVA/" rel="tag">JAVA</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%AE%89%E5%85%A8/" rel="tag">安全</a></li></ul>
