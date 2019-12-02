@@ -1074,6 +1074,33 @@ a.article-title:hover {
 #page-nav .space {
   color: #ddd;
 }
+.toc-article {
+  background: #eee;
+  border: 1px solid #bbb;
+  border-radius: 10px;
+  margin: auto;
+  padding: 1.2em 1em 0 1em;
+  max-width: 100%;
+}
+.toc-title {
+  font-size: 120%;
+}
+#toc {
+  line-height: 1em;
+  font-size: 0.9em;
+  float: right;
+}
+#toc .toc {
+  padding: 0;
+  margin: 1em;
+  line-height: 1.8em;
+}
+#toc .toc li {
+  list-style-type: none;
+}
+#toc .toc-child {
+  margin-left: 1em;
+}
 #footer {
   background: #262a30;
   padding: 50px 0;
