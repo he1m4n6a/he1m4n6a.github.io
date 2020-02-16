@@ -144,7 +144,7 @@
 </span>
     </div>
     <div class="post-content ">
-        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p><a href="https://www.freebuf.com/articles/web/214096.html" target="_blank" rel="noopener">https://www.freebuf.com/articles/web/214096.html</a> 已经总结的很好了，没必要再重复造轮子，就转载过来。里面的代码大家最好自己idea里调试一遍，有助于理解。文章中最后的总结是构造payload的精华总结，希望大家能好好看下总结和理解。</p>
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>文章 <a href="https://www.freebuf.com/articles/web/214096.html" target="_blank" rel="noopener">https://www.freebuf.com/articles/web/214096.html</a> 已经把几种利用方式总结的很好了，没必要再重复造轮子，就转载过来。里面的代码大家最好自己idea里调试一遍，有助于理解。文章中最后的总结是构造payload的精华总结，希望大家能好好看下总结和理解。</p>
 <h1 id="Apache-Commons-Collections-简介"><a href="#Apache-Commons-Collections-简介" class="headerlink" title="Apache Commons Collections 简介"></a>Apache Commons Collections 简介</h1><p>Apache Commons Collections是一个扩展了Java标准库里的Collection结构的第三方基础库，它提供了很多强有力的数据结构类型并且实现了各种集合工具类。作为Apache开源项目的重要组件，Commons Collections被广泛应用于各种Java应用的开发。</p>
 <p>CommonsCollections造成RCE的根本原因就在于我们<strong>构造了一个特殊的ChainedTransformer类的对象，这样当我们调用这个对象的transform函数的时候，就会造成命令执行</strong>，于是，我们需要做的事情就是去寻找某个类，把包含恶意代码的transformerChain放到这个类里面，当对这个类的对象进行反序列化的时候会调用transformerChain的transform函数</p>
 <p>下面的payload构造都是参考自<a href="https://github.com/frohoff/ysoserial" target="_blank" rel="noopener">ysoserial</a>。这个工具用来生成各种反序列攻击向量，本文介绍的是常用的CommonmonsCollections库的构造方法，除此之外，还有很多反序列化的构造方法，大家可以去看源码好好研究下。</p>
