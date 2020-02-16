@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="He1m4n6a的博客">
+    <meta name="keyword"  content="腾讯">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        JAVA反序列化漏洞总结 - He1m4n6a的博客 | He1m4n6a&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/aircloud.css">
+    <link rel="stylesheet" href="/css/gitment.css">
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar ">
+            <img src="/img/avatar.jpg" />
+        </div>
+        <div class="name">
+            <i>He1m4n6a</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archive">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#前言"><span class="toc-text">前言</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#什么是序列化和反序列化"><span class="toc-text">什么是序列化和反序列化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#序列化有什么用"><span class="toc-text">序列化有什么用</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Java反序列化类型"><span class="toc-text">Java反序列化类型</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1、-Java原生序列化"><span class="toc-text">1、 Java原生序列化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2、-Json反序列化"><span class="toc-text">2、 Json反序列化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3、-Fastjson反序列化"><span class="toc-text">3、 Fastjson反序列化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4、Protobuf-反序列化"><span class="toc-text">4、Protobuf 反序列化</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#各方式反序列化比较"><span class="toc-text">各方式反序列化比较</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#各序列化漏洞简介"><span class="toc-text">各序列化漏洞简介</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1、Object-Serialize-漏洞"><span class="toc-text">1、Object Serialize 漏洞</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2、Jackson-databind-漏洞"><span class="toc-text">2、Jackson-databind 漏洞</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3、FastJson-漏洞"><span class="toc-text">3、FastJson 漏洞</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#防止反序列化漏洞"><span class="toc-text">防止反序列化漏洞</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1、Java-Serialization"><span class="toc-text">1、Java Serialization</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2、jackson-databind"><span class="toc-text">2、jackson-databind</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3、fastjson"><span class="toc-text">3、fastjson</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#总结："><span class="toc-text">总结：</span></a></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        JAVA反序列化漏洞总结
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2019-02-15 14:40:45</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#JAVA" title="JAVA">JAVA</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#反序列化" title="反序列化">反序列化</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <p>本文本人首发自<a href="https://www.secpulse.com/archives/95012.html" target="_blank" rel="noopener">https://www.secpulse.com/archives/95012.html</a></p>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><h3 id="什么是序列化和反序列化"><a href="#什么是序列化和反序列化" class="headerlink" title="什么是序列化和反序列化"></a>什么是序列化和反序列化</h3><p>Java 提供了一种对象序列化的机制，该机制中，一个对象可以被表示为一个字节序列，该字节序列包括该对象的数据、有关对象的类型的信息和存储在对象中数据的类型。反序列化就是通过序列化后的字段还原成这个对象本身。但标识不被序列化的字段是不会被还原的。</p>
+<h3 id="序列化有什么用"><a href="#序列化有什么用" class="headerlink" title="序列化有什么用"></a>序列化有什么用</h3><p>1）网站相应的session对象存储在硬盘上，那么保存在session中的内容就必须实现相关的序列化操作。</p>
+<p>2）如果使用的java对象要在分布式中使用或者在rmi远程调用的网络中使用的话，那么相关的对象必须实现java序列化接口。</p>
+<h2 id="Java反序列化类型"><a href="#Java反序列化类型" class="headerlink" title="Java反序列化类型"></a>Java反序列化类型</h2><p>我们最常见就是原生的java反序列化类型，其实java中有几种方式可以执行反序列化，本文目的也是对这几种类型的反序列化方法进行归纳和总结。</p>
+<h3 id="1、-Java原生序列化"><a href="#1、-Java原生序列化" class="headerlink" title="1、 Java原生序列化"></a>1、 Java原生序列化</h3><p>Java包中自带的类InputStream和OutputStream，它们之间可以互相转化，使用writeObject序列化，使用readObject反序列化。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.io.*;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DeserializeDemo</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="class"></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String [] args)</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"><span class="function">   </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">      Employee e = <span class="keyword">null</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">      <span class="keyword">try</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">      &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">         FileInputStream fileIn = <span class="keyword">new</span> FileInputStream(<span class="string">"/tmp/employee.ser"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">         ObjectInputStream in = <span class="keyword">new</span> ObjectInputStream(fileIn);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">         e = (Employee) in.readObject();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">         in.close();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">         fileIn.close();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">      &#125;<span class="keyword">catch</span>(IOException i)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">      &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">         i.printStackTrace();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">         <span class="keyword">return</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">      &#125;<span class="keyword">catch</span>(ClassNotFoundException c)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">      &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">         System.out.println(<span class="string">"Employee class not found"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line">         c.printStackTrace();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line">         <span class="keyword">return</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">24</span></pre></td><td class="code"><pre><span class="line">      &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">25</span></pre></td><td class="code"><pre><span class="line">      System.out.println(<span class="string">"Deserialized Employee..."</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">26</span></pre></td><td class="code"><pre><span class="line">      System.out.println(<span class="string">"Name: "</span> + e.name);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">27</span></pre></td><td class="code"><pre><span class="line">      System.out.println(<span class="string">"Address: "</span> + e.address);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">28</span></pre></td><td class="code"><pre><span class="line">      System.out.println(<span class="string">"SSN: "</span> + e.SSN);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">29</span></pre></td><td class="code"><pre><span class="line">      System.out.println(<span class="string">"Number: "</span> + e.number);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">30</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">31</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<h3 id="2、-Json反序列化"><a href="#2、-Json反序列化" class="headerlink" title="2、 Json反序列化"></a>2、 Json反序列化</h3><p>Json序列化一般会使用jackson包，通过ObjectMapper类来进行一些操作，比如将对象转化为byte数组或者将json串转化为对象。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> &lt;T&gt; <span class="function">String <span class="title">serialize</span><span class="params">(T t)</span> <span class="keyword">throws</span> JsonProcessingException </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">        ObjectMapper mapper = <span class="keyword">new</span> ObjectMapper();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">        String jsonResult = mapper.writerWithDefaultPrettyPrinter()</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">                .writeValueAsString(t);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">return</span> jsonResult;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr></table></figure>
+
+<h3 id="3、-Fastjson反序列化"><a href="#3、-Fastjson反序列化" class="headerlink" title="3、 Fastjson反序列化"></a>3、 Fastjson反序列化</h3><p>Fastjson是一个性能很好的Java语言实现的Json解析器和生成器，由来自阿里巴巴的工程师开发。具有极快的性能，超越任何其他的Java Json Parser。Fastjson使用parseObject来进行反序列化。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.alibaba.fastjson.JSON;    </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person</span> </span>&#123;  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">int</span> age;  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">    String name;  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getAge</span><span class="params">()</span> </span>&#123;  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">return</span> age;  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">    &#125;  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAge</span><span class="params">(<span class="keyword">int</span> age)</span> </span>&#123;  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">this</span>.age = age;  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">    &#125;  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">return</span> name;  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">    &#125;  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span> </span>&#123;  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">this</span>.name = name;  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">    &#125;  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">        String jsonString=<span class="string">"&#123;\"name\":\"hah\",\"age\":1&#125;"</span>;  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">        Person person = JSON.parseObject(jsonString, Person<span class="class">.<span class="keyword">class</span>)</span>;  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">        System.out.println(<span class="number">1</span>);  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line">    &#125;  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<h3 id="4、Protobuf-反序列化"><a href="#4、Protobuf-反序列化" class="headerlink" title="4、Protobuf 反序列化"></a>4、Protobuf 反序列化</h3><p>Protocol Buffers 是一种轻便高效的结构化数据存储格式，可以用于结构化数据串行化，或者说序列化。它很适合做数据存储或 RPC 数据交换格式。可用于通讯协议、数据存储等领域的语言无关、平台无关、可扩展的序列化结构数据格式。目前提供了 C++、Java、Python 三种语言的 API。</p>
+<p><strong>proto.proto文件内容</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> proto;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">message TestMsg&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">    optional string id = <span class="number">1</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">    optional string name = <span class="number">2</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p><strong>序列化</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">byte</span>[] build()&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">    Proto.TestMsg.Builder builder = Proto.TestMsg.newBuilder();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">    builder.setId(<span class="string">"ID的值"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">    builder.setName(<span class="string">"Name的值"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">    Proto.TestMsg msg = builder.build();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">return</span> msg.toByteArray();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p><strong>反序列化</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">Proto.TestMsg msg = Proto.TestMsg.parseFrom(message.returnByte());</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">System.out.Println(msg);</span></pre></td></tr></table></figure>
+
+
+
+<h2 id="各方式反序列化比较"><a href="#各方式反序列化比较" class="headerlink" title="各方式反序列化比较"></a>各方式反序列化比较</h2><p><img src="/images/a6/1.png" alt="img"></p>
+<h2 id="各序列化漏洞简介"><a href="#各序列化漏洞简介" class="headerlink" title="各序列化漏洞简介"></a>各序列化漏洞简介</h2><p>除了使用protobuf进行反序列化没有出现过漏洞，其他方式的序列化都曾出现过漏洞。下面将简单介绍下漏洞，详细的漏洞和exp构造方法大家可以去网上搜索关键字查看（java几个反序列化漏洞exp构造过程都十分精彩，推荐大家认真阅读下）</p>
+<h3 id="1、Object-Serialize-漏洞"><a href="#1、Object-Serialize-漏洞" class="headerlink" title="1、Object Serialize 漏洞"></a>1、Object Serialize 漏洞</h3><p>Apache Commons Collections中实现了TransformedMap ，该类可以在一个元素被添加/删除/或是被修改时(即key或value：集合中的数据存储形式即是一个索引对应一个值，就像身份证与人的关系那样)，会调用transform方法自动进行特定的修饰变换。</p>
+<p><img src="/images/a6/2.png" alt="img"></p>
+<p>TransformedMap.decorate方法，预期是对Map类的数据结构进行转化，该方法有三个参数。</p>
+<ul>
+<li>第一个参数为待转化的Map对象</li>
+<li>第二个参数为Map对象内的key要经过的转化方法（可为单个方法，也可为链，也可为空）</li>
+<li>第三个参数为Map对象内的value要经过的转化方法</li>
+</ul>
+<p>通过对第三个参数通过构造ChainedTransformer链，通过一系列变化，最终执行系统命令。</p>
+<h3 id="2、Jackson-databind-漏洞"><a href="#2、Jackson-databind-漏洞" class="headerlink" title="2、Jackson-databind 漏洞"></a>2、Jackson-databind 漏洞</h3><p>Jackson是一套开源的java序列化与反序列化工具框架，可将java对象序列化为xml和json格式的字符串及提供对应的反序列化过程。由于其解析效率较高，目前是Spring MVC中内置使用的解析方式，该漏洞的触发条件是ObjectMapper反序列化前调用了enableDefaultTyping方法。该方法允许json字符串中指定反序列化java对象的类名，而在使用Object、Map、List等对象时，可诱发反序列化漏洞，导致可执行任意命令。</p>
+<h3 id="3、FastJson-漏洞"><a href="#3、FastJson-漏洞" class="headerlink" title="3、FastJson 漏洞"></a>3、FastJson 漏洞</h3><p>fastjson在解析json的过程中，支持使用autoType来实例化某一个具体的类，并通过json来填充其属性值。而JDK自带的类com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl中有一个私有属性_bytecodes，其部分方法会执行这个值中包含的Java字节码。通过注入恶意代码到_bytecode，导致任意代码执行漏洞。</p>
+<p><strong>注：</strong>Fastjson和Jackson Payload构造的方式都一样，虽然解析函数不一样，但是都是将json转为object，过程是类似的。</p>
+<h2 id="防止反序列化漏洞"><a href="#防止反序列化漏洞" class="headerlink" title="防止反序列化漏洞"></a>防止反序列化漏洞</h2><h3 id="1、Java-Serialization"><a href="#1、Java-Serialization" class="headerlink" title="1、Java Serialization"></a>1、Java Serialization</h3><ul>
+<li>jdk里增加了一个filter机制 <a href="http://openjdk.java.net/jeps/290" target="_blank" rel="noopener">http://openjdk.java.net/jeps/290 </a>，这个一开始是出现在jdk9上的，后面移值回jdk6/7/8上，如果安装的jdk版本是比较新的，可以找到相关的类</li>
+<li>Oracle打算废除java序列化：<a href="https://www.infoworld.com/article/3275924/java/oracle-plans-to-dump-risky-java-serialization.html" target="_blank" rel="noopener">https://www.infoworld.com/article/3275924/java/oracle-plans-to-dump-risky-java-serialization.html</a></li>
+</ul>
+<h3 id="2、jackson-databind"><a href="#2、jackson-databind" class="headerlink" title="2、jackson-databind"></a>2、jackson-databind</h3><ul>
+<li>jackson-databind里是过滤掉一些已知的类，参见<a href="https://github.com/FasterXML/jackson-databind/blob/jackson-databind-2.9.6/src/main/java/com/fasterxml/jackson/databind/jsontype/impl/SubTypeValidator.java" target="_blank" rel="noopener">SubTypeValidator.java</a></li>
+<li>jackson-databind的<a href="https://github.com/FasterXML/jackson-databind/issues?q=is%3Aissue+label%3ACVE+is%3Aclosed" target="_blank" rel="noopener">CVE issue列表</a></li>
+</ul>
+<h3 id="3、fastjson"><a href="#3、fastjson" class="headerlink" title="3、fastjson"></a>3、fastjson</h3><ul>
+<li>fastjson通过一个denyList来过滤掉一些危险类的package，参见<a href="https://github.com/alibaba/fastjson/blob/1.2.7.sec01/src/main/java/com/alibaba/fastjson/parser/ParserConfig.java#L169" target="_blank" rel="noopener">ParserConfig.java</a></li>
+<li>fastjson在新版本里denyList改为通过hashcode来隐藏掉package信息，但通过这个<a href="https://github.com/alibaba/fastjson/blob/1.2.47/src/test/java/com/alibaba/json/bvt/parser/deser/deny/DenyTest5.java" target="_blank" rel="noopener">DenyTest5</a>可以知道还是过滤掉常见危险类的package</li>
+<li>fastjson在新版本里默认把autoType的功能禁止掉了</li>
+</ul>
+<p><strong>这些序列化漏洞的根本原因是：没有控制序列化的类型范围。</strong></p>
+<p>仔细看的读者会发现并没有提及protobuf的反序列化漏洞，为什么在protobuf里并没有这些反序列化问题？</p>
+<ul>
+<li>protobuf在IDL里定义好了package范围</li>
+<li>protobuf的代码都是自动生成的，怎么处理二进制数据都是固定的</li>
+</ul>
+<p>protobuf把一切都框住了，少了灵活性，自然就少漏洞。</p>
+<p><strong>注：</strong>IDL（Interface description language）文件：参与通讯的各方需要对通讯的内容需要做相关的约定（Specifications）。为了建立一个与语言和平台无关的约定，这个约定需要采用与具体开发语言、平台无关的语言来进行描述。这种语言被称为接口描述语言（IDL），采用IDL撰写的协议约定称之为IDL文件。</p>
+<h2 id="总结："><a href="#总结：" class="headerlink" title="总结："></a>总结：</h2><p>本文总结了java反序列化的几种方式，并回顾了java几个经典的漏洞以及对应的修复方案，希望通过本文，大家对java反序列化漏洞有更深刻的认知。</p>
+<p><strong>参考链接：</strong></p>
+<p><a href="http://hengyunabc.github.io/thinking-about-grpc-protobuf/" target="_blank" rel="noopener">http://hengyunabc.github.io/thinking-about-grpc-protobuf/</a></p>
+<p><a href="https://blog.csdn.net/u011721501/article/details/78555246" target="_blank" rel="noopener">https://blog.csdn.net/u011721501/article/details/78555246</a></p>
+<p><a href="https://www.freebuf.com/sectool/165655.html" target="_blank" rel="noopener">https://www.freebuf.com/sectool/165655.html</a></p>
+<p><a href="https://www.cnblogs.com/he1m4n6a/p/10131566.html" target="_blank" rel="noopener">https://www.cnblogs.com/he1m4n6a/p/10131566.html</a></p>
+<p><a href="https://kevien.github.io/2018/06/18/FastJson反序列化漏洞(续)/" target="_blank" rel="noopener">https://kevien.github.io/2018/06/18/FastJson%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E6%BC%8F%E6%B4%9E(%E7%BB%AD)/</a></p>
+<p><a href="https://www.jianshu.com/p/e9e631285cb0" target="_blank" rel="noopener">https://www.jianshu.com/p/e9e631285cb0</a></p>
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        
+
+        
+
+        
+
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://github.com/he1m4n6a" target="_blank" rel="noopener">github</a></span>
+        <span>/</span>
+        
+        <span><a href="https://weibo.com/u/1736968374" target="_blank" rel="noopener">weibo</a></span>
+        <span>/</span>
+        
+        <span><a href="#">wechat</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="/js/index.js"></script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+    <script>
+        /**
+         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+        */
+        if( '' || '')
+        var disqus_config = function () {
+            this.page.url = '';  // Replace PAGE_URL with your page's canonical URL variable
+            this.page.identifier = ''; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document, s = d.createElement('script');
+            s.src = 'https://airclouds-blog.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+
+
+
+</html>
