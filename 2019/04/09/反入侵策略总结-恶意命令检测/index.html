@@ -178,34 +178,34 @@
 </ol>
 <p>使用<code>-l选项</code>可以列出所有的突变模块，并给出了大小和时间级别、描述等。</p>
 <p><strong>Command Obfuscators:</strong></p>
-<p>Name: Case Swapper</p>
-<p>Description: 相互转换所有大小写字符</p>
-<p>Name: Reverse</p>
-<p>Description: 反转一个命令</p>
+<p>​    Name: Case Swapper</p>
+<p>​    Description: 相互转换所有大小写字符</p>
+<p>​    Name: Reverse</p>
+<p>​    Description: 反转一个命令</p>
 <p><strong>String Obfuscators:</strong></p>
-<p>Name: File Glob</p>
-<p>Description: 使用文件和glob排序重新组装字符串</p>
-<p>Name: Folder Glob</p>
-<p>Description: 使用文件和glob排序重新组装字符串</p>
-<p>Name: Hex Hash</p>
-<p>Description: 使用md5的输出对字符串进行编码</p>
+<p>​    Name: File Glob</p>
+<p>​    Description: 使用文件和glob排序重新组装字符串</p>
+<p>​    Name: Folder Glob</p>
+<p>​    Description: 使用文件和glob排序重新组装字符串</p>
+<p>​    Name: Hex Hash</p>
+<p>​    Description: 使用md5的输出对字符串进行编码</p>
 <p><strong>Token Obfuscators:</strong></p>
-<p>Name: ForCode</p>
-<p>Description: 打乱命令并在一个循环里恢复</p>
-<p>Name: Special Char Only</p>
-<p>Description: 将命令转换为只使用特殊字符</p>
+<p>​    Name: ForCode</p>
+<p>​    Description: 打乱命令并在一个循环里恢复</p>
+<p>​    Name: Special Char Only</p>
+<p>​    Description: 将命令转换为只使用特殊字符</p>
 <p><strong>Encoders:</strong></p>
-<p>Name: Base64</p>
-<p>Description: Base64编码命令</p>
-<p>Name: RotN</p>
-<p>Description: 在ASCII字符集中将每个字符偏移随机次数</p>
-<p>Name: Xor Non Null</p>
-<p>Description: 使用perl中的xor运算符对字符串进行编码</p>
+<p>​    Name: Base64</p>
+<p>​    Description: Base64编码命令</p>
+<p>​    Name: RotN</p>
+<p>​    Description: 在ASCII字符集中将每个字符偏移随机次数</p>
+<p>​    Name: Xor Non Null</p>
+<p>​    Description: 使用perl中的xor运算符对字符串进行编码</p>
 <p><strong>Compressors:</strong></p>
-<p>Name: Bzip2</p>
-<p>Description: 使用bzip2压缩命令</p>
-<p>Name: Gzip</p>
-<p>Description: 使用gzip压缩命令</p>
+<p>​    Name: Bzip2</p>
+<p>​    Description: 使用bzip2压缩命令</p>
+<p>​    Name: Gzip</p>
+<p>​    Description: 使用gzip压缩命令</p>
 <h2 id="bash-调试功能"><a href="#bash-调试功能" class="headerlink" title="bash 调试功能"></a>bash 调试功能</h2><p>经常使用shell的，大家都应该知道 sh -x 这个命令，sh其实是bash的软连接，本质上还是调用的bash。sh -x可以打印出shell脚本的运行过程，这样就可以看到真正的执行命令，但是有一点不好，就是它真的会把命令执行起来。<strong>用它作为沙箱不合适，不仅浪费了检测的时间，还有可能被反调试</strong>。</p>
 <p>那我们的想法便是使用阉割版的bash，仅把命令打印出来但不执行。实现这一功能需要去修改源码后重新编译。可以参考：<a href="https://cloud.tencent.com/developer/article/1369290" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1369290</a></p>
 <h1 id="恶意命令"><a href="#恶意命令" class="headerlink" title="恶意命令"></a>恶意命令</h1><p>参考： <a href="https://techviral.net/dangerous-linux-commands/" target="_blank" rel="noopener">https://techviral.net/dangerous-linux-commands/</a></p>

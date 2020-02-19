@@ -89,7 +89,7 @@
     </div>
     
         <div id="toc" class="toc-article">
-    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#基线检测"><span class="toc-text">基线检测</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Sudoers检测"><span class="toc-text">Sudoers检测</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#不安全的加密算法"><span class="toc-text">不安全的加密算法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#低版本软件"><span class="toc-text">低版本软件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三方组件漏洞检测"><span class="toc-text">三方组件漏洞检测</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#基本检测"><span class="toc-text">基本检测</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#特权账户检测"><span class="toc-text">特权账户检测</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#异常账户检测"><span class="toc-text">异常账户检测</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#暴力破解检测"><span class="toc-text">暴力破解检测</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#弱口令账户检测"><span class="toc-text">弱口令账户检测</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#系统弱口令"><span class="toc-text">系统弱口令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DB弱口令空口令"><span class="toc-text">DB弱口令空口令</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Mysql"><span class="toc-text">Mysql</span></a></li></ol></li></ol></li></ol></li></ol>
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#基线检测"><span class="toc-text">基线检测</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Sudoers检测"><span class="toc-text">Sudoers检测</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#不安全的加密算法"><span class="toc-text">不安全的加密算法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#低版本软件"><span class="toc-text">低版本软件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三方组件漏洞检测"><span class="toc-text">三方组件漏洞检测</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#基本检测"><span class="toc-text">基本检测</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#特权账户检测"><span class="toc-text">特权账户检测</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#异常账户检测"><span class="toc-text">异常账户检测</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#暴力破解检测"><span class="toc-text">暴力破解检测</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#弱口令账户检测"><span class="toc-text">弱口令账户检测</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#系统弱口令"><span class="toc-text">系统弱口令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DB弱口令空口令"><span class="toc-text">DB弱口令空口令</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Mysql"><span class="toc-text">Mysql</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#其他DB"><span class="toc-text">其他DB</span></a></li></ol></li></ol></li></ol></li></ol>
 </div>
     
 </div>
@@ -241,16 +241,26 @@
 </ol>
 <h3 id="DB弱口令空口令"><a href="#DB弱口令空口令" class="headerlink" title="DB弱口令空口令"></a>DB弱口令空口令</h3><h4 id="Mysql"><a href="#Mysql" class="headerlink" title="Mysql"></a>Mysql</h4><p>mysql弱口令探测不使用直接连接爆破，而是去爆破存储密码hash文件的user.MYD。</p>
 <ol>
-<li><p>通过mysql进程pid，获取/proc/[mysql_pid]/cwd/mysql/user.MYD，<code>strings user.MYD</code>然后解析提取里面的hash值。</p>
+<li>通过mysql进程pid，获取/proc/[mysql_pid]/cwd/mysql/user.MYD，<code>strings user.MYD</code>然后解析提取里面的hash值。</li>
+<li>mysql加密方式是通过两次SHA1加密<code>SHA1(SHA1($pass))</code> ，<a href="https://blog.csdn.net/xluren/article/details/17539719" target="_blank" rel="noopener">python代码</a>实现很简单。</li>
+</ol>
+<h4 id="其他DB"><a href="#其他DB" class="headerlink" title="其他DB"></a>其他DB</h4><p>常用</p>
+<figure class="highlight asciidoc"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="bullet">- </span>Mysql</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="bullet">- </span>MongoDB</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="bullet">- </span>Postgresql</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="bullet">- </span>Redis</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"><span class="bullet">- </span>Memcached</span></pre></td></tr></table></figure>
+
+<ol>
+<li><p>这几个是常用的数据库，检测逻辑是<strong>主动发起一个连接</strong>，看是否能链接成功，可以检测弱口令以及空口令的情况。</p>
 </li>
-<li><p>mysql加密方式是通过两次SHA1加密<code>SHA1(SHA1($pass))</code> ，<a href="https://blog.csdn.net/xluren/article/details/17539719" target="_blank" rel="noopener">python代码</a>实现很简单。</p>
+<li><p>发起连接后，最后都要调用下close，确保连接关闭。</p>
+</li>
+<li><p>Mysql检测文件的方法难检测空口令，可以用这种主动连接的方式进行检测。</p>
 </li>
 </ol>
+<p>实现逻辑参考：<a href="https://github.com/y1ng1996/F-Scrack/blob/master/F-Scrack.py" target="_blank" rel="noopener">https://github.com/y1ng1996/F-Scrack/blob/master/F-Scrack.py</a></p>
 <p><strong>参考：</strong></p>
 <p><a href="https://blog.csdn.net/pyufftj/article/details/28012219" target="_blank" rel="noopener">https://blog.csdn.net/pyufftj/article/details/28012219</a></p>
 <p><a href="https://zhuanlan.zhihu.com/p/37165658" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/37165658</a></p>
 <p><a href="https://wiki.silic.wiki/习科旧站:获取mysql中user.myd中hash技巧" target="_blank" rel="noopener">https://wiki.silic.wiki/习科旧站:获取mysql中user.myd中hash技巧</a></p>
-<p><img src="https://common.cnblogs.com/editor/tiny_mce/themes/advanced/img/trans.gif" alt="img"></p>
+<p><a href="https://xz.aliyun.com/t/6172" target="_blank" rel="noopener">https://xz.aliyun.com/t/6172</a></p>
 
         
             <div class="donate-container">
