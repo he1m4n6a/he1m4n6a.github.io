@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="He1m4n6a的博客">
+    <meta name="keyword"  content="腾讯">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        反入侵策略总结-基础信息搜集 - He1m4n6a的博客 | He1m4n6a&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/aircloud.css">
+    <link rel="stylesheet" href="/css/gitment.css">
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar ">
+            <img src="/img/avatar.jpg" />
+        </div>
+        <div class="name">
+            <i>He1m4n6a</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archive">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#前言"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#介绍"><span class="toc-text">介绍</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#架构"><span class="toc-text">架构</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#功能"><span class="toc-text">功能</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#信息搜集"><span class="toc-text">信息搜集</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#系统基本信息"><span class="toc-text">系统基本信息</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#重要文件监控"><span class="toc-text">重要文件监控</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#日志搜集"><span class="toc-text">日志搜集</span></a></li></ol></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        反入侵策略总结-基础信息搜集
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2019-04-01 21:26:49</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#反入侵" title="反入侵">反入侵</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#基础信息搜集" title="基础信息搜集">基础信息搜集</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本系列文章将对HIDS做个简介，互联网团队自研一个HIDS系统，需要研发、策略、运营。研发和运营将不做介绍，本系列就对HIDS的核心<strong>（安全策略）</strong>做个简单的研究。基本上是根据自己的整理的思维导图做个梳理<strong>（暂时只研究linux的策略）</strong>：</p>
+<p><img src="/images/a10/1.png" alt="1"></p>
+<h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>主机入侵检测系统（HIDS）是基于主机的入侵检测系统，部署在需要防护的主机服务器上的代理程序，用于监控和报告系统配置和应用程序活动。一些常见的功能包括日志分析，完整性测试、策略实施和rootkit检测。自研的HIDS可以针对特定用例进行定制，使得安全研究中可以及时方便的构建自定义规则。目前开源的入侵检测系统有大名鼎鼎的ossec、国内开源的yulong以及facebook的osquery。HIDS检测的核心数据包含<strong>命令、网络、文件</strong>三大类型，文件产生进程、进程产生网络。HIDS的各种安全策略都是通过这3种类型进行安全分析而得出的规则。</p>
+<h1 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h1><p>目前大部分的HIDS平台建设主要分三大部分：<strong>终端Agent监控组件，Dashboard控制面板和与SIEM、运维数据等其他平台对接的接口集合</strong>。</p>
+<p><strong>终端Agent组件：</strong>主要作用包括监控文件变更、监控服务器状态、下发一些操作指令等。</p>
+<p><strong>DashBoard：</strong>用来执行一些策略推送、资源管理方面的操作</p>
+<p><strong>MQ &amp;&amp; Servers：</strong>用来做负载均衡并吞吐数据到数据库</p>
+<p><strong>Database：</strong>数据库</p>
+<p><strong>SIEM APIs</strong>：用来将HIDS的数据和SIEM做整合</p>
+<p><img src="/images/a10/2.png" alt="img"></p>
+<h1 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h1><ol>
+<li><strong>基础信息收集：</strong>系统版本号、系统用户、web组件、数据库、三方组件包等信息，主要用于CVE漏洞检测以及应急响应。</li>
+<li><strong>日志监控：</strong>主要是登录相关的日志、bash日志以及webserver产生的日志，主用用做异常登录监控、危险命令监控以及基础DOS检测。</li>
+<li><strong>文件监控：</strong>新增文件、敏感权限文件、核心文件变动监控、crontab文件监控，主要用于rookit检测、webshell监控等。</li>
+<li><strong>进程监控：</strong>主要用于木马、反弹shell、rookit等检测。</li>
+<li><strong>流量监控：</strong>主要用于木马，反弹shell等发生网络行为的一些异常监控。</li>
+<li><strong>系统命令监控：</strong>主要用于入侵后命令执行的检测。</li>
+</ol>
+<h1 id="信息搜集"><a href="#信息搜集" class="headerlink" title="信息搜集"></a>信息搜集</h1><h2 id="系统基本信息"><a href="#系统基本信息" class="headerlink" title="系统基本信息"></a>系统基本信息</h2><ul>
+<li><p><strong>系统版本：</strong>可以使用命令<code>uname –r</code>,<code>uname –m</code>或者查看<code>/etc/issue</code>, <code>/etc/readhat-release</code>进行系统版本信息搜集。</p>
+</li>
+<li><p><strong>用户信息：</strong>通过<code>/etc/passwd</code>文件搜集用户信息，剔除nologin的用户</p>
+</li>
+<li><p><strong>进程信息：</strong>通过遍历/proc目录下获取所有的进程信息，取信息参考[/proc目录结构](<a href="https://common.cnblogs.com/editor/tiny_mce/plugins/preview/" target="_blank" rel="noopener">https://common.cnblogs.com/editor/tiny_mce/plugins/preview/</a> <a href="http://man7.org/linux/man-pages/man5/proc.5.html" target="_blank" rel="noopener">http://man7.org/linux/man-pages/man5/proc.5.html</a> )</p>
+</li>
+<li><p><strong>环境变量信息</strong>：切换到各个用户，运行以下[命令](<a href="https://common.cnblogs.com/editor/tiny_mce/plugins/preview/" target="_blank" rel="noopener">https://common.cnblogs.com/editor/tiny_mce/plugins/preview/</a> <a href="https://www.jianshu.com/p/fec33aed017b)。" target="_blank" rel="noopener">https://www.jianshu.com/p/fec33aed017b)。</a></p>
+<ul>
+<li>set命令显示当前shell的变量，包括当前用户的变量;</li>
+<li>env命令显示当前用户的变量;</li>
+<li>export命令显示当前导出成用户变量的shell变量。</li>
+</ul>
+</li>
+<li><p><strong>WEB Server进程信息：</strong>通过监控到的所有的进程信息，筛选出命令行运行了<code>nginx|httpd|apache|tomcat|weblogic|jboss|jetty</code>等webserver的信息。通过<code>/proc/[pid]/cmdline</code>获取到服务运行的命令行，一般是用于搜集webserver的版本号以及webserver的web代码路径。不同的webserver要通过不同的方法的命令和方法获得，例如nginx可以通过找到nginx的路径运行<code>nginx –v</code>获得版本信息，通过读取<code>/proc/[pid]/cmdline</code>命令行信息匹配-c的内容或者<code>/proc/[pid]/cwd</code>运行目录获取到web文件的路径。</p>
+</li>
+<li><p><strong>数据库信息进程信息：</strong>数据库配置路径和版本的获取方法和web路径获取方法类似。</p>
+</li>
+<li><p><strong>三方组件信息：</strong>三方组件包最常见的就是java的三方组件，获取方法是遍历webservers三方路径下的jar文件。如果是war文件部署，还需要把war包解压，然后再重复上述步骤遍历.jar<strong>文件获取到三方组件的名字和版本号</strong>。另一种更优雅获取组件的方式可能是解析web应用的<a href="https://www.javatpoint.com/maven-pom-xml" target="_blank" rel="noopener">pom.xml</a>文件（并非所有java web应用程序都有），文件里的标签 ``管理着三方组件的信息。</p>
+<p>其他组件的搜集（例如ThinkPHP等框架），主要也就是匹配框架指纹（<a href="https://blog.51cto.com/simeon/2115190" target="_blank" rel="noopener">可能根据robots.txt文件，可能根据一个文件里的特定内容等）</a>这个就需要大家去网上或者自己搭建搜集指纹，可以优先常用cms的识别方法，后期可慢慢优化添加其他框架。</p>
+</li>
+<li><p><strong>crontab信息：</strong><code>/etc/crontab</code>文件保存系统计划任务，<code>/var/spool/cron/</code>文件夹保存用户计划任务</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="string">"/etc/cron.d/"</span>, // system all</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="string">"/var/at/tabs/"</span>, // <span class="keyword">user</span> <span class="title">mac</span>:lion</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="string">"/var/spool/cron/"</span>, // <span class="keyword">user</span> <span class="title">linux</span>:centos</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="string">"/var/spool/cron/crontabs/"</span>, // <span class="keyword">user</span> <span class="title">linux</span>:debian</span></pre></td></tr></table></figure>
+
+<p>上面的路径是<a href="https://github.com/osquery/osquery" target="_blank" rel="noopener">开源HIDS</a>里定义的</p>
+</li>
+</ul>
+<h2 id="重要文件监控"><a href="#重要文件监控" class="headerlink" title="重要文件监控"></a>重要文件监控</h2><p>这项功能实现很简单，就是定时计算整个目录下文件或者单个的Hash值并存储起来。但是哪些文件属于重要文件就需要安全人员去研究定义，这个过程可能不是一蹴而就，一方面可能新的漏洞层出不穷，一方面是受限于个人的知识点有限，无法梳理出所有通用的漏洞策略。以下是一些我的不完全整理：</p>
+<ul>
+<li><p><strong><code>/bin/ps</code>、<code>/bin/netstat</code>、<code>/usr/sbin/lsof</code>、<code>/usr/bin/top</code>等命令：</strong>rookit时候hacker可能会替换这些系统命令</p>
+</li>
+<li><p><strong>libc.so文件：</strong>ubuntu平台<code>/usr/lib/x86_64-linux-gnu/libc.so</code>，centos平台<code>/lib64/libc.so.6</code>。查看某个平台具体的libc.so文件路径，可以运行<code>ldd ls | grep libc.so</code>。</p>
+</li>
+<li><p><strong>开机启动文件：</strong></p>
+<ul>
+<li><p>/etc/init.d是 /etc/rc.d/init.d 的软链接，测试新装的linux系统必须开启的服务</p>
+<p><code>ssd、rsyslog、network、crond</code></p>
+</li>
+<li><p>[/etc/rc.local](<a href="https://common.cnblogs.com/editor/tiny_mce/plugins/preview/" target="_blank" rel="noopener">https://common.cnblogs.com/editor/tiny_mce/plugins/preview/</a>  <a href="https://www.landui.com/help/nshow-8196.html" target="_blank" rel="noopener">https://www.landui.com/help/nshow-8196.html</a>  )</p>
+<ul>
+<li><p>基于白名单过滤，查找异常的执行命令</p>
+</li>
+<li><p>基于已知的特征做数量统计或异常行为分析。</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p><strong>/etc/profile文件：</strong>本文件可设置全局的系统变量。</p>
+</li>
+<li><p><strong>内核模块：</strong> <code>ls -alt /sys/module</code></p>
+</li>
+<li><p><strong>预加载文件：</strong>/etc/ld.so.preload</p>
+</li>
+</ul>
+<h2 id="日志搜集"><a href="#日志搜集" class="headerlink" title="日志搜集"></a>日志搜集</h2><ul>
+<li><strong>/var/log/secure：</strong>Linux系统的安全日志，记录用户和工作组变化情况、用户登陆认证情况。一般入侵告警ssh被尝试爆破就是通过这个文件来进行规则制定的。</li>
+<li><strong>/var/log/wtmp：</strong>该日志文件永久记录每个用户登录、注销及系统的启动、停机的事件，这个文件是二进制文件，cat查看不了，可以使用last命令查看。此文件可用于异常用户登录检测，通过检测异常的IP和登录地进行告警。</li>
+<li><strong>history日志：</strong>监控用户输入的历史命令，后续会讲到具体做法。</li>
+<li><strong>webserver日志：</strong>主要用于应急响应或者做些cc攻击的防御，是否集成到HIDS里有待商榷。定位到日志的具体路径是难点，做简单的cc攻击防御的话，最简单可以通过ip时间段内访问频率来设置防御策略。</li>
+</ul>
+<p><strong>参考：</strong></p>
+<p><a href="https://www.freebuf.com/articles/es/197337.html" target="_blank" rel="noopener">https://www.freebuf.com/articles/es/197337.html</a></p>
+<p><a href="https://www.freebuf.com/articles/es/194510.html" target="_blank" rel="noopener">https://www.freebuf.com/articles/es/194510.html</a></p>
+<p><img src="https://common.cnblogs.com/editor/tiny_mce/themes/advanced/img/trans.gif" alt="img"></p>
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        
+
+        
+
+        
+
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://github.com/he1m4n6a" target="_blank" rel="noopener">github</a></span>
+        <span>/</span>
+        
+        <span><a href="https://weibo.com/u/1736968374" target="_blank" rel="noopener">weibo</a></span>
+        <span>/</span>
+        
+        <span><a href="#">wechat</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="/js/index.js"></script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+    <script>
+        /**
+         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+        */
+        if( '' || '')
+        var disqus_config = function () {
+            this.page.url = '';  // Replace PAGE_URL with your page's canonical URL variable
+            this.page.identifier = ''; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document, s = d.createElement('script');
+            s.src = 'https://airclouds-blog.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+
+
+
+</html>
