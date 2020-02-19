@@ -181,7 +181,7 @@
 <p>其他组件的搜集（例如ThinkPHP等框架），主要也就是匹配框架指纹（<a href="https://blog.51cto.com/simeon/2115190" target="_blank" rel="noopener">可能根据robots.txt文件，可能根据一个文件里的特定内容等）</a>这个就需要大家去网上或者自己搭建搜集指纹，可以优先常用cms的识别方法，后期可慢慢优化添加其他框架。</p>
 </li>
 <li><p><strong>crontab信息：</strong><code>/etc/crontab</code>文件保存系统计划任务，<code>/var/spool/cron/</code>文件夹保存用户计划任务</p>
-<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="string">"/etc/cron.d/"</span>, // system all</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="string">"/var/at/tabs/"</span>, // <span class="keyword">user</span> <span class="title">mac</span>:lion</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="string">"/var/spool/cron/"</span>, // <span class="keyword">user</span> <span class="title">linux</span>:centos</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="string">"/var/spool/cron/crontabs/"</span>, // <span class="keyword">user</span> <span class="title">linux</span>:debian</span></pre></td></tr></table></figure>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="string">"/etc/cron.d/"</span>, <span class="comment">// system all</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="string">"/var/at/tabs/"</span>, <span class="comment">// user mac:lion</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="string">"/var/spool/cron/"</span>, <span class="comment">// user linux:centos</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="string">"/var/spool/cron/crontabs/"</span>, <span class="comment">// user linux:debian</span></span></pre></td></tr></table></figure>
 
 <p>上面的路径是<a href="https://github.com/osquery/osquery" target="_blank" rel="noopener">开源HIDS</a>里定义的</p>
 </li>
@@ -223,7 +223,6 @@
 <p><strong>参考：</strong></p>
 <p><a href="https://www.freebuf.com/articles/es/197337.html" target="_blank" rel="noopener">https://www.freebuf.com/articles/es/197337.html</a></p>
 <p><a href="https://www.freebuf.com/articles/es/194510.html" target="_blank" rel="noopener">https://www.freebuf.com/articles/es/194510.html</a></p>
-<p><img src="https://common.cnblogs.com/editor/tiny_mce/themes/advanced/img/trans.gif" alt="img"></p>
 
         
             <div class="donate-container">

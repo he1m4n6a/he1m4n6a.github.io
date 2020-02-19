@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="He1m4n6a的博客">
+    <meta name="keyword"  content="腾讯">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        反入侵策略总结-基础检测 - He1m4n6a的博客 | He1m4n6a&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/aircloud.css">
+    <link rel="stylesheet" href="/css/gitment.css">
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar ">
+            <img src="/img/avatar.jpg" />
+        </div>
+        <div class="name">
+            <i>He1m4n6a</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archive">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#基线检测"><span class="toc-text">基线检测</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Sudoers检测"><span class="toc-text">Sudoers检测</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#不安全的加密算法"><span class="toc-text">不安全的加密算法</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#低版本软件"><span class="toc-text">低版本软件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#三方组件漏洞检测"><span class="toc-text">三方组件漏洞检测</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#基本检测"><span class="toc-text">基本检测</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#特权账户检测"><span class="toc-text">特权账户检测</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#异常账户检测"><span class="toc-text">异常账户检测</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#暴力破解检测"><span class="toc-text">暴力破解检测</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#弱口令账户检测"><span class="toc-text">弱口令账户检测</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#系统弱口令"><span class="toc-text">系统弱口令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DB弱口令空口令"><span class="toc-text">DB弱口令空口令</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Mysql"><span class="toc-text">Mysql</span></a></li></ol></li></ol></li></ol></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        反入侵策略总结-基础检测
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2019-04-05 21:42:21</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#反入侵" title="反入侵">反入侵</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#基线检测" title="基线检测">基线检测</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#弱口令检测" title="弱口令检测">弱口令检测</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <h1 id="基线检测"><a href="#基线检测" class="headerlink" title="基线检测"></a>基线检测</h1><p>基线检测应该是HIDS最基础的功能，不管是为了合规还是为了等保测试，基线应该说是最基础也是最重要的一项检测。</p>
+<h2 id="Sudoers检测"><a href="#Sudoers检测" class="headerlink" title="Sudoers检测"></a>Sudoers检测</h2><p>配置用例： <code>user1 ALL=(ALL) NOPASSWD: ALL</code></p>
+<p><a href="https://blog.csdn.net/Field_Yang/article/details/51547804" target="_blank" rel="noopener">对应含义</a>： <code>用户 登录的主机=(可以变换的身份) 不需要密码执行: 可以执行的命令</code></p>
+<p><strong>归纳五种危险的配置：</strong></p>
+<ol>
+<li><p><strong>未明确限制可以使用命令白名单的用户</strong></p>
+<p><code>ALL ALL=(root) NOPASSWD:CMD</code></p>
+<p>第一个ALL表示所有用户都可以使用申请的命令白命令。 该配置扩大了可以升权的用户范围，存在潜在提权风险。</p>
+</li>
+<li><p><strong>未明确限制升权后的用户</strong></p>
+<p><code>username ALL=(ALL) NOPASSWD:CMD</code></p>
+<p>括号里ALL表示用户可以升权到任意用户（配置成root也是高风险），包括root和其他所有用户。该配置扩大了升权后的用户范围，存在潜在提权风险。</p>
+</li>
+<li><p><strong>待升权命令的自身访问权限较低，存在被替换风险</strong></p>
+<p><code>user1 ALL=(root) NOPASSWD:/home/user1/test</code></p>
+<p>/home/user1/test的自身访问权限为user1。用户获得user1权限后，可以把该命令替换为某个破坏性命令导致提权。</p>
+</li>
+<li><p><strong>待升权命令仅包含命令，而没有明确参数</strong></p>
+<p><code>username ALL=(root) NOPASSWD:/bin/bash</code></p>
+<p>配置了/bin/bash，没有限制对应的参数（执行的脚本），可导致执行任意脚本提权。</p>
+</li>
+<li><p><strong>待升权命令中使用”*”不当</strong></p>
+<p><code>user1 ALL=(root) NOPASSWD:/sbin/ip netns exec qrouter-[0-9a-z]* timeout 5 /sbin/tcpdump -s 60 -c [1-3]*</code></p>
+<p>这里申请的命令/sbin/ip，不再是单独的命令，而是加上了参数，但是该参数中使用了通配符”<em>” 。 ”</em>”作为通配符，可以匹配任意个字符，包括空格，分号等。所以可以匹配任意命令。</p>
+</li>
+</ol>
+<p><strong>检测规则：</strong></p>
+<ol>
+<li>上面讲了5条基本的危险配置，可以简单的归结为<code>(可以变换的身份)</code>为<code>root|ALL</code>，后面为<code>NOPASSWD</code>就很可能存在风险。即可提炼出正则规则，配置告警。</li>
+<li>根据实际情况，如果实际业务中上面的误报多，就可以对最后一步命令的进行进一步的监控过滤。可采取白名单或者黑名单命令的形式进行监控，黑名单命令例如：<code>su</code>、<code>sh</code>·、<code>rm</code>等（一切可能会危害系统的命令）。如果是加了参数，就监控参数中是否包含“*”号。</li>
+</ol>
+<h2 id="不安全的加密算法"><a href="#不安全的加密算法" class="headerlink" title="不安全的加密算法"></a>不安全的加密算法</h2><ol>
+<li>不安全的SSH 协议： 检测etc/ssh/sshd_config的Protocal是否支持SSH1</li>
+<li>不安全/etc/shadow加密协议（弱口令检测讲解到）</li>
+</ol>
+<h2 id="低版本软件"><a href="#低版本软件" class="headerlink" title="低版本软件"></a>低版本软件</h2><p><strong>检测规则：</strong></p>
+<ol>
+<li>根据信息搜集模块搜集到的版本信息，定义漏洞版本的规则，若匹配到规则则告警。包括但不限于：<ul>
+<li>内核系统低版本</li>
+<li>ssh低版本</li>
+<li>各种DB低版本</li>
+<li>nginx低版本</li>
+</ul>
+</li>
+</ol>
+<h2 id="三方组件漏洞检测"><a href="#三方组件漏洞检测" class="headerlink" title="三方组件漏洞检测"></a>三方组件漏洞检测</h2><p>三方组件一般是检测CVE漏洞， 关于CVE漏洞库的匹配， [OWASP Dependency Check](<a href="https://common.cnblogs.com/editor/tiny_mce/plugins/preview/" target="_blank" rel="noopener">https://common.cnblogs.com/editor/tiny_mce/plugins/preview/</a> <a href="https://github.com/jeremylong/DependencyCheck" target="_blank" rel="noopener">https://github.com/jeremylong/DependencyCheck</a> )这款工具可以检测，如何嵌入到主机扫描系统中：</p>
+<ul>
+<li>通过看OWASP Dependency Check源码自己实现类似的检测逻辑或者直接复用它的数据库，不过要定时更新。</li>
+<li>上述的逻辑最好是单独的一个模块或者组件，提供一个API接口，主机扫描系统只要输入对应的组件的版本信息，就能得到漏洞的反馈信息。</li>
+</ul>
+<h1 id="基本检测"><a href="#基本检测" class="headerlink" title="基本检测"></a>基本检测</h1><h2 id="特权账户检测"><a href="#特权账户检测" class="headerlink" title="特权账户检测"></a>特权账户检测</h2><p><strong>检测规则：</strong></p>
+<ol>
+<li>通过之前的信息搜集模块搜集到的用户信息，判断是否存在uid=0且用户名不为root的特权账户。</li>
+</ol>
+<h2 id="异常账户检测"><a href="#异常账户检测" class="headerlink" title="异常账户检测"></a>异常账户检测</h2><p><strong>检测规则：</strong></p>
+<ol>
+<li>通过历史登录情况自动总结归纳常用登录账户和地点（或者提供添加白名单功能）</li>
+<li>监控<code>/var/log/secure</code>或者<code>/var/log/auth.log</code>SSH的登陆情况，若存在成功事件并且用户不在白名单上，则告警。</li>
+</ol>
+<h2 id="暴力破解检测"><a href="#暴力破解检测" class="headerlink" title="暴力破解检测"></a>暴力破解检测</h2><p><strong>检测规则：</strong></p>
+<ol>
+<li>依旧是就监控<code>/var/log/secure</code>或者<code>/var/log/auth.log</code>的登陆情况，定义一定的时间内某IP尝试登陆失败的次数大于某个阈值则告警。</li>
+<li>大型互联网的机器可能经常受到攻击，不想每次都告警，可以在1的基础上加上特定条件-<strong>失败多次后存在登陆成功的事件</strong>，则告警。</li>
+</ol>
+<h2 id="弱口令账户检测"><a href="#弱口令账户检测" class="headerlink" title="弱口令账户检测"></a>弱口令账户检测</h2><h3 id="系统弱口令"><a href="#系统弱口令" class="headerlink" title="系统弱口令"></a>系统弱口令</h3><p>shadow中存放的<a href="http://www.voidcn.com/article/p-kkjoukbh-qg.html" target="_blank" rel="noopener">密码密文格式</a>如下：<code>$id$salt$encrypted</code></p>
+<p>其中id是指使用的哈希算法，可取如下值：</p>
+<table>
+<thead>
+<tr>
+<th>ID</th>
+<th>Method</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>MD5</td>
+</tr>
+<tr>
+<td>2a</td>
+<td>Blowfish (not in mainline glibc; added in some Linux distributions)</td>
+</tr>
+<tr>
+<td>5</td>
+<td>SHA-256 (since glibc 2.7)</td>
+</tr>
+<tr>
+<td>6</td>
+<td>SHA-256 (since glibc 2.7)</td>
+</tr>
+</tbody></table>
+<p><strong>检测规则：</strong></p>
+<ol>
+<li>查看ID是否为6，不为6告警加密算法强度不够</li>
+<li>定义弱口令字典，根据<code>编码(hash(&quot;passwd＋salt&quot;))</code>规则加密弱口令字典，和/etc/shadow中的encrypted比较，相等则存在弱口令，代码可参考： <a href="https://kknews.cc/code/pyolgke.html" target="_blank" rel="noopener">https://kknews.cc/code/pyolgke.html</a></li>
+</ol>
+<h3 id="DB弱口令空口令"><a href="#DB弱口令空口令" class="headerlink" title="DB弱口令空口令"></a>DB弱口令空口令</h3><h4 id="Mysql"><a href="#Mysql" class="headerlink" title="Mysql"></a>Mysql</h4><p>mysql弱口令探测不使用直接连接爆破，而是去爆破存储密码hash文件的user.MYD。</p>
+<ol>
+<li><p>通过mysql进程pid，获取/proc/[mysql_pid]/cwd/mysql/user.MYD，<code>strings user.MYD</code>然后解析提取里面的hash值。</p>
+</li>
+<li><p>mysql加密方式是通过两次SHA1加密<code>SHA1(SHA1($pass))</code> ，<a href="https://blog.csdn.net/xluren/article/details/17539719" target="_blank" rel="noopener">python代码</a>实现很简单。</p>
+</li>
+</ol>
+<p><strong>参考：</strong></p>
+<p><a href="https://blog.csdn.net/pyufftj/article/details/28012219" target="_blank" rel="noopener">https://blog.csdn.net/pyufftj/article/details/28012219</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/37165658" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/37165658</a></p>
+<p><a href="https://wiki.silic.wiki/习科旧站:获取mysql中user.myd中hash技巧" target="_blank" rel="noopener">https://wiki.silic.wiki/习科旧站:获取mysql中user.myd中hash技巧</a></p>
+<p><img src="https://common.cnblogs.com/editor/tiny_mce/themes/advanced/img/trans.gif" alt="img"></p>
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        
+
+        
+
+        
+
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://github.com/he1m4n6a" target="_blank" rel="noopener">github</a></span>
+        <span>/</span>
+        
+        <span><a href="https://weibo.com/u/1736968374" target="_blank" rel="noopener">weibo</a></span>
+        <span>/</span>
+        
+        <span><a href="#">wechat</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="/js/index.js"></script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+    <script>
+        /**
+         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+        */
+        if( '' || '')
+        var disqus_config = function () {
+            this.page.url = '';  // Replace PAGE_URL with your page's canonical URL variable
+            this.page.identifier = ''; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document, s = d.createElement('script');
+            s.src = 'https://airclouds-blog.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+
+
+
+</html>
