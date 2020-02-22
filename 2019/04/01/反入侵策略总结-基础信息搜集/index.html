@@ -142,7 +142,6 @@
     </div>
     <div class="post-content ">
         <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本系列文章将对HIDS做个简介，互联网团队自研一个HIDS系统，需要研发、策略、运营。研发和运营将不做介绍，本系列就对HIDS的核心<strong>（安全策略）</strong>做个简单的研究。基本上是根据自己的整理的思维导图做个梳理<strong>（暂时只研究linux的策略）</strong>：</p>
-<p><img src="/images/a10/1.png" alt="1"></p>
 <h1 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h1><p>主机入侵检测系统（HIDS）是基于主机的入侵检测系统，部署在需要防护的主机服务器上的代理程序，用于监控和报告系统配置和应用程序活动。一些常见的功能包括日志分析，完整性测试、策略实施和rootkit检测。自研的HIDS可以针对特定用例进行定制，使得安全研究中可以及时方便的构建自定义规则。目前开源的入侵检测系统有大名鼎鼎的ossec、国内开源的yulong以及facebook的osquery。HIDS检测的核心数据包含<strong>命令、网络、文件</strong>三大类型，文件产生进程、进程产生网络。HIDS的各种安全策略都是通过这3种类型进行安全分析而得出的规则。</p>
 <h1 id="架构"><a href="#架构" class="headerlink" title="架构"></a>架构</h1><p>目前大部分的HIDS平台建设主要分三大部分：<strong>终端Agent监控组件，Dashboard控制面板和与SIEM、运维数据等其他平台对接的接口集合</strong>。</p>
 <p><strong>终端Agent组件：</strong>主要作用包括监控文件变更、监控服务器状态、下发一些操作指令等。</p>
@@ -150,7 +149,7 @@
 <p><strong>MQ &amp;&amp; Servers：</strong>用来做负载均衡并吞吐数据到数据库</p>
 <p><strong>Database：</strong>数据库</p>
 <p><strong>SIEM APIs</strong>：用来将HIDS的数据和SIEM做整合</p>
-<p><img src="/images/a10/2.png" alt="img"></p>
+<p><img src="/images/a10/1.png" alt="1"></p>
 <h1 id="功能"><a href="#功能" class="headerlink" title="功能"></a>功能</h1><ol>
 <li><strong>基础信息收集：</strong>系统版本号、系统用户、web组件、数据库、三方组件包等信息，主要用于CVE漏洞检测以及应急响应。</li>
 <li><strong>日志监控：</strong>主要是登录相关的日志、bash日志以及webserver产生的日志，主用用做异常登录监控、危险命令监控以及基础DOS检测。</li>
@@ -160,7 +159,9 @@
 <li><strong>系统命令监控：</strong>主要用于入侵后命令执行的检测。</li>
 </ol>
 <h1 id="信息搜集"><a href="#信息搜集" class="headerlink" title="信息搜集"></a>信息搜集</h1><h2 id="系统基本信息"><a href="#系统基本信息" class="headerlink" title="系统基本信息"></a>系统基本信息</h2><ul>
-<li><p><strong>系统版本：</strong>可以使用命令<code>uname –r</code>,<code>uname –m</code>或者查看<code>/etc/issue</code>, <code>/etc/readhat-release</code>进行系统版本信息搜集。</p>
+<li><p><strong>系统版本：</strong>根据操作系统解析相应 <code>/etc/readhat-release</code>、<code>/etc/redhat-release</code>、<code>/etc/gentoo-release</code>文件系统版本信息搜集。</p>
+</li>
+<li><p><strong>keneral信息：</strong>解析<code>/proc/cmdline</code>和<code>/proc/version</code></p>
 </li>
 <li><p><strong>用户信息：</strong>通过<code>/etc/passwd</code>文件搜集用户信息，剔除nologin的用户</p>
 </li>
@@ -173,6 +174,10 @@
 <li>export命令显示当前导出成用户变量的shell变量。</li>
 </ul>
 </li>
+<li><p><strong>已登录用户信息：</strong>已登录用户保存在<code>/var/run/utmp</code>（对应linux <code>who</code>命令），c函数<code>getutxent</code>可直接解析此文件获取信息</p>
+</li>
+<li><p><strong>历史登录用户信息：</strong>已登录用户保存在<code>/var/run/utmp</code>/（对用linux <code>last</code>命令），c函数<code>getutxent</code>可直接解析此文件获取信息</p>
+</li>
 <li><p><strong>WEB Server进程信息：</strong>通过监控到的所有的进程信息，筛选出命令行运行了<code>nginx|httpd|apache|tomcat|weblogic|jboss|jetty</code>等webserver的信息。通过<code>/proc/[pid]/cmdline</code>获取到服务运行的命令行，一般是用于搜集webserver的版本号以及webserver的web代码路径。不同的webserver要通过不同的方法的命令和方法获得，例如nginx可以通过找到nginx的路径运行<code>nginx –v</code>获得版本信息，通过读取<code>/proc/[pid]/cmdline</code>命令行信息匹配-c的内容或者<code>/proc/[pid]/cwd</code>运行目录获取到web文件的路径。</p>
 </li>
 <li><p><strong>数据库信息进程信息：</strong>数据库配置路径和版本的获取方法和web路径获取方法类似。</p>
@@ -184,6 +189,33 @@
 <figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="string">"/etc/cron.d/"</span>, <span class="comment">// system all</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="string">"/var/at/tabs/"</span>, <span class="comment">// user mac:lion</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="string">"/var/spool/cron/"</span>, <span class="comment">// user linux:centos</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="string">"/var/spool/cron/crontabs/"</span>, <span class="comment">// user linux:debian</span></span></pre></td></tr></table></figure>
 
 <p>上面的路径是<a href="https://github.com/osquery/osquery" target="_blank" rel="noopener">开源HIDS</a>里定义的</p>
+</li>
+<li><p><strong>authorized信息</strong>：遍历所有加目录下的<code>&quot;.ssh/authorized_keys&quot;,&quot;.ssh/authorized_keys2&quot;</code>文件</p>
+</li>
+<li><p><strong>konw_host文件：</strong>遍历所有用户家目录下的<code>.ssh/known_hosts</code>文件</p>
+</li>
+<li><p><strong>sudoers信息：</strong>解析<code>/etc/sudoers</code>和<code>/etc/sudoers.d/</code>目录下的文件</p>
+</li>
+<li><p><strong>iptables信息：</strong>解析<code>/proc/net/ip_tables_names</code>文件</p>
+</li>
+<li><p><strong>系统控制文件：</strong>解析系统控制配置文件</p>
+<ul>
+<li><p>系统文件路径：<code>/etc/sysct.conf</code></p>
+</li>
+<li><p>系统控制文件可能存在路径</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="string">"/run/sysctl.d/%.conf"</span>,           </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="string">"/etc/sysctl.d/%.conf"</span>,</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="string">"/usr/local/lib/sysctl.d/%.conf"</span>, </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="string">"/usr/lib/sysctl.d/%.conf"</span>,</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"><span class="string">"/lib/sysctl.d/%.conf"</span>,</span></pre></td></tr></table></figure>
+</li>
+</ul>
+</li>
+<li><p><strong>其他信息（非完整）：</strong></p>
+<ul>
+<li><strong>memory_map：</strong>解析<code>/proc/iomem</code></li>
+<li><strong>mounts：</strong>解析<code>/proc/mounts</code></li>
+<li><strong>modules：</strong>解析<code>/proc/modules</code></li>
+<li><strong>memory_info：</strong>解析<code>/proc/meminfo</code></li>
+<li><strong>shared_memory：</strong>通过<code>shmctl</code>函数遍历merory id从1遍历到最大</li>
+<li><strong>uptime：</strong>通过<code>sysctl</code>函数获取boottime</li>
+</ul>
 </li>
 </ul>
 <h2 id="重要文件监控"><a href="#重要文件监控" class="headerlink" title="重要文件监控"></a>重要文件监控</h2><p>这项功能实现很简单，就是定时计算整个目录下文件或者单个的Hash值并存储起来。但是哪些文件属于重要文件就需要安全人员去研究定义，这个过程可能不是一蹴而就，一方面可能新的漏洞层出不穷，一方面是受限于个人的知识点有限，无法梳理出所有通用的漏洞策略。以下是一些我的不完全整理：</p>
@@ -211,7 +243,12 @@
 </li>
 <li><p><strong>内核模块：</strong> <code>ls -alt /sys/module</code></p>
 </li>
-<li><p><strong>预加载文件：</strong>/etc/ld.so.preload</p>
+<li><p><strong>预加载文件：</strong><code>/etc/ld.so.preload</code></p>
+</li>
+<li><p><strong>suid文件监控：</strong>全局搜索是不太现实，一般服务器负载都比较高，全局搜索耗时和对系统负担大。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="string">"/bin"</span>,           </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="string">"/sbin"</span>,           </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="string">"/usr/bin"</span>, </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="string">"/usr/sbin"</span>,</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"><span class="string">"/usr/local/bin"</span>, </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"><span class="string">"/usr/local/sbin"</span>, </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="string">"/tmp"</span>,</span></pre></td></tr></table></figure>
+
+<p>搜索上述几个路径的文件，判断权限是<a href="https://www.cnblogs.com/sparkdev/p/9651622.html" target="_blank" rel="noopener">suid和guid</a></p>
 </li>
 </ul>
 <h2 id="日志搜集"><a href="#日志搜集" class="headerlink" title="日志搜集"></a>日志搜集</h2><ul>
@@ -223,6 +260,7 @@
 <p><strong>参考：</strong></p>
 <p><a href="https://www.freebuf.com/articles/es/197337.html" target="_blank" rel="noopener">https://www.freebuf.com/articles/es/197337.html</a></p>
 <p><a href="https://www.freebuf.com/articles/es/194510.html" target="_blank" rel="noopener">https://www.freebuf.com/articles/es/194510.html</a></p>
+<p><img src="https://common.cnblogs.com/editor/tiny_mce/themes/advanced/img/trans.gif" alt="img"></p>
 
         
             <div class="donate-container">
