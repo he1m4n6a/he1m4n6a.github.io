@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="He1m4n6a的博客">
+    <meta name="keyword"  content="腾讯">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        反入侵策略总结-进程网络监控 - He1m4n6a的博客 | He1m4n6a&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/aircloud.css">
+    <link rel="stylesheet" href="/css/gitment.css">
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar ">
+            <img src="/img/avatar.jpg" />
+        </div>
+        <div class="name">
+            <i>He1m4n6a</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archive">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#publisher-subscriber架构"><span class="toc-text">publisher/subscriber架构</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#auditd监控实战"><span class="toc-text">auditd监控实战</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#osquery解析audit"><span class="toc-text">osquery解析audit</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#进程监控"><span class="toc-text">进程监控</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#网络监控"><span class="toc-text">网络监控</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#文件监控"><span class="toc-text">文件监控</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#什么是inotify"><span class="toc-text">什么是inotify</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#原理"><span class="toc-text">原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用"><span class="toc-text">使用</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        反入侵策略总结-进程网络监控
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2020-02-22 17:31:06</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#反入侵" title="反入侵">反入侵</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#内核监控" title="内核监控">内核监控</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#audit" title="audit">audit</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#inotify" title="inotify">inotify</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <h1 id="publisher-subscriber架构"><a href="#publisher-subscriber架构" class="headerlink" title="publisher/subscriber架构"></a><code>publisher/subscriber</code>架构</h1><p>osquery使用了<a href="https://www.ibm.com/developerworks/cn/linux/l-lo-use-space-audit-tool/index.html" target="_blank" rel="noopener">auditd</a>来获取系统调用。关于系统调用的方法优缺点后面会讲到，现在学习介绍下osquery的p/s框架，优秀的框架对我们很有借鉴意义。</p>
+<h2 id="auditd监控实战"><a href="#auditd监控实战" class="headerlink" title="auditd监控实战"></a>auditd监控实战</h2><p>我们通过一个实际的例子来对<code>audit.log</code>的日志结构以及unix中的<code>connect</code>内核调用进行一个简单的说明。设置规则</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> auditctl -l</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">No rules</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> auditctl -a always,<span class="built_in">exit</span> -F arch=b64 -S connect</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> auditctl -l</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">-a always,exit -F arch=b64 -S connect</span></pre></td></tr></table></figure>
+
+<p>执行<code>curl www.baidu.com</code>，查看<code>/var/log/audit/audit.log</code>日志，找到其中与<code>curl www.baidu.com</code>相关的日志记录：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">type=SYSCALL msg=audit(1544195763.393:260010): arch=c000003e syscall=42 success=no exit=-115 a0=3 a1=7ffccb794910 a2=10 a3=7ffccb7941e0 items=0 ppid=53240 pid=17096 auid=1000 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0 tty=pts5 ses=1 comm="curl" exe="/usr/bin/curl" subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 key=(null)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">type=SOCKADDR msg=audit(1544195763.393:260010): saddr=0200005073EFD21B0000000000000000</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">type=PROCTITLE msg=audit(1544195763.393:260010): proctitle=6375726C007777772E62616964752E636F6D</span></pre></td></tr></table></figure>
+
+<p>此事件由三个记录组成（每个以<code>type=</code>作为开始）,共享相同的时间戳和编号(其中<code>1544192911.452</code>是时间戳，<code>28850</code>是事件编号)。每个记录包含好几对 name=value ，由空格或者逗号分开。<a href="https://access.redhat.com/documentation/zh-cn/red_hat_enterprise_linux/7/html/security_guide/sec-understanding_audit_log_files" target="_blank" rel="noopener">理解审核日志文件</a>对<code>audit.log</code>中的日志文件进行了详细地解释。<a href="https://access.redhat.com/documentation/zh-cn/red_hat_enterprise_linux/7/html/security_guide/app-Audit_Reference#sec-Audit_Events_Fields" target="_blank" rel="noopener">审核系统引用</a>对日志中的每一个<code>name=value</code>都进行了详细地说明。在本文仅仅只对其中几个关键的字段进行说明。</p>
+<ul>
+<li><code>type=SYSCALL</code>，其中<code>SYSCALL</code>就表示连接到 Kernel 的系统调用触发了这个记录，在<a href="https://access.redhat.com/documentation/zh-cn/red_hat_enterprise_linux/7/html/security_guide/sec-Audit_Record_Types" target="_blank" rel="noopener">审核记录类型</a>中记录了所有的类型。</li>
+<li><code>syscall=42</code>，表示当前的系统调用值是42，由于我们记录的<code>connect</code>内核调用，说明42就表示<code>connect</code>内核调用。<a href="https://www.ibm.com/developerworks/cn/linux/kernel/syscall/part1/appendix.html" target="_blank" rel="noopener">Linux系统调用列表</a>记录了所有的内核调用</li>
+<li><code>success=no</code>，表示这个系统调用是成功还是失败。在本例中是没有成功。</li>
+<li><code>exit=-115</code>,表示的是系统调用的返回值。</li>
+<li><code>exe=&quot;/usr/bin/curl&quot;</code>，记录了进程的可执行路径。</li>
+<li><code>saddr=0200005073EFD21B0000000000000000</code>，表示的是系统调用的远程地址。(因为是<code>connect</code>内核调用，那么必然会与远程服务器通信)</li>
+<li><code>proctitle=6375726C007777772E62616964752E636F6D</code>，记录的是具体的执行的命令。</li>
+<li><code>a0-a3</code>,记录了内核调用的前四个参数。</li>
+</ul>
+<p>由于其中的很多信息都进行了编码不便于我们理解，可以使用<code>ausearch</code>解析上面的audit的日志，由于已经知道了<code>event id</code>是<code>28850</code>,直接使用<code>ausearch --interpret -a 260010</code>解析。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">type=PROCTITLE msg=audit(12/07/2018 10:16:03.393:260010) : proctitle=curl www.baidu.com </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">type=SOCKADDR msg=audit(12/07/2018 10:16:03.393:260010) : saddr=&#123; fam=inet laddr=115.239.210.27 lport=80 &#125; </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">type=SYSCALL msg=audit(12/07/2018 10:16:03.393:260010) : arch=x86_64 syscall=connect success=no exit=EINPROGRESS(Operation now in progress) a0=0x3 a1=0x7ffccb794910 a2=0x10 a3=0x7ffccb7941e0 items=0 ppid=53240 pid=17096 auid=username uid=root gid=root euid=root suid=root fsuid=root egid=root sgid=root fsgid=root tty=pts5 ses=1 comm=curl exe=/usr/bin/curl subj=unconfined_u:unconfined_r:unconfined_t:s0-s0:c0.c1023 key=(null)</span></pre></td></tr></table></figure>
+
+<p>其中<code>proctitle=curl www.baidu.com</code>就解析出了我们的命令；<code>saddr={ fam=inet laddr=115.239.210.27 lport=80 }</code>解析除了<code>wwww.baidu.com</code>的IP地址(当然是DNS的地址),<code>auid=username</code>显示的是哪个用户执行的命令。</p>
+<h2 id="osquery解析audit"><a href="#osquery解析audit" class="headerlink" title="osquery解析audit"></a>osquery解析audit</h2><p>使用文档参考：<a href="https://s0osquery0readthedocs0io.icopy.site/en/latest/deployment/process-auditing/" target="_blank" rel="noopener">https://s0osquery0readthedocs0io.icopy.site/en/latest/deployment/process-auditing/</a></p>
+<p>osquery如果想要借助于<code>auditd</code>来获取信息，就需要关闭系统的<code>auditd</code>服务，由<code>osquery</code>来接管。<code>osquery</code>接管了之后就会默认地加入三条auditd的规则。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">-a always,exit -S connect-a always,exit -S bind-a always,exit -S execve</span></pre></td></tr></table></figure>
+
+<p>由于利用<code>auditd</code>获取数据的方式与之前说明的<code>shell_history</code>/<code>process_open_socket</code>方式完全不同，osquery采用了<code>event publisher/subscriber</code>的架构来处理。</p>
+<blockquote>
+<p>An osquery event publisher is a combination of a threaded run loop and event storage abstraction. The publisher loops on some selected resource or uses operating system APIs to register callbacks. The loop or callback introspects on the event and sends it to every appropriate subscriber. An osquery event subscriber will send subscriptions to a publisher, save published data, and react to a query by returning appropriate data.</p>
+</blockquote>
+<p>大致的中文意思是：osquery的事件发布结合了进程循环和事件存储。发布者(publisher )会对某些特定的资源循环或者是对操作系统的API回调。这些循环和回调得到信息之后就会发送至订阅者(subscriber)。这些订阅者就会保存数据，对SQL语句进行相应。</p>
+<h1 id="进程监控"><a href="#进程监控" class="headerlink" title="进程监控"></a>进程监控</h1><p><a href="https://he1m4n6a.github.io/2020/02/22/反入侵策略总结-内核监控方式/">https://he1m4n6a.github.io/2020/02/22/反入侵策略总结-内核监控方式/</a> 上篇总结了监控系统调用的几种方法，进程监控主要监控两方面：</p>
+<ol>
+<li>新建进程</li>
+<li>进程执行命令</li>
+</ol>
+<p><strong>新建进程用的是<code>fork</code>、<code>vfork</code>、<code>clone</code>这三个函数，我们在内核中监控三个对应的系统调用即可。</strong></p>
+<ul>
+<li><p><code>fork</code> fork创造的子进程是父进程的完整副本，复制了父亲进程的资源，包括内存的内容task_struct内容</p>
+</li>
+<li><p><code>vfork</code> vfork创建的子进程与父进程共享数据段,而且由vfork()创建的子进程将先于父进程运行</p>
+</li>
+<li><p><code>clone</code> Linux上创建线程一般使用的是pthread库 实际上linux也给我们提供了创建线程的系统调用，就是clone</p>
+</li>
+</ul>
+<p><strong>注意：</strong>当监控<code>clone</code>调用时候，需要剔除CLONE_THREAD</p>
+<p><strong>执行命命监控的是<code>execve</code>和<code>execveat</code>这两个系统调用。</strong></p>
+<ul>
+<li><a href="http://man7.org/linux/man-pages/man2/execve.2.html" target="_blank" rel="noopener">execve</a> 执行程序</li>
+<li><a href="http://man7.org/linux/man-pages/man2/execveat.2.html" target="_blank" rel="noopener">execveat</a> 执行一个关于目录描述符的程序</li>
+</ul>
+<h1 id="网络监控"><a href="#网络监控" class="headerlink" title="网络监控"></a>网络监控</h1><p>和进程监控类似，只不过监控的是内核调用<code>connec</code>和<code>bind</code></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">auto</span> &amp;event_data = boost::<span class="built_in">get</span>&lt;SyscallAuditEventData&gt;(event.data);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="comment">// 判断类别</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (event_data.syscall_number == __NR_connect) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">	row[<span class="string">"action"</span>] = <span class="string">"connect"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">&#125; <span class="keyword">else</span> <span class="keyword">if</span> (event_data.syscall_number == __NR_bind) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">	row[<span class="string">"action"</span>] = <span class="string">"bind"</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">&#125; <span class="keyword">else</span> &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">continue</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<h1 id="文件监控"><a href="#文件监控" class="headerlink" title="文件监控"></a>文件监控</h1><h2 id="什么是inotify"><a href="#什么是inotify" class="headerlink" title="什么是inotify"></a>什么是inotify</h2><p>inotify是Linux中用于监控文件系统变化的一个框架，不同于前一个框架dnotify, inotify可以实现基于inode的文件监控。也就是说监控对象不再局限于目录，也包含了文件。不仅如此，在事件的通知方面，inotify摈弃了dnotify的信号方式，采用在文件系统的处理函数中放置hook函数的方式实现。</p>
+<p>在inotify中，对于一个文件或目录的监控被称为一个watch。 给某一个文件或目录添加一个watch就表示要对该文件添加某一类型的监控。监控的类型由一个掩码Mask表示，mask有：</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="attr">IN_ACCESS</span> <span class="string">： 文件的读操作</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="attr">IN_ATTRIB</span> <span class="string">： 文件属性变化</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"><span class="attr">IN_CLOSE_WRITE</span> <span class="string">： 文件被关闭之前被写</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="attr">IN_CLOSE_NOWRITE</span> <span class="string">： 文件被关闭</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line"><span class="attr">IN_CREATE</span> <span class="string">： 新建文件</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line"><span class="attr">IN_DELETE</span> <span class="string">： 删除文件</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line"><span class="attr">IN_MODIFY</span> <span class="string">： 修改文件</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line"><span class="attr">IN_MOVE_SELF</span> <span class="string">： 被监控的文件或者目录被移动</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line"><span class="attr">IN_MOVED_FROM</span> <span class="string">： 文件从被监控的目录中移出</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line"><span class="attr">IN_MOVED_TO</span> <span class="string">： 文件从被监控的目录中移入</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line"><span class="attr">IN_OPEN</span> <span class="string">： 文件被打开</span></span></pre></td></tr></table></figure>
+
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>inotify通过在文件系统的操作函数(vfs_open, vfs_unlink等)中插入hook函数改变代码的执行路径，从而产生相应的事件。以下是一个hook函数的列表： <img src="../images/a12/1.png" alt="img"> </p>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>Inotify 提供 3 个系统调用，它们可以构建各种各样的文件系统监控器：</p>
+<ul>
+<li><code>inotify_init()</code> 在内核中创建 inotify 子系统的一个实例，成功的话将返回一个文件描述符，失败则返回 -1。就像其他系统调用一样，如果 <code>inotify_init()</code> 失败，请检查 <code>errno</code> 以获得诊断信息。</li>
+<li>顾名思义，<code>inotify_add_watch()</code> 用于添加监视器。每个监视器必须提供一个路径名和相关事件的列表（每个事件由一个常量指定，比如 IN_MODIFY）。要监控多个事件，只需在事件之间使用逻辑操作符<em>或</em> — C 语言中的管道线（<code>|</code>）操作符。如果 <code>inotify_add_watch()</code> 成功，该调用会为已注册的监视器返回一个惟一的标识符；否则，返回 -1。使用这个标识符更改或删除相关的监视器。</li>
+<li><code>inotify_rm_watch()</code> 删除一个监视器。</li>
+</ul>
+<p><strong>监控创建、删除和修改事件的目录代码:</strong></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;errno.h&gt;</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/types.h&gt;</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/inotify.h&gt;</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> EVENT_SIZE  ( sizeof (struct inotify_event) )</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> BUF_LEN     ( 1024 * ( EVENT_SIZE + 16 ) )</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">( <span class="keyword">int</span> argc, <span class="keyword">char</span> **argv )</span> </span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line"><span class="function"></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">  <span class="keyword">int</span> length, i = <span class="number">0</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">  <span class="keyword">int</span> fd;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">  <span class="keyword">int</span> wd;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">  <span class="keyword">char</span> <span class="built_in">buffer</span>[BUF_LEN];</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">  fd = inotify_init();</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">  <span class="keyword">if</span> ( fd &lt; <span class="number">0</span> ) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">    perror( <span class="string">"inotify_init"</span> );</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">  &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line">  wd = inotify_add_watch( fd, <span class="string">"/home/strike"</span>, </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">24</span></pre></td><td class="code"><pre><span class="line">                         IN_MODIFY | IN_CREATE | IN_DELETE );</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">25</span></pre></td><td class="code"><pre><span class="line">  length = <span class="built_in">read</span>( fd, <span class="built_in">buffer</span>, BUF_LEN );  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">26</span></pre></td><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">27</span></pre></td><td class="code"><pre><span class="line">  <span class="keyword">if</span> ( length &lt; <span class="number">0</span> ) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">28</span></pre></td><td class="code"><pre><span class="line">    perror( <span class="string">"read"</span> );</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">29</span></pre></td><td class="code"><pre><span class="line">  &#125;  </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">30</span></pre></td><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">31</span></pre></td><td class="code"><pre><span class="line">  <span class="keyword">while</span> ( i &lt; length ) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">32</span></pre></td><td class="code"><pre><span class="line">    <span class="class"><span class="keyword">struct</span> <span class="title">inotify_event</span> *<span class="title">event</span> = ( <span class="title">struct</span> <span class="title">inotify_event</span> * ) &amp;<span class="title">buffer</span>[ <span class="title">i</span> ];</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">33</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">if</span> ( event-&gt;len ) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">34</span></pre></td><td class="code"><pre><span class="line">      <span class="keyword">if</span> ( event-&gt;mask &amp; IN_CREATE ) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">35</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">if</span> ( event-&gt;mask &amp; IN_ISDIR ) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">36</span></pre></td><td class="code"><pre><span class="line">          <span class="built_in">printf</span>( <span class="string">"The directory %s was created.\n"</span>, event-&gt;name );       </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">37</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">38</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">else</span> &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">39</span></pre></td><td class="code"><pre><span class="line">          <span class="built_in">printf</span>( <span class="string">"The file %s was created.\n"</span>, event-&gt;name );</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">40</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">41</span></pre></td><td class="code"><pre><span class="line">      &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">42</span></pre></td><td class="code"><pre><span class="line">      <span class="keyword">else</span> <span class="keyword">if</span> ( event-&gt;mask &amp; IN_DELETE ) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">43</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">if</span> ( event-&gt;mask &amp; IN_ISDIR ) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">44</span></pre></td><td class="code"><pre><span class="line">          <span class="built_in">printf</span>( <span class="string">"The directory %s was deleted.\n"</span>, event-&gt;name );       </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">45</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">46</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">else</span> &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">47</span></pre></td><td class="code"><pre><span class="line">          <span class="built_in">printf</span>( <span class="string">"The file %s was deleted.\n"</span>, event-&gt;name );</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">48</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">49</span></pre></td><td class="code"><pre><span class="line">      &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">50</span></pre></td><td class="code"><pre><span class="line">      <span class="keyword">else</span> <span class="keyword">if</span> ( event-&gt;mask &amp; IN_MODIFY ) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">51</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">if</span> ( event-&gt;mask &amp; IN_ISDIR ) &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">52</span></pre></td><td class="code"><pre><span class="line">          <span class="built_in">printf</span>( <span class="string">"The directory %s was modified.\n"</span>, event-&gt;name );</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">53</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">54</span></pre></td><td class="code"><pre><span class="line">        <span class="keyword">else</span> &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">55</span></pre></td><td class="code"><pre><span class="line">          <span class="built_in">printf</span>( <span class="string">"The file %s was modified.\n"</span>, event-&gt;name );</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">56</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">57</span></pre></td><td class="code"><pre><span class="line">      &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">58</span></pre></td><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">59</span></pre></td><td class="code"><pre><span class="line">    i += EVENT_SIZE + event-&gt;len;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">60</span></pre></td><td class="code"><pre><span class="line">  &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">61</span></pre></td><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">62</span></pre></td><td class="code"><pre><span class="line">  ( <span class="keyword">void</span> ) inotify_rm_watch( fd, wd );</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">63</span></pre></td><td class="code"><pre><span class="line">  ( <span class="keyword">void</span> ) <span class="built_in">close</span>( fd );</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">64</span></pre></td><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">65</span></pre></td><td class="code"><pre><span class="line">  <span class="built_in">exit</span>( <span class="number">0</span> );</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">66</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<ol>
+<li>这个应用程序通过 <code>fd = inotify_init();</code> </li>
+<li>创建一个 inotify 实例，并添加一个监视器来监控修改、新建、删除的文件（由 <code>wd = inotify_add_watch(...)</code> 指定）。</li>
+<li><code>read()</code> 方法在一个或多个警告到达之前是被阻塞的。警告的详细内容 — 每个文件、每个事件 — 是以字节流的形式发送的；因此，应用程序中的循环将字节流转换成一系列事件结构。</li>
+</ol>
+<p>在文件 /usr/include/sys/inotify.h. 中，您可以找到事件结构的定义，它是一种 C 结构：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">inotify_event</span> </span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="class">&#123;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">  <span class="keyword">int</span> wd;       <span class="comment">/* The watch descriptor */</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">  <span class="keyword">uint32_t</span> mask;    <span class="comment">/* Watch mask */</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">  <span class="keyword">uint32_t</span> cookie;  <span class="comment">/* A cookie to tie two events together */</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">  <span class="keyword">uint32_t</span> len;     <span class="comment">/* The length of the filename found in the name field */</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">  <span class="keyword">char</span> name __flexarr;  <span class="comment">/* The name of the file, padding to the end with NULs */</span>    </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+
+
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>进程、网络、文件的监控，都可以用上一章节hook系统调用的方式进行监控，但对于文件监控来说，因为linux自带了inotify的监控审计框架，我们可以直接通过用户态编程使用inotify的框架。对于进程和网络监控主要是对关键函数的hook，以及hook框架的选型。</p>
+<p><strong>参考：</strong></p>
+<p><a href="https://www.sohu.com/a/244164762_467784" target="_blank" rel="noopener">https://www.sohu.com/a/244164762_467784</a></p>
+<p><a href="https://www.ibm.com/developerworks/cn/linux/l-ubuntu-inotify/" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/linux/l-ubuntu-inotify/</a></p>
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        
+
+        
+
+        
+
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://github.com/he1m4n6a" target="_blank" rel="noopener">github</a></span>
+        <span>/</span>
+        
+        <span><a href="https://weibo.com/u/1736968374" target="_blank" rel="noopener">weibo</a></span>
+        <span>/</span>
+        
+        <span><a href="#">wechat</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="/js/index.js"></script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+    <script>
+        /**
+         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+        */
+        if( '' || '')
+        var disqus_config = function () {
+            this.page.url = '';  // Replace PAGE_URL with your page's canonical URL variable
+            this.page.identifier = ''; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document, s = d.createElement('script');
+            s.src = 'https://airclouds-blog.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+
+
+
+</html>

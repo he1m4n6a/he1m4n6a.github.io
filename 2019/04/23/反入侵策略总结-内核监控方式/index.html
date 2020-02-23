@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="He1m4n6a的博客">
+    <meta name="keyword"  content="腾讯">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        反入侵策略总结-内核监控方式 - He1m4n6a的博客 | He1m4n6a&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/aircloud.css">
+    <link rel="stylesheet" href="/css/gitment.css">
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar ">
+            <img src="/img/avatar.jpg" />
+        </div>
+        <div class="name">
+            <i>He1m4n6a</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archive">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#内核监控方式"><span class="toc-text">内核监控方式</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#So-preload"><span class="toc-text">So preload</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#原理"><span class="toc-text">原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#演示"><span class="toc-text">演示</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用条件"><span class="toc-text">使用条件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#优缺点"><span class="toc-text">优缺点</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Netlink-Connector"><span class="toc-text">Netlink Connector</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#原理-1"><span class="toc-text">原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#演示-1"><span class="toc-text">演示</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用条件-1"><span class="toc-text">使用条件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#优缺点-1"><span class="toc-text">优缺点</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Audit"><span class="toc-text">Audit</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#演示-2"><span class="toc-text">演示</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用条件-2"><span class="toc-text">使用条件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#优缺点-2"><span class="toc-text">优缺点</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Syscall-hook"><span class="toc-text">Syscall hook</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#原理-2"><span class="toc-text">原理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#演示-3"><span class="toc-text">演示</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用条件-3"><span class="toc-text">使用条件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#优缺点-3"><span class="toc-text">优缺点</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        反入侵策略总结-内核监控方式
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2019-04-23 16:28:12</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#反入侵" title="反入侵">反入侵</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#内核监控" title="内核监控">内核监控</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#audit" title="audit">audit</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#netlink" title="netlink">netlink</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#syscall" title="syscall">syscall</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <p>转自 <a href="https://www.freebuf.com/column/208928.html，本文已归纳的很好，如有补充我直接补充在文章中不单独标注说明了" target="_blank" rel="noopener">https://www.freebuf.com/column/208928.html，本文已归纳的很好，如有补充我直接补充在文章中不单独标注说明了</a>.</p>
+<h1 id="内核监控方式"><a href="#内核监控方式" class="headerlink" title="内核监控方式"></a>内核监控方式</h1><p>目前来看，常见的获取进程创建的信息的方式有以下四种：</p>
+<ul>
+<li>So preload</li>
+<li>Netlink Connector</li>
+<li>Audit</li>
+<li>Syscall hook</li>
+</ul>
+<h1 id="So-preload"><a href="#So-preload" class="headerlink" title="So preload"></a>So preload</h1><h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><ol>
+<li><p>Linux 中大部分的可执行程序是动态链接的，常用的有关进程执行的函数例如 <code>execve</code>均实现在 libc.so 这个动态链接库中。</p>
+</li>
+<li><p>Linux 提供了一个 so preload 的机制，它允许定义优先加载的动态链接库，方便使用者有选择地载入不同动态链接库中的相同函数。</p>
+</li>
+</ol>
+<p>结合上述两点不难得出，我们可以通过 so preload 来覆盖 libc.so 中的 <code>execve</code>等函数来监控进程的创建。</p>
+<h2 id="演示"><a href="#演示" class="headerlink" title="演示"></a>演示</h2><ol>
+<li><p>创建文件 hook.c ，内容如下：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> _GNU_SOURCE</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;dlfcn.h&gt;</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">ssize_t</span> <span class="params">(*<span class="keyword">execve_func_t</span>)</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* filename, <span class="keyword">char</span>* <span class="keyword">const</span> argv[], <span class="keyword">char</span>* <span class="keyword">const</span> envp[])</span></span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">execve_func_t</span> old_execve = <span class="literal">NULL</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">execve</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span>* filename, <span class="keyword">char</span>* <span class="keyword">const</span> argv[], <span class="keyword">char</span>* <span class="keyword">const</span> envp[])</span> </span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line"><span class="built_in">printf</span>(<span class="string">"Running hook\n"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line"><span class="built_in">printf</span>(<span class="string">"Program executed: %s\n"</span>, filename);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">old_execve = dlsym(RTLD_NEXT, <span class="string">"execve"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">return</span> old_execve(filename, argv, envp);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>该文件的主要部分就是重新定义了 <code>execve</code>函数，在原始的 <code>execve</code>执行之前打印可执行文件的名字。</p>
+</li>
+<li><p>生成动态链接库：<code>gcc hook.c-fPIC-shared-o hook.so</code></p>
+</li>
+<li><p>将上面生成的动态链接库注册成 preload ：<code>echo&#39;/path/to/hook.so&#39;&gt;/etc/ld.so.preload</code></p>
+</li>
+<li><p>退出当前 shell 并重新登录（下面会讲原因），执行命令即可看到我们编写的代码已被执行：</p>
+</li>
+</ol>
+<p><img src="../images/a11/1.png" alt="图片描述"></p>
+<h2 id="使用条件"><a href="#使用条件" class="headerlink" title="使用条件"></a>使用条件</h2><p>该方法没有什么条件限制，只需有 root 权限即可<strong>（做入侵监控程序 root 权限是必需的，后面的几种方法默认也都是在 root 权限下）</strong>。</p>
+<h2 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h2><p><strong>优点</strong></p>
+<ul>
+<li>轻量级，只修改库函数代码，不与内核进行交互。</li>
+</ul>
+<p><strong>缺点</strong></p>
+<ul>
+<li><p>只能影响在 preload 之后创建的进程</p>
+</li>
+<li><p>无法监控静态链接的程序</p>
+</li>
+<li><p>通过 <code>int80h</code>绕过 libc 直接调用系统调用</p>
+</li>
+</ul>
+<h1 id="Netlink-Connector"><a href="#Netlink-Connector" class="headerlink" title="Netlink Connector"></a>Netlink Connector</h1><h2 id="原理-1"><a href="#原理-1" class="headerlink" title="原理"></a>原理</h2><p>Netlink 是一个套接字家族（socket family），它被用于内核与用户态进程以及用户态进程之间的 IPC 通信，我们常用的 <code>ss</code>命令就是通过 Netlink 与内核通信获取的信息。</p>
+<p>Netlink Connector 是一种 Netlink ，它的 Netlink 协议号是 <code>NETLINK_CONNECTOR</code>，其代码位于 <a href="https://link.zhihu.com/?target=https%3A//github.com/torvalds/linux/tree/master/drivers/connector">https://github.com/torvalds/linux/tree/master/drivers/connector</a> 中，其中 connectors.c 和 cnqueue.c 是 Netlink Connector 的实现代码，而 cnproc.c 是一个应用实例，名为进程事件连接器，我们可以通过该连接器来实现对进程创建的监控。</p>
+<p><img src="../images/a11/2.png" alt="图片描述"></p>
+<p><strong>具体流程：</strong></p>
+<p> <img src="../images/a11/3.png" alt="图片描述"></p>
+<p>图中的 ncp 为 Netlink Connector Process，即用户态我们需要开发的程序。</p>
+<h2 id="演示-1"><a href="#演示-1" class="headerlink" title="演示"></a>演示</h2><p>在 Github 上已有人基于进程事件连接器开发了一个简单的进程监控程序：<a href="https://link.zhihu.com/?target=https%3A//github.com/ggrandes-clones/pmon/blob/master/src/pmon.c">https://github.com/ggrandes-clones/pmon/blob/master/src/pmon.c</a> ，其核心函数为以下三个：</p>
+<ul>
+<li><code>nl_connect</code>：与内核建立连接</li>
+<li><code>set_proc_ev_listen</code>：订阅进程事件</li>
+<li><code>handle_proc_ev</code>：处理进程事件</li>
+</ul>
+<p>其执行流程正如上图所示。</p>
+<p>我们通过 <code>gcc pmon.c-o pmon</code>生成可执行程序，然后执行该程序即可看到效果：</p>
+<p><img src="../images/a11/4.png" alt="图片描述"></p>
+<p>获取到的 pid 之后，再去 <code>/proc/</code>目录下获取进程的详细信息即可。</p>
+<h2 id="使用条件-1"><a href="#使用条件-1" class="headerlink" title="使用条件"></a>使用条件</h2><p>内核支持 Netlink Connector</p>
+<ul>
+<li>版本 &gt; 2.6.14</li>
+<li>内核配置开启： <code>cat /boot/config-$(uname -r)|egrep &#39;CONFIG_CONNECTOR|CONFIG_PROC_EVENTS&#39;</code></li>
+</ul>
+<h2 id="优缺点-1"><a href="#优缺点-1" class="headerlink" title="优缺点"></a>优缺点</h2><p><strong>优点</strong></p>
+<ul>
+<li>轻量级，在用户态即可获得内核提供的信息。</li>
+</ul>
+<p><strong>缺点</strong></p>
+<ul>
+<li>仅能获取到 pid ，详细信息需要查 <code>/proc//</code>，这就存在时间差，可能有数据丢失。</li>
+</ul>
+<h1 id="Audit"><a href="#Audit" class="headerlink" title="Audit"></a>Audit</h1><p>Linux Audit 是 Linux 内核中用来进行审计的组件，可监控系统调用和文件访问。可用来</p>
+<ul>
+<li>Watching file access</li>
+<li>Monitoring system calls</li>
+<li>Recording commands run by a user</li>
+<li>Recording security events</li>
+<li>Monitoring network access</li>
+</ul>
+<p>具体架构如下 :</p>
+<p> <img src="../images/a11/5.png" alt="图片描述"></p>
+<ol>
+<li>用户通过用户态的管理进程配置规则（例如图中的 go-audit ，也可替换为常用的 auditd ），并通过 Netlink 套接字通知给内核。</li>
+<li>内核中的 kauditd 通过 Netlink 获取到规则并加载。</li>
+<li>应用程序在调用系统调用和系统调用返回时都会经过 kauditd ，kauditd 会将这些事件记录下来并通过 Netlink 回传给用户态进程。</li>
+<li>用户态进程解析事件日志并输出。</li>
+</ol>
+<h2 id="演示-2"><a href="#演示-2" class="headerlink" title="演示"></a>演示</h2><p>从上面的架构图可知，整个框架分为用户态和内核态两部分，内核空间的 kauditd 是不可变的，用户态的程序是可以定制的，目前最常用的用户态程序就是 auditd ，除此之外知名的 <a href="https://medium.com/palantir/auditing-with-osquery-part-one-introduction-to-the-linux-audit-framework-217967cec406" target="_blank" rel="noopener">osquery</a> 在底层也是通过与 Audit 交互来获取进程事件。下面我们就简单介绍一下如何通过 auditd 来监控进程创建。</p>
+<p>首先安装并启动 auditd ：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">apt <span class="keyword">update</span> &amp;&amp; apt <span class="keyword">install</span> auditd</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">systemctl <span class="keyword">start</span> auditd &amp;&amp; systemctl <span class="keyword">status</span> auditd</span></pre></td></tr></table></figure>
+
+<p>auditd 软件包中含有一个命名行控制程序 <code>auditctl</code>，我们可以通过它在命令行中与 auditd 进行交互，用如下命令创建一个对 <code>execve</code>这个系统调用的监控：</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">auditctl -a <span class="keyword">exit</span>,always -F arch=b64 -S execve</span></pre></td></tr></table></figure>
+
+<p>再通过 auditd 软件包中的 <code>ausearch</code>来检索 auditd 产生的日志：</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">ausearch -sc execve | <span class="keyword">grep</span> <span class="regexp">/usr/</span>bin<span class="regexp">/id</span></span></pre></td></tr></table></figure>
+
+<p>整个过程的执行结果如下：</p>
+<p><img src="../images/a11/6.png" alt="图片描述"></p>
+<p>至于其他的使用方法可以通过 <code>man auditd</code>和 <code>man auditctl</code>来查看。</p>
+<h2 id="使用条件-2"><a href="#使用条件-2" class="headerlink" title="使用条件"></a>使用条件</h2><p>内核开启 Audit</p>
+<ul>
+<li><code>cat/boot/config-$(uname-r)|grep^CONFIG_AUDIT</code></li>
+</ul>
+<h2 id="优缺点-2"><a href="#优缺点-2" class="headerlink" title="优缺点"></a>优缺点</h2><p><strong>优点</strong></p>
+<ul>
+<li>组件完善，使用 auditd 软件包中的工具即可满足大部分需求，无需额外开发代码。</li>
+<li>相比于 Netlink Connector ，获取的信息更为全面，不仅仅是 pid 。</li>
+</ul>
+<p><strong>缺点</strong></p>
+<ul>
+<li>性能消耗随着进程数量提升有所上升，需要通过添加白名单等配置来限制其资源占用。</li>
+</ul>
+<p><strong>关于性能消耗：</strong></p>
+<p>开启了osquery的审计功能之后,会在两个方面存在性能损耗:</p>
+<ol>
+<li>当开启了内核中审计功能之后并且存在审计规则，那么内核每次都会比对审计规则和实际产生的审计事件。</li>
+<li>这个<code>audit consumer</code>(在本例中是<code>osquery</code>)将会从内核<code>netlink socket</code>中接受数据，然后将数据解析为了其内部定义的表的格式(<code>socket_events</code>和<code>process_events</code>)并保存在早RocksDB中。最后一旦这个数据被查询，那么这个数据就会被写入到文件或者是通过日志插件发送。</li>
+</ol>
+<p>每一次在内核中产生系统调用，就会产生相应的审计事件。如果这样的系统调用越多，那么内核产生这些系统调用的审计事件的工作量就越大，同时osquery解析这些审计事件并且保存在数据库中的工作量也越大。</p>
+<h1 id="Syscall-hook"><a href="#Syscall-hook" class="headerlink" title="Syscall hook"></a>Syscall hook</h1><p>上面的 Netlink Connector 和 Audit 都是 Linux 本身提供的监控系统调用的方法，如果我们想拥有更大程度的可定制化，我们就需要通过安装内核模块的方式来对系统调用进行 hook 。</p>
+<h2 id="原理-2"><a href="#原理-2" class="headerlink" title="原理"></a>原理</h2><p>目前常用的 hook 方法是通过修改 <code>sys_call_table</code>（ Linux 系统调用表）来实现，具体原理就是系统在执行系统调用时是通过系统调用号在 <code>sys_call_table</code>中找到相应的函数进行调用，所以只要将 <code>sys_call_table</code>中 <code>execve</code>对应的地址改为我们安装的内核模块中的函数地址即可。</p>
+<p>上述具体的实现细节可参考 YSRC 的这篇关于驭龙 HIDS 如何实现进程监控的文章：<a href="https://link.zhihu.com/?target=https%3A//mp.weixin.qq.com/s/ntE5FNM8UaXQFC5l4iKUUw">https://mp.weixin.qq.com/s/ntE5FNM8UaXQFC5l4iKUUw</a> ，这里贴出文章里的一张图方便大家对整个流程有个直观地了解：</p>
+<p> <img src="../images/a11/7.png" alt="图片描述"></p>
+<h2 id="演示-3"><a href="#演示-3" class="headerlink" title="演示"></a>演示</h2><p>关于 Syscall hook 的 Demo ，我在 Github 上找了很多 Demo 代码，其中就包括驭龙 HIDS 的 hook 模块，但是这些都无法在我的机器上（ Ubuntu 16.04 Kernel 4.4.0-151-generic ）正常运行，这也就暴露了 Syscall hook 的兼容性问题。</p>
+<p>最后我决定使用 Sysdig 来进行演示，Sysdig 是一个开源的系统监控工具，其核心原理是通过内核模块监控系统调用，并将系统调用抽象成事件，用户根据这些事件定制检测规则。作为一个相对成熟的产品，Sysdig 的兼容性做得比较好，所以这里用它来演示，同时也可以方便大家自己进行测试。</p>
+<p>具体步骤如下：</p>
+<p>1.通过官方的安装脚本进行安装：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">curl -s https://s3.amazonaws.com/download.draios.com/stable/install-sysdig | sudo bash</span></pre></td></tr></table></figure>
+
+<p>2.检测内核模块是否已经安全：<code>lsmod|grep sysdig</code></p>
+<p>3.启动对 <code>execve</code>的监控：<code>sysdig evt.type=execve</code></p>
+<p>最终的执行效果如下：</p>
+<p><img src="../images/a11/8.png" alt="图片描述"></p>
+<p>有关于 Sysdig 的更多信息可以访问其 wiki 进行获取，另外，Sysdig 团队推出了一个专门用于安全监控的工具 Falco ，Falco 在 Sysdig 的基础上抽象出了可读性更高的检测规则，并支持在容器内部署，同样，大家如果感兴趣可以访问其 wiki 获取更多信息。</p>
+<h2 id="使用条件-3"><a href="#使用条件-3" class="headerlink" title="使用条件"></a>使用条件</h2><ul>
+<li>可以安装内核模块。</li>
+<li>需针对不同 Linux 发行版和内核版本进行定制。</li>
+</ul>
+<h2 id="优缺点-3"><a href="#优缺点-3" class="headerlink" title="优缺点"></a>优缺点</h2><p><strong>优点</strong></p>
+<ul>
+<li>高定制化，从系统调用层面获取完整信息。</li>
+</ul>
+<p><strong>缺点</strong></p>
+<ul>
+<li>开发难度大。</li>
+<li>兼容性差，需针对不同发行版和内核版本进行定制和测试。</li>
+</ul>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>本文共讲了4种常见的监控进程创建的方法，这些方法本质上是对库函数或系统调用的监控，各有优劣，这里我再各用一句话总结一下：</p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="attr">So</span> <span class="string">preload ：Hook 库函数，不与内核交互，轻量但易被绕过。</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="attr">Netlink</span> <span class="string">Connector ：从内核获取数据，监控系统调用，轻量，仅能直接获取 pid ，其他信息需要通过读取 proc/&lt;pid&gt;/来补全。</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="attr">Audit</span> <span class="string">：从内核获取数据，监控系统调用，功能多，不只监控进程创建，获取的信息相对全面。</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="attr">Syscall</span> <span class="string">hook ：从内核获取数据，监控系统调用，最接近实际系统调用，定制度高，兼容性差。</span></span></pre></td></tr></table></figure>
+
+<p>对我个人来讲，单纯地看监控进程创建这方面，我还是更推荐使用 Netlink Connector 的方式，这种方式在保证从内核获取数据的前提下又足够轻量，方便进行定制化开发。如果是想要进行全方面的监控包括进程、网络和文件，Audit 是一个不错的选择。</p>
+<p><strong>参考：</strong></p>
+<p><a href="https://blog.csdn.net/whuzm08/article/details/87267956" target="_blank" rel="noopener">https://blog.csdn.net/whuzm08/article/details/87267956</a></p>
+<p><a href="https://blog.spoock.com/2019/01/13/auditing-with-osquery/" target="_blank" rel="noopener">https://blog.spoock.com/2019/01/13/auditing-with-osquery/</a></p>
+<p><a href="https://segmentfault.com/a/1190000019828080" target="_blank" rel="noopener">https://segmentfault.com/a/1190000019828080</a></p>
+<p><a href="https://4hou.win/wordpress/?p=29586" target="_blank" rel="noopener">https://4hou.win/wordpress/?p…</a></p>
+<p><a href="https://tech.meituan.com/2019/01/17/distributed-hids-cluster-architecture-design.html" target="_blank" rel="noopener">https://tech.meituan.com/2019…</a></p>
+<p><a href="https://www.ibm.com/developerworks/cn/linux/l-lo-use-space-audit-tool/index.html" target="_blank" rel="noopener">https://www.ibm.com/developer…</a></p>
+<p><a href="https://linux-audit.com/configuring-and-auditing-linux-systems-with-audit-daemon/" target="_blank" rel="noopener">https://linux-audit.com/confi…</a></p>
+<p><a href="https://my.oschina.net/macwe/blog/603583" target="_blank" rel="noopener">https://my.oschina.net/macwe/…</a></p>
+<p><a href="https://mp.weixin.qq.com/s/ntE5FNM8UaXQFC5l4iKUUw" target="_blank" rel="noopener">https://mp.weixin.qq.com/s/nt…</a></p>
+<p><a href="https://mp.weixin.qq.com/s?__biz=MzUzODQ0ODkyNA==&mid=2247483854&idx=2&sn=815883b02ab0000956959f78c3f31e2b&scene=21" target="_blank" rel="noopener">https://mp.weixin.qq.com/s?__…</a></p>
+<p><a href="https://github.com/draios/sysdig" target="_blank" rel="noopener">https://github.com/draios/sysdig</a></p>
+<p><a href="https://github.com/falcosecurity/falco" target="_blank" rel="noopener">https://github.com/falcosecur…</a></p>
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        
+
+        
+
+        
+
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://github.com/he1m4n6a" target="_blank" rel="noopener">github</a></span>
+        <span>/</span>
+        
+        <span><a href="https://weibo.com/u/1736968374" target="_blank" rel="noopener">weibo</a></span>
+        <span>/</span>
+        
+        <span><a href="#">wechat</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="/js/index.js"></script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+    <script>
+        /**
+         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+        */
+        if( '' || '')
+        var disqus_config = function () {
+            this.page.url = '';  // Replace PAGE_URL with your page's canonical URL variable
+            this.page.identifier = ''; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document, s = d.createElement('script');
+            s.src = 'https://airclouds-blog.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+
+
+
+</html>
