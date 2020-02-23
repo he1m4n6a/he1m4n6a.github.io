@@ -124,7 +124,7 @@
     </div>
 
     <div class="post-meta">
-        <span class="attr">发布于：<span>2019-05-25 08:57:32</span></span>
+        <span class="attr">发布于：<span>2019-05-25 09:57:32</span></span>
         
         <span class="attr">标签：/
         
@@ -258,24 +258,18 @@
 <p><strong>绕过风险：仅能通过进程执行文件名判断是否为Shell进程，上传可执行文件、拷贝Bash文件到其他路径等方法会绕过这个方法</strong>。例如这篇<a href="https://www.cnblogs.com/LittleHann/p/4596223.html#_label8" target="_blank" rel="noopener">文章</a>提到的，通过将/bin/sh重命名为其他名字进行反弹shell。</p>
 <h2 id="非bash反弹shell检测"><a href="#非bash反弹shell检测" class="headerlink" title="非bash反弹shell检测"></a>非bash反弹shell检测</h2><p>Bash只是一个应用程序的普通应用，其内部封装了调用glibc execve的功能而已，除了bash之外，白帽子还可以基于任意的应用层技术来实现反弹shell，例如：</p>
 <ul>
-<li>python/perl实现纯代码形式的反弹shell文件执行：<strong>文件脚本检测</strong></li>
-<li>python/perl实现纯代码形式的反弹shell命令行指令（fileless）：<strong>纯命令行fileless检测</strong></li>
+<li>python/perl实现纯代码形式的反弹shell文件执行：<a href="https://he1m4n6a.github.io/2019/04/09/%E5%8F%8D%E5%85%A5%E4%BE%B5%E7%AD%96%E7%95%A5%E6%80%BB%E7%BB%93-%E6%81%B6%E6%84%8F%E5%91%BD%E4%BB%A4%E6%A3%80%E6%B5%8B/"><strong>文件脚本检测</strong></a></li>
+<li>python/perl实现纯代码形式的反弹shell命令行指令（fileless）：<a href="https://he1m4n6a.github.io/2019/04/09/%E5%8F%8D%E5%85%A5%E4%BE%B5%E7%AD%96%E7%95%A5%E6%80%BB%E7%BB%93-%E6%81%B6%E6%84%8F%E5%91%BD%E4%BB%A4%E6%A3%80%E6%B5%8B/"><strong>纯命令行fileless检测</strong></a></li>
 <li>C/C++实现纯代码形式的反弹shell：<strong>二进制文件检测</strong></li>
 </ul>
 <p>无论怎么实现，这个进程肯定是有网络通信的事件，通过进程和socket事件关联情况，获取网络通信的协议。如果有相应的网络事件，在对进程所对应的文件进行上述情形进行安全检查。</p>
-<h3 id="进程和socket事件关联"><a href="#进程和socket事件关联" class="headerlink" title="进程和socket事件关联"></a>进程和socket事件关联</h3><p>关联process和socket数据</p>
+<h3 id="进程和socket事件关联"><a href="#进程和socket事件关联" class="headerlink" title="进程和socket事件关联"></a>进程和socket事件关联</h3><p><a href="https://blog.spoock.com/2018/12/06/osquery-source-analysis-process-open-socket/" target="_blank" rel="noopener">关联process和socket数据</a></p>
 <ol>
-<li><p>遍历<code>/proc</code>，获取所有进程的pid</p>
-</li>
-<li><p>通过pid，遍历<code>/proc/pid/fd</code>对应的link链接，检查是否存在<code>socket:[]</code>，存在就获取对应的inode</p>
-</li>
-<li><p>获取<code>/proc/pid/ns</code>中net的inode</p>
-</li>
-<li><p>遍历 <code>/proc/pid/net/</code>下的<code>icmp/tcp/udp/udplite/raw</code>的协议</p>
-</li>
-<li><p>比较第四步中的inode信息与第一步的inode信息，一致的就是我们需要获取的数据。</p>
-<p><a href="https://blog.spoock.com/2018/12/06/osquery-source-analysis-process-open-socket/" target="_blank" rel="noopener">https://blog.spoock.com/2018/12/06/osquery-source-analysis-process-open-socket/</a></p>
-</li>
+<li>遍历<code>/proc</code>，获取所有进程的pid</li>
+<li>通过pid，遍历<code>/proc/pid/fd</code>对应的link链接，检查是否存在<code>socket:[]</code>，存在就获取对应的inode</li>
+<li>获取<code>/proc/pid/ns</code>中net的inode</li>
+<li>遍历 <code>/proc/pid/net/</code>下的<code>icmp/tcp/udp/udplite/raw</code>的协议</li>
+<li>比较第四步中的inode信息与第一步的inode信息，一致的就是我们需要获取的数据。</li>
 </ol>
 <h2 id="网络层检测"><a href="#网络层检测" class="headerlink" title="网络层检测"></a>网络层检测</h2><h3 id="dns-amp-icmp反弹shell"><a href="#dns-amp-icmp反弹shell" class="headerlink" title="dns&amp;icmp反弹shell"></a>dns&amp;icmp反弹shell</h3><p>本质上说，dns和icmp是一种网络通信方式，使用任何语言都可以借助这两种网络通信方式进行反弹shell交互。</p>
 <p>但是我们知道，dns和icmp和tcp/udp不一样，它们都不是直连的网络信道，而是需要通过一个第三方进行消息中转。</p>
@@ -299,7 +293,11 @@
 <h3 id="检测方法-1"><a href="#检测方法-1" class="headerlink" title="检测方法"></a>检测方法</h3><p>这个是NIDS范畴的内容了，主要思想是根据特征码进行检测。</p>
 <p>反弹shell的通信会话中，会包含一些<code>cmdline shell特征</code>，例如<code>#root....</code>等，可以在网络侧进行NTA实时检测。</p>
 <p><strong>参考：</strong></p>
-<p><a href="https://xz.aliyun.com/t/2549" target="_blank" rel="noopener">https://xz.aliyun.com/t/2549</a><br><a href="https://www.cnblogs.com/r00tgrok/p/reverse_shell_cheatsheet.html" target="_blank" rel="noopener">https://www.cnblogs.com/r00tgrok/p/reverse_shell_cheatsheet.html</a><br><a href="https://www.cnblogs.com/shanmao/archive/2012/12/26/2834210.html" target="_blank" rel="noopener">https://www.cnblogs.com/shanmao/archive/2012/12/26/2834210.html</a><br><a href="https://xz.aliyun.com/t/6727" target="_blank" rel="noopener">https://xz.aliyun.com/t/6727</a><br><a href="https://www.cnblogs.com/LittleHann/p/12038070.html#_lab2_3_5" target="_blank" rel="noopener">https://www.cnblogs.com/LittleHann/p/12038070.html#_lab2_3_5</a></p>
+<p><a href="https://xz.aliyun.com/t/2549" target="_blank" rel="noopener">https://xz.aliyun.com/t/2549</a></p>
+<p><a href="https://www.cnblogs.com/r00tgrok/p/reverse_shell_cheatsheet.html" target="_blank" rel="noopener">https://www.cnblogs.com/r00tgrok/p/reverse_shell_cheatsheet.html</a></p>
+<p><a href="https://www.cnblogs.com/shanmao/archive/2012/12/26/2834210.html" target="_blank" rel="noopener">https://www.cnblogs.com/shanmao/archive/2012/12/26/2834210.html</a></p>
+<p><a href="https://xz.aliyun.com/t/6727" target="_blank" rel="noopener">https://xz.aliyun.com/t/6727</a></p>
+<p><a href="https://www.cnblogs.com/LittleHann/p/12038070.html#_lab2_3_5" target="_blank" rel="noopener">https://www.cnblogs.com/LittleHann/p/12038070.html#_lab2_3_5</a></p>
 
         
             <div class="donate-container">
