@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="He1m4n6a的博客">
+    <meta name="keyword"  content="腾讯">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        Docker安全机制 - He1m4n6a的博客 | He1m4n6a&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/aircloud.css">
+    <link rel="stylesheet" href="/css/gitment.css">
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar ">
+            <img src="/img/avatar.jpg" />
+        </div>
+        <div class="name">
+            <i>He1m4n6a</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archive">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Namespace"><span class="toc-text">Namespace</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Namespace简介"><span class="toc-text">Namespace简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#六种类型说明"><span class="toc-text">六种类型说明</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Cgroups"><span class="toc-text">Cgroups</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#简介"><span class="toc-text">简介</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#cgroups-核心概念"><span class="toc-text">cgroups 核心概念</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#子资源系统（Resource-Classes-or-SubSystem）"><span class="toc-text">子资源系统（Resource Classes or SubSystem）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Hierarchy"><span class="toc-text">Hierarchy</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#使用-cgroups"><span class="toc-text">使用 cgroups</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#查看-cgroups-挂载信息"><span class="toc-text">查看 cgroups 挂载信息</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#创建-cgroup"><span class="toc-text">创建 cgroup</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#删除-cgroup"><span class="toc-text">删除 cgroup</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#设置-cgroup-参数"><span class="toc-text">设置 cgroup 参数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#把进程加入到-cgroup"><span class="toc-text">把进程加入到 cgroup</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#在-cgroup-中运行进程"><span class="toc-text">在 cgroup 中运行进程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#把进程移动到-cgroup"><span class="toc-text">把进程移动到 cgroup</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Docker使用cgroup"><span class="toc-text">Docker使用cgroup</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Capbilities"><span class="toc-text">Capbilities</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#capbilities查看"><span class="toc-text">capbilities查看</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Docker默认capbilities"><span class="toc-text">Docker默认capbilities</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#seccomp"><span class="toc-text">seccomp</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#使用"><span class="toc-text">使用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#默认策略"><span class="toc-text">默认策略</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#AppArmor和Selinux"><span class="toc-text">AppArmor和Selinux</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#加载和卸载profiles"><span class="toc-text">加载和卸载profiles</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#默认策略-1"><span class="toc-text">默认策略</span></a></li></ol></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        Docker安全机制
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>20109-07-16 19:22:12</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#namespace" title="namespace">namespace</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#capabilities" title="capabilities">capabilities</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#seccomp" title="seccomp">seccomp</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <h1 id="Namespace"><a href="#Namespace" class="headerlink" title="Namespace"></a>Namespace</h1><h2 id="Namespace简介"><a href="#Namespace简介" class="headerlink" title="Namespace简介"></a>Namespace简介</h2><p>Linux Namespace 是 Linux 内核提供的一个功能，可以实现系统资源的隔离。目前共有六种namespace：</p>
+<table>
+<thead>
+<tr>
+<th align="left">类型</th>
+<th align="left">系统调用参数</th>
+<th align="left">内核版本</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left">Mount Namespace</td>
+<td align="left">CLONE_NEWNS</td>
+<td align="left">2.4.19</td>
+</tr>
+<tr>
+<td align="left">UTS Namespace</td>
+<td align="left">CLONE_NEWUTS</td>
+<td align="left">2.6.19</td>
+</tr>
+<tr>
+<td align="left">IPC Namespace</td>
+<td align="left">CLONE_NEWIPC</td>
+<td align="left">2.6.19</td>
+</tr>
+<tr>
+<td align="left">PID Namespace</td>
+<td align="left">CLONE_NEWPID</td>
+<td align="left">2.6.24</td>
+</tr>
+<tr>
+<td align="left">Network Namespace</td>
+<td align="left">CLONE_NEWNET</td>
+<td align="left">2.6.29</td>
+</tr>
+<tr>
+<td align="left">User Namespace</td>
+<td align="left">CLONE_NEWUSER</td>
+<td align="left">3.8</td>
+</tr>
+</tbody></table>
+<p><strong>可以通过三个系统调用的方式：</strong></p>
+<ul>
+<li>clone， 创建新的进程和新的namespace，新创建的进程 attach 到新创建的 namespace</li>
+<li>unshare，不创建新的进程，创建新的 namespace 并把当前进程 attach 上</li>
+<li>setns， attach 进程到已有的 namespace 上</li>
+</ul>
+<p>shell 也提供了一个和系统调用同名的 unshare 命令可以非常简单的创建 namespace。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">sudo unshare --fork --pid --mount-proc bash</span></pre></td></tr></table></figure>
+
+<h2 id="六种类型说明"><a href="#六种类型说明" class="headerlink" title="六种类型说明"></a>六种类型说明</h2><ol>
+<li><p>UTS(UNIX Timesharing System) Namespace 可以用来隔离 nodename 和 domainname 两个系统标识。在 UTS Namespace 中，每个 Namespace 可以有自己的 hostname。 </p>
+</li>
+<li><p>IPC(Interprocess Communication) Namespace 用来隔离 System V IPC 和 POSIX message queues。每一个 IPC Namespace 都有自己的 System V IPC 和 POSIX message queue。 </p>
+</li>
+<li><p>PID(Process ID) Namespace 可以用来隔离进程 ID。<strong>同一个进程在不同的 PID Namespace 中可以拥有不同的 PID</strong>。在 Docker Container 中，使用 <code>ps -ef</code> 可以看到启动容器的进程 PID 为 1，但是在宿主机上，该进程却又有不同的 PID。 </p>
+</li>
+<li><p>Mount Namespace 用来隔离各个进程看到的挂载点视图。在不同的 Namespace 中，看到的挂载点文件系统层次是不一样的。在 Mount Namespace 中调用 <code>mount</code> 和 <code>unmount</code> 仅仅会影响当前 Namespace 内的文件系统，而对全局文件系统是没有影响的。 </p>
+</li>
+<li><p>User Namespace 主要是隔离用户的用户组 ID。也就是说，一个进程的 User ID 和 Group ID 在 User Namespace 内外可以是不同的。比较常用的是，在宿主机上以一个非 root 用户运行创建一个 User Namespace，然后在 User Namespace 中被映射为了 root 用户。*<em>这意味着这个进程在 User Namespace 中有 root 权限，但是在宿主机上却没有 root 权限。 *</em></p>
+</li>
+<li><p>Network Namespace 用来隔离网络设置、IP 地址和端口号等网络栈的 Namespace。Network Namespace 可以让每个容器拥有自己独立的网络设备，而且容器内的应用可以绑定到自己的端口，每个 Namespace 的端口都不会有冲突。在宿主机搭建网桥后，就能很方便地实现容器之间的通信。 </p>
+</li>
+</ol>
+<h1 id="Cgroups"><a href="#Cgroups" class="headerlink" title="Cgroups"></a>Cgroups</h1><h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><p>Linux Namespace 帮助进程隔离出自己的单独空间，而 Cgroups 则可以限制每个空间的大小。 Linux cgroups 的全称是 Linux Control Groups，它是 Linux 内核的特性，主要作用是<strong>限制、记录和隔离进程组（process groups）使用的物理资源（cpu、memory、IO 等）</strong>。 </p>
+<p><strong>Cgroups 从设计之初使命就很明确，为进程提供资源控制，它主要的功能包括：</strong></p>
+<ul>
+<li><strong>资源限制</strong>：限制进程使用的资源上限，比如最大内存、文件系统缓存使用限制</li>
+<li><strong>优先级控制</strong>：不同的组可以有不同的优先级，比如 CPU 使用和磁盘 IO 吞吐</li>
+<li><strong>审计</strong>：计算 group 的资源使用情况，可以用来计费</li>
+<li><strong>控制</strong>：挂起一组进程，或者重启一组进程</li>
+</ul>
+<h2 id="cgroups-核心概念"><a href="#cgroups-核心概念" class="headerlink" title="cgroups 核心概念"></a>cgroups 核心概念</h2><p>前面说过，cgroups 是用来对进程进行资源管理的，因此 cgroup 需要考虑如何抽象这两种概念：进程和资源，同时如何组织自己的结构。cgroups 中有几个非常重要的概念：</p>
+<ul>
+<li><strong>task</strong>：任务，对应于系统中运行的一个实体，一般是指进程</li>
+<li><strong>subsystem</strong>：子系统，具体的资源控制器（resource class 或者 resource controller），控制某个特定的资源使用。比如 CPU 子系统可以控制 CPU 时间，memory 子系统可以控制内存使用量</li>
+<li><strong>cgroup</strong>：控制组，一组任务和子系统的关联关系，表示对这些任务进行怎样的资源管理策略</li>
+<li><strong>hierarchy</strong>：层级树，一系列 cgroup 组成的树形结构。每个节点都是一个 cgroup，cgroup 可以有多个子节点，子节点默认会继承父节点的属性。系统中可以有多个 hierarchy</li>
+</ul>
+<p>虽然 cgroups 支持 hierarchy，允许不同的子资源挂到不同的目录，但是多个树之间有各种限制，增加了理解和维护的复杂性。在实际使用中，所有的子资源都会统一放到某个路径下（比如 ubuntu16.04 的 <code>/sys/fs/cgroup/</code>），因此本文并不详细介绍多个树的情况，感兴趣的可以参考 <a href="https://access.redhat.com/documentation/en-US/Red_Hat_Enterprise_Linux/6/html/Resource_Management_Guide/sec-Relationships_Between_Subsystems_Hierarchies_Control_Groups_and_Tasks.html" target="_blank" rel="noopener">RedHat 的这篇文档。</a></p>
+<h3 id="子资源系统（Resource-Classes-or-SubSystem）"><a href="#子资源系统（Resource-Classes-or-SubSystem）" class="headerlink" title="子资源系统（Resource Classes or SubSystem）"></a>子资源系统（Resource Classes or SubSystem）</h3><p>目前有下面这些资源子系统：</p>
+<ul>
+<li>Block IO（<code>blkio</code>)：限制块设备（磁盘、SSD、USB 等）的 IO 速率</li>
+<li>CPU Set(<code>cpuset</code>)：限制任务能运行在哪些 CPU 核上</li>
+<li>CPU Accounting(<code>cpuacct</code>)：生成 cgroup 中任务使用 CPU 的报告</li>
+<li>CPU (<code>CPU</code>)：限制调度器分配的 CPU 时间</li>
+<li>Devices (<code>devices</code>)：允许或者拒绝 cgroup 中任务对设备的访问</li>
+<li>Freezer (<code>freezer</code>)：挂起或者重启 cgroup 中的任务</li>
+<li>Memory (<code>memory</code>)：限制 cgroup 中任务使用内存的量，并生成任务当前内存的使用情况报告</li>
+<li>Network Classifier(<code>net_cls</code>)：为 cgroup 中的报文设置上特定的 classid 标志，这样 tc 等工具就能根据标记对网络进行配置</li>
+<li>Network Priority (<code>net_prio</code>)：对每个网络接口设置报文的优先级</li>
+<li><code>perf_event</code>：识别任务的 cgroup 成员，可以用来做性能分析</li>
+</ul>
+<h3 id="Hierarchy"><a href="#Hierarchy" class="headerlink" title="Hierarchy"></a>Hierarchy</h3><p>Linux 进程之间组成一棵树的结构，每个进程（除了 <code>init</code> 根进程之外）都有一个父进程，子进程创建之后会继承父进程的一些属性（比如环境变量，打开的文件描述符等）。</p>
+<p>和进程模型类似，只不过 cgroups 是一个森林结构。</p>
+<h2 id="使用-cgroups"><a href="#使用-cgroups" class="headerlink" title="使用 cgroups"></a>使用 cgroups</h2><p>cgroup 内核功能比较有趣的地方是它没有提供任何的系统调用接口，而是对 linux vfs 的一个实现，因此可以用类似文件系统的方式进行操作。</p>
+<p>使用 cgroups 的方式有几种：</p>
+<ul>
+<li>使用 cgroups 提供的虚拟文件系统，直接通过创建、读写和删除目录、文件来控制 cgroups</li>
+<li>使用命令行工具，比如 libcgroup 包提供的 cgcreate、cgexec、cgclassify 命令</li>
+<li>使用 <code>rules engine daemon</code> 提供的配置文件</li>
+<li>当然，systemd、lxc、docker 这些封装了 cgroups 的软件也能让你通过它们定义的接口控制 cgroups 的内容</li>
+</ul>
+<h4 id="查看-cgroups-挂载信息"><a href="#查看-cgroups-挂载信息" class="headerlink" title="查看 cgroups 挂载信息"></a>查看 cgroups 挂载信息</h4><p>在 ubuntu 16.04 的机器上，cgroups 已经挂载到文件系统上了，可以通过 <code>mount</code> 命令查看：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">root@PEK1000251892:~<span class="comment"># mount -t cgroup</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">cgroup on /sys/fs/cgroup/systemd <span class="built_in">type</span> cgroup (rw,nosuid,nodev,noexec,relatime,xattr,release_agent=/lib/systemd/systemd-cgroups-agent,name=systemd)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">cgroup on /sys/fs/cgroup/net_cls,net_prio <span class="built_in">type</span> cgroup (rw,nosuid,nodev,noexec,relatime,net_cls,net_prio)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">cgroup on /sys/fs/cgroup/cpu,cpuacct <span class="built_in">type</span> cgroup (rw,nosuid,nodev,noexec,relatime,cpu,cpuacct)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">cgroup on /sys/fs/cgroup/hugetlb <span class="built_in">type</span> cgroup (rw,nosuid,nodev,noexec,relatime,hugetlb,release_agent=/run/cgmanager/agents/cgm-release-agent.hugetlb)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">cgroup on /sys/fs/cgroup/cpuset <span class="built_in">type</span> cgroup (rw,nosuid,nodev,noexec,relatime,cpuset,clone_children)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">cgroup on /sys/fs/cgroup/freezer <span class="built_in">type</span> cgroup (rw,nosuid,nodev,noexec,relatime,freezer)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">cgroup on /sys/fs/cgroup/perf_event <span class="built_in">type</span> cgroup (rw,nosuid,nodev,noexec,relatime,perf_event,release_agent=/run/cgmanager/agents/cgm-release-agent.perf_event)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">cgroup on /sys/fs/cgroup/pids <span class="built_in">type</span> cgroup (rw,nosuid,nodev,noexec,relatime,pids,release_agent=/run/cgmanager/agents/cgm-release-agent.pids)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">cgroup on /sys/fs/cgroup/devices <span class="built_in">type</span> cgroup (rw,nosuid,nodev,noexec,relatime,devices)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">cgroup on /sys/fs/cgroup/blkio <span class="built_in">type</span> cgroup (rw,nosuid,nodev,noexec,relatime,blkio)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">cgroup on /sys/fs/cgroup/memory <span class="built_in">type</span> cgroup (rw,nosuid,nodev,noexec,relatime,memory)</span></pre></td></tr></table></figure>
+
+<p>如果没有的话，也可以通过以下命令来把想要的 subsystem mount 到系统中：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">root@PEK1000251892:~<span class="comment"># mount mount -t cgroup -o cpu,cpuset,memory cpu_and_mem /cgroup/cpu_and_mem</span></span></pre></td></tr></table></figure>
+
+<p>上述命令表示把 cpu、cpuset、memory 三个子资源 mount 到 <code>/cgroup/cpu_and_mem</code> 目录下。</p>
+<p>每个 cgroup 目录下面都会有描述该 cgroup 的文件，除了每个 cgroup 独特的资源控制文件，还有一些通用的文件：</p>
+<ul>
+<li><code>tasks</code>：当前 cgroup 包含的任务（task）pid 列表，把某个进程的 pid 添加到这个文件中就等于把进程移到该 cgroup</li>
+<li><code>cgroup.procs</code>：当前 cgroup 中包含的 thread group 列表，使用逻辑和 <code>tasks</code> 相同</li>
+<li><code>notify_on_release</code>：0 或者 1，是否在 cgroup 销毁的时候执行 notify。如果为 1，那么当这个 cgroup 最后一个任务离开时（退出或者迁移到其他 cgroup），并且最后一个子 cgroup 被删除时，系统会执行 <code>release_agent</code> 中指定的命令</li>
+<li><code>release_agent</code>：需要执行的命令</li>
+</ul>
+<h4 id="创建-cgroup"><a href="#创建-cgroup" class="headerlink" title="创建 cgroup"></a>创建 cgroup</h4><p>创建 cgroup，可以直接用 <code>mkdir</code> 在对应的子资源中创建一个目录：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">root@PEK1000251892:~<span class="comment"># mkdir /sys/fs/cgroup/cpu/mycgroup</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">root@PEK1000251892:~<span class="comment"># ls /sys/fs/cgroup/cpu/mycgroup</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">cgroup.clone_children  cpuacct.stat   cpuacct.usage_percpu  cpu.cfs_quota_us  cpu.stat           tasks</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">cgroup.procs           cpuacct.usage  cpu.cfs_period_us     cpu.shares        notify_on_release</span></pre></td></tr></table></figure>
+
+<p>上面命令在 cpu 子资源中创建了 <code>mycgroup</code>，创建 cgroup 之后，目录中会自动创建需要的文件。</p>
+<h4 id="删除-cgroup"><a href="#删除-cgroup" class="headerlink" title="删除 cgroup"></a>删除 cgroup</h4><p>删除子资源，就是删除对应的目录：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">root@PEK1000251892:~<span class="comment"># rmdir /sys/fs/cgroup/cpu/mycgroup/</span></span></pre></td></tr></table></figure>
+
+<p>删除之后，如果 tasks 文件中有进程，它们会自动迁移到父 cgroup 中。</p>
+<h4 id="设置-cgroup-参数"><a href="#设置-cgroup-参数" class="headerlink" title="设置 cgroup 参数"></a>设置 cgroup 参数</h4><p>设置 group 的参数就是直接往特定的文件中写入特定格式的内容，比如要限制 cgroup 能够使用的 CPU 核数：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">root@PEK1000251892:~<span class="comment"># echo 0-1 &gt; /sys/fs/cgroup/cpuset/mycgroup/cpuset.cpus</span></span></pre></td></tr></table></figure>
+
+<h4 id="把进程加入到-cgroup"><a href="#把进程加入到-cgroup" class="headerlink" title="把进程加入到 cgroup"></a>把进程加入到 cgroup</h4><p>要把某个已经运行的进程加入到 cgroup，可以直接往需要的 cgroup tasks 文件中写入进程的 PID：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">root@PEK1000251892:~<span class="comment"># echo 2358 &gt; /sys/fs/cgroup/memory/mycgroup/tasks</span></span></pre></td></tr></table></figure>
+
+<h4 id="在-cgroup-中运行进程"><a href="#在-cgroup-中运行进程" class="headerlink" title="在 cgroup 中运行进程"></a>在 cgroup 中运行进程</h4><p>如果想直接把进程运行在某个 cgroup，但是运行前还不知道进程的 Pid 应该怎么办呢？</p>
+<p>我们可以利用 cgroup 的继承方式来实现，<strong>因为子进程会继承父进程的 cgroup</strong>，因此我们可以把当前 shell 加入到要想的 cgroup：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">root@PEK1000251892:~<span class="comment"># echo $$ &gt; /sys/fs/cgroup/cpu/mycgroup/tasks</span></span></pre></td></tr></table></figure>
+
+<p>上面的方案有个缺陷，运行完之后原来的 shell 还在 cgroup 中。如果希望进程运行完不影响当前使用的 shell，可以另起一个临时的 shell：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">sh -c <span class="string">"echo \$$ &gt; /sys/fs/cgroup/memory/mycgroup/tasks &amp; &amp; stress -m 1"</span></span></pre></td></tr></table></figure>
+
+<h4 id="把进程移动到-cgroup"><a href="#把进程移动到-cgroup" class="headerlink" title="把进程移动到 cgroup"></a>把进程移动到 cgroup</h4><p>如果想要把进程移动到另外一个 cgroup，只要使用 <code>echo</code> 把进程 PID 写入到 cgroup tasks 文件中即可，原来 cgroup tasks 文件会自动删除该进程。</p>
+<h2 id="Docker使用cgroup"><a href="#Docker使用cgroup" class="headerlink" title="Docker使用cgroup"></a>Docker使用cgroup</h2><p>默认情况下，Docker 启动一个容器后，会在 <code>/sys/fs/cgroup</code>目录下的各个资源目录下生成以容器 ID 为名字的目录（group），比如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">/sys/fs/cgroup/cpu/docker/03dd196f415276375f754d51ce29b418b170bd92d88c5e420d6901c32f93dc14</span></pre></td></tr></table></figure>
+
+<p>此时 cpu.cfs_quota_us 的内容为 -1，表示默认情况下并没有限制容器的 CPU 使用。在容器被 stopped 后，该目录被删除。</p>
+<p>运行命令 <code>docker run -d --name web41 --cpu-quota 25000 --cpu-period 100 --cpu-shares 30 training/webapp python app.py</code> 启动一个新的容器，结果：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">root@devstack:/sys/fs/cgroup/cpu/docker/06bd180cd340f8288c18e8f0e01ade66d066058dd053ef46161eb682ab69ec24<span class="comment"># cat cpu.cfs_quota_us</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">25000</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">root@devstack:/sys/fs/cgroup/cpu/docker/06bd180cd340f8288c18e8f0e01ade66d066058dd053ef46161eb682ab69ec24<span class="comment"># cat tasks</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">3704</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">root@devstack:/sys/fs/cgroup/cpu/docker/06bd180cd340f8288c18e8f0e01ade66d066058dd053ef46161eb682ab69ec24<span class="comment"># cat cpu.cfs_period_us</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">2000</span></pre></td></tr></table></figure>
+
+<p>Docker 会将容器中的进程的 ID 加入到各个资源对应的 tasks 文件中。表示 Docker 也是以上面的机制来使用 cgroups 对容器的 CPU 使用进行限制。</p>
+<p>相似地，可以通过 <code>docker run</code> 中 <code>mem</code> 相关的参数对容器的内存使用进行限制：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">    --cpuset-mems string          MEMs <span class="keyword">in</span> <span class="built_in">which</span> to allow execution (0-3, 0,1)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">    --kernel-memory string        Kernel memory <span class="built_in">limit</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">-m, --memory string               Memory <span class="built_in">limit</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">    --memory-reservation string   Memory soft <span class="built_in">limit</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">    --memory-swap string          Swap <span class="built_in">limit</span> equal to memory plus swap: <span class="string">'-1'</span> to <span class="built_in">enable</span> unlimited swap</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">    --memory-swappiness int       Tune container memory swappiness (0 to 100) (default -1)</span></pre></td></tr></table></figure>
+
+<p>比如<code>docker run -d --name web42 --blkio-weight 100 --memory 10M --cpu-quota 25000 --cpu-period 2000 --cpu-shares 30 training/webapp python app.py</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">root@devstack:/sys/fs/cgroup/memory/docker/ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410<span class="comment"># cat memory.limit_in_bytes</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">10485760</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">root@devstack:/sys/fs/cgroup/blkio/docker/ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410<span class="comment"># cat blkio.weight</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"> 100</span></pre></td></tr></table></figure>
+
+<p>目前 docker 已经几乎支持了所有的 cgroups 资源，可以限制容器对包括 network，device，cpu 和 memory 在内的资源的使用，比如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">root@devstack:/sys/fs/cgroup<span class="comment"># find -iname ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">./net_prio/docker/ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">./net_cls/docker/ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">./systemd/docker/ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">./hugetlb/docker/ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">./perf_event/docker/ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">./blkio/docker/ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">./freezer/docker/ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">./devices/docker/ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">./memory/docker/ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">./cpuacct/docker/ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">./cpu/docker/ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">./cpuset/docker/ec8d850ebbabaf24df572cb5acd89a6e7a953fe5aa5d3c6a69c4532f92b57410</span></pre></td></tr></table></figure>
+
+<h1 id="Capbilities"><a href="#Capbilities" class="headerlink" title="Capbilities"></a>Capbilities</h1><h2 id="capbilities查看"><a href="#capbilities查看" class="headerlink" title="capbilities查看"></a>capbilities查看</h2><p>在上一篇文章中介绍了capbilities了，实际是一种把root权限细分的技术，现在介绍下docker中的capbilities的使用。</p>
+<p>列出系统支持的capability使用命令 <code>capsh --print</code> ，查看dockerd进程所有capbilities：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">root@PEK1000251892:~<span class="comment"># cat /proc/`pidof dockerd`/status | grep Cap</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">CapInh: 0000000000000000</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">CapPrm: 0000003fffffffff</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">CapEff: 0000003fffffffff</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">CapBnd: 0000003fffffffff</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">CapAmb: 0000000000000000</span></pre></td></tr></table></figure>
+
+<p>解码</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">root@PEK1000251892:~<span class="comment"># capsh --decode=0000003fffffffff</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">0x0000003fffffffff=cap_chown,cap_dac_override,cap_dac_read_search,cap_fowner,cap_fsetid,cap_kill,cap_setgid,cap_setuid,cap_setpcap,cap_linux_immutable,cap_net_bind_service,cap_net_broadcast,cap_net_admin,cap_net_raw,cap_ipc_lock,cap_ipc_owner,cap_sys_module,cap_sys_rawio,cap_sys_chroot,cap_sys_ptrace,cap_sys_pacct,cap_sys_admin,cap_sys_boot,cap_sys_nice,cap_sys_resource,cap_sys_time,cap_sys_tty_config,cap_mknod,cap_lease,cap_audit_write,cap_audit_control,cap_setfcap,cap_mac_override,cap_mac_admin,cap_syslog,cap_wake_alarm,cap_block_suspend,37</span></pre></td></tr></table></figure>
+
+<p>和getpcaps得到结果一样</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">root@PEK1000251892:~<span class="comment"># getpcaps `pidof dockerd`</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">Capabilities <span class="keyword">for</span> `116548<span class="string">': = cap_chown,cap_dac_override,cap_dac_read_search,cap_fowner,cap_fsetid,cap_kill,cap_setgid,cap_setuid,cap_setpcap,cap_linux_immutable,cap_net_bind_service,cap_net_broadcast,cap_net_admin,cap_net_raw,cap_ipc_lock,cap_ipc_owner,cap_sys_module,cap_sys_rawio,cap_sys_chroot,cap_sys_ptrace,cap_sys_pacct,cap_sys_admin,cap_sys_boot,cap_sys_nice,cap_sys_resource,cap_sys_time,cap_sys_tty_config,cap_mknod,cap_lease,cap_audit_write,cap_audit_control,cap_setfcap,cap_mac_override,cap_mac_admin,cap_syslog,cap_wake_alarm,cap_block_suspend,37+ep</span></span></pre></td></tr></table></figure>
+
+<h2 id="Docker默认capbilities"><a href="#Docker默认capbilities" class="headerlink" title="Docker默认capbilities"></a>Docker默认capbilities</h2><p>Docker 能调整容器中的进程针对主机上的 OS 功能的访问授权，这些功能访问授权称为 capability。 Docker 在创建容器时，会默认去除一组 capability，包括：</p>
+<ul>
+<li>SETPCAP: 修改进程的 capability</li>
+<li>SYS_MODULE: 插入/删除内核模块</li>
+<li>SYS_RAWIO: 修改内核内存</li>
+<li>SYS_PACCT: 配置进程的记账</li>
+<li>SYS_NICE: 修改进程的优先级</li>
+<li>SYS_RESOURCE: 覆盖资源的限制</li>
+<li>SYS_TIME: 修改系统时钟</li>
+<li>SYS_TTY_CONFIG: 配置 TTY 设备</li>
+<li>AUDIT_WRITE: 写审计日志</li>
+<li>AUDIT_CONTROL: 配置审计子系统</li>
+<li>MAC_OVERRIDE: 忽略内核 MAC 策略</li>
+<li>MAC_ADMIN: 配置 MAC 设置信息</li>
+<li>SYSLOG: 修改内核的 print 行为</li>
+<li>NET_ADMIN: 配置网络</li>
+<li>SYS_ADMIN: 表示系统管理的全部功能</li>
+</ul>
+<p>Docker为了确保容器的安全，仅仅支持了其中的<strong>14项基本的 Capabilities</strong>，现在，我们不妨来看看这些 Capabilities 到底有哪些，它们分别是： <code>CAP_CHOWN</code> 、 <code>CAP_DAC_OVERRIDE</code> 、 <code>CAP_FSETID</code> 、 <code>CAP_MKNOD</code> 、 <code>FOWNER</code> 、 <code>NET_RAW</code> 、 <code>SETGID</code> 、 <code>SETUID</code> 、 <code>SETFCAP</code> 、 <code>SETPCAP</code> 、 <code>NET_BIND_SERVICE</code> 、 <code>SYS_CHROOT</code> 、 <code>KILL</code> 和 <code>AUDIT_WRITE</code> 。  在这 14 项中几乎没有一项涉及到系统管理权限，比如 Docker 容器的 root 用户不具备 CAP_SYS_ADMIN，磁盘限额操作、mount 操作、创建进程新命名空间等均无法实现；比如由于没有 CAP_NET_ADMIN，网络方面的配置管理也将受到管制。因此，默认情况下，Docker 容器中的 root 用户并没有以往我们想象得那么能力超群，Docker 依然对其存在限制，这样设计的出发点之一自然是安全。 </p>
+<p>添加容器的 capability 用 <code>--cap-add</code>，去除容器的 capability 用 <code>--cap-drop</code>。 Linux 文档中的所有 capability 名都是以 <code>CAP_</code> 开头的全部大写字母，但是这里用其不带前缀的小字版本。例子：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$ docker run --rm -u nobody \</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">    ubuntu:latest \</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">    /bin/bash -c <span class="string">"capsh --print | grep net_raw"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">Current: = cap_chown,cap_dac_override,cap_fowner,cap_fsetid,cap_kill,cap_setgid,cap_setuid,cap_setpcap,cap_net_bind_service,cap_net_raw,cap_sys_chroot,cap_mknod,cap_audit_write,cap_setfcap+i</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">    Bounding <span class="built_in">set</span> =cap_chown,cap_dac_override,cap_fowner,cap_fsetid,cap_kill,cap_setgid,cap_setuid,cap_setpcap,cap_net_bind_service,cap_net_raw,cap_sys_chroot,cap_mknod,cap_audit_write,cap_setfcap</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">$ docker run --rm -u nobody \</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">    --<span class="built_in">cap</span>-drop net_raw \ <span class="comment"># drop NET_RAW capability</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">    ubuntu:latest \</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">    /bin/bash -c <span class="string">"capsh --print | grep net_raw"</span> <span class="comment"># no output</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">$ docker run --rm -u nobody \</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">    ubuntu:latest \</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">    /bin/bash -c <span class="string">"capsh --print | grep sys_admin"</span> <span class="comment"># no output</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">$ docker run --rm -u nobody \</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">    --<span class="built_in">cap</span>-add sys_admin \</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">    ubuntu:latest \</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">    /bin/bash -c <span class="string">"capsh --print | grep sys_admin"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line">urrent: = cap_chown,cap_dac_override,cap_fowner,cap_fsetid,cap_kill,cap_setgid,cap_setuid,cap_setpcap,cap_net_bind_service,cap_net_raw,cap_sys_chroot,cap_sys_admin,cap_mknod,cap_audit_write,cap_setfcap+i</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line">Bounding <span class="built_in">set</span> =cap_chown,cap_dac_override,cap_fowner,cap_fsetid,cap_kill,cap_setgid,cap_setuid,cap_setpcap,cap_net_bind_service,cap_net_raw,cap_sys_chroot,cap_sys_admin,cap_mknod,cap_audit_write,cap_setfcap</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">24</span></pre></td><td class="code"><pre><span class="line">hp</span></pre></td></tr></table></figure>
+
+<h1 id="seccomp"><a href="#seccomp" class="headerlink" title="seccomp"></a>seccomp</h1><h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p><strong>Seccomp</strong>是<strong>Secure computing mode</strong>的缩写，它是Linux内核提供的一个操作，用于<strong>限制一个进程可以执行的系统调用</strong>。当然，我们需要有一个配置文件来指明进程到底可以执行哪些系统调用，不可以执行哪些系统调用。</p>
+<p>在Docker中，它使用Seccomp来限制一个容器可以执行的系统调用。</p>
+<p>默认情况下，<strong>Seccomp</strong>会禁止容器执行64位Linux系统的313个系统调用的44个。我找不到这个<strong>Seccomp</strong>的默认配置文件在哪，可能是写在了源码中。</p>
+<p>我们下面来描述如何使用<strong>Seccomp</strong>。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$ grep CONFIG_SECCOMP= /boot/config-$(uname -r)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">CONFIG_SECCOMP=y</span></pre></td></tr></table></figure>
+
+<p>首先，创建一个配置文件:<strong>/home/ygy/seccomp/profile.json</strong>,其内容为:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">    <span class="attr">"defaultAction"</span>: <span class="string">"SCMP_ACT_ALLOW"</span>,</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">    <span class="attr">"syscalls"</span>: [</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">        &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">            <span class="attr">"name"</span>: <span class="string">"chmod"</span>,</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">            <span class="attr">"action"</span>: <span class="string">"SCMP_ACT_ERRNO"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">    ]</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>在上面的这个配置文件中，默认情况下，我们允许容器执行全部的系统调用．但是，禁止它执行<strong>chmod</strong>这个系统调用．</p>
+<p>然后，我们用这个<strong>Seccomp</strong>配置文件来启动一个Docker容器:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">docker run --rm -it --security-opt seccomp:/home/ygy/seccomp/profile.json busybox chmod 400 /etc/hosts</span></pre></td></tr></table></figure>
+
+<p>结果如下:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">chmod: /etc/hosts: Operation not permitted</span></pre></td></tr></table></figure>
+
+<p>使用<code>docker inspect</code>查看容器详细信息，有如下输出：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">"SecurityOpt": [</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">               <span class="string">"seccomp:     </span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">                 &#123;"defaultAction":"SCMP_ACT_ALLOW",</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">                 "syscalls":[&#123;"name":"chmod","action":"SCMP_ACT_ERRNO"&#125;]&#125;"</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">           ],</span></pre></td></tr></table></figure>
+
+<p>我们也可以在<code>run</code>一个容器的时候，通过<code>--security-opt seccomp:unconfined</code>参数来允许容器执行全部的系统的调用。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">docker run --rm -it --security-opt seccomp:unconfined busybox chmod 400 /etc/hosts</span></pre></td></tr></table></figure>
+
+<h2 id="默认策略"><a href="#默认策略" class="headerlink" title="默认策略"></a>默认策略</h2><p>docker seccomp使用白名单策机制，默认的策略列表： <a href="https://github.com/moby/moby/blob/master/profiles/seccomp/default.json" target="_blank" rel="noopener">https://github.com/moby/moby/blob/master/profiles/seccomp/default.json</a> </p>
+<p>一些重要的<a href="https://docs.docker.com/engine/security/seccomp/" target="_blank" rel="noopener">系统调用</a>如下：（不完整列表）</p>
+<table>
+<thead>
+<tr>
+<th align="left">Syscall</th>
+<th align="left">Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="left"><code>acct</code></td>
+<td align="left">Accounting syscall which could let containers disable their own resource limits or process accounting. Also gated by <code>CAP_SYS_PACCT</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>add_key</code></td>
+<td align="left">Prevent containers from using the kernel keyring, which is not namespaced.</td>
+</tr>
+<tr>
+<td align="left"><code>bpf</code></td>
+<td align="left">Deny loading potentially persistent bpf programs into kernel, already gated by <code>CAP_SYS_ADMIN</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>clock_adjtime</code></td>
+<td align="left">Time/date is not namespaced. Also gated by <code>CAP_SYS_TIME</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>clock_settime</code></td>
+<td align="left">Time/date is not namespaced. Also gated by <code>CAP_SYS_TIME</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>clone</code></td>
+<td align="left">Deny cloning new namespaces. Also gated by <code>CAP_SYS_ADMIN</code> for CLONE_* flags, except <code>CLONE_USERNS</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>create_module</code></td>
+<td align="left">Deny manipulation and functions on kernel modules. Obsolete. Also gated by <code>CAP_SYS_MODULE</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>delete_module</code></td>
+<td align="left">Deny manipulation and functions on kernel modules. Also gated by <code>CAP_SYS_MODULE</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>finit_module</code></td>
+<td align="left">Deny manipulation and functions on kernel modules. Also gated by <code>CAP_SYS_MODULE</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>get_kernel_syms</code></td>
+<td align="left">Deny retrieval of exported kernel and module symbols. Obsolete.</td>
+</tr>
+<tr>
+<td align="left"><code>get_mempolicy</code></td>
+<td align="left">Syscall that modifies kernel memory and NUMA settings. Already gated by <code>CAP_SYS_NICE</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>init_module</code></td>
+<td align="left">Deny manipulation and functions on kernel modules. Also gated by <code>CAP_SYS_MODULE</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>ioperm</code></td>
+<td align="left">Prevent containers from modifying kernel I/O privilege levels. Already gated by <code>CAP_SYS_RAWIO</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>iopl</code></td>
+<td align="left">Prevent containers from modifying kernel I/O privilege levels. Already gated by <code>CAP_SYS_RAWIO</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>kcmp</code></td>
+<td align="left">Restrict process inspection capabilities, already blocked by dropping <code>CAP_PTRACE</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>kexec_file_load</code></td>
+<td align="left">Sister syscall of <code>kexec_load</code> that does the same thing, slightly different arguments. Also gated by <code>CAP_SYS_BOOT</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>kexec_load</code></td>
+<td align="left">Deny loading a new kernel for later execution. Also gated by <code>CAP_SYS_BOOT</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>keyctl</code></td>
+<td align="left">Prevent containers from using the kernel keyring, which is not namespaced.</td>
+</tr>
+<tr>
+<td align="left"><code>lookup_dcookie</code></td>
+<td align="left">Tracing/profiling syscall, which could leak a lot of information on the host. Also gated by <code>CAP_SYS_ADMIN</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>mbind</code></td>
+<td align="left">Syscall that modifies kernel memory and NUMA settings. Already gated by <code>CAP_SYS_NICE</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>mount</code></td>
+<td align="left">Deny mounting, already gated by <code>CAP_SYS_ADMIN</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>move_pages</code></td>
+<td align="left">Syscall that modifies kernel memory and NUMA settings.</td>
+</tr>
+<tr>
+<td align="left"><code>name_to_handle_at</code></td>
+<td align="left">Sister syscall to <code>open_by_handle_at</code>. Already gated by <code>CAP_DAC_READ_SEARCH</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>nfsservctl</code></td>
+<td align="left">Deny interaction with the kernel nfs daemon. Obsolete since Linux 3.1.</td>
+</tr>
+<tr>
+<td align="left"><code>open_by_handle_at</code></td>
+<td align="left">Cause of an old container breakout. Also gated by <code>CAP_DAC_READ_SEARCH</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>perf_event_open</code></td>
+<td align="left">Tracing/profiling syscall, which could leak a lot of information on the host.</td>
+</tr>
+<tr>
+<td align="left"><code>personality</code></td>
+<td align="left">Prevent container from enabling BSD emulation. Not inherently dangerous, but poorly tested, potential for a lot of kernel vulns.</td>
+</tr>
+<tr>
+<td align="left"><code>pivot_root</code></td>
+<td align="left">Deny <code>pivot_root</code>, should be privileged operation.</td>
+</tr>
+<tr>
+<td align="left"><code>process_vm_readv</code></td>
+<td align="left">Restrict process inspection capabilities, already blocked by dropping <code>CAP_PTRACE</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>process_vm_writev</code></td>
+<td align="left">Restrict process inspection capabilities, already blocked by dropping <code>CAP_PTRACE</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>ptrace</code></td>
+<td align="left">Tracing/profiling syscall, which could leak a lot of information on the host. Already blocked by dropping <code>CAP_PTRACE</code>. Blocked in Linux kernel versions before 4.8 to avoid seccomp bypass.</td>
+</tr>
+<tr>
+<td align="left"><code>query_module</code></td>
+<td align="left">Deny manipulation and functions on kernel modules. Obsolete.</td>
+</tr>
+<tr>
+<td align="left"><code>quotactl</code></td>
+<td align="left">Quota syscall which could let containers disable their own resource limits or process accounting. Also gated by <code>CAP_SYS_ADMIN</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>reboot</code></td>
+<td align="left">Don’t let containers reboot the host. Also gated by <code>CAP_SYS_BOOT</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>request_key</code></td>
+<td align="left">Prevent containers from using the kernel keyring, which is not namespaced.</td>
+</tr>
+<tr>
+<td align="left"><code>set_mempolicy</code></td>
+<td align="left">Syscall that modifies kernel memory and NUMA settings. Already gated by <code>CAP_SYS_NICE</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>setns</code></td>
+<td align="left">Deny associating a thread with a namespace. Also gated by <code>CAP_SYS_ADMIN</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>settimeofday</code></td>
+<td align="left">Time/date is not namespaced. Also gated by <code>CAP_SYS_TIME</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>stime</code></td>
+<td align="left">Time/date is not namespaced. Also gated by <code>CAP_SYS_TIME</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>swapon</code></td>
+<td align="left">Deny start/stop swapping to file/device. Also gated by <code>CAP_SYS_ADMIN</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>swapoff</code></td>
+<td align="left">Deny start/stop swapping to file/device. Also gated by <code>CAP_SYS_ADMIN</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>sysfs</code></td>
+<td align="left">Obsolete syscall.</td>
+</tr>
+<tr>
+<td align="left"><code>_sysctl</code></td>
+<td align="left">Obsolete, replaced by /proc/sys.</td>
+</tr>
+<tr>
+<td align="left"><code>umount</code></td>
+<td align="left">Should be a privileged operation. Also gated by <code>CAP_SYS_ADMIN</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>umount2</code></td>
+<td align="left">Should be a privileged operation. Also gated by <code>CAP_SYS_ADMIN</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>unshare</code></td>
+<td align="left">Deny cloning new namespaces for processes. Also gated by <code>CAP_SYS_ADMIN</code>, with the exception of <code>unshare --user</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>uselib</code></td>
+<td align="left">Older syscall related to shared libraries, unused for a long time.</td>
+</tr>
+<tr>
+<td align="left"><code>userfaultfd</code></td>
+<td align="left">Userspace page fault handling, largely needed for process migration.</td>
+</tr>
+<tr>
+<td align="left"><code>ustat</code></td>
+<td align="left">Obsolete syscall.</td>
+</tr>
+<tr>
+<td align="left"><code>vm86</code></td>
+<td align="left">In kernel x86 real mode virtual machine. Also gated by <code>CAP_SYS_ADMIN</code>.</td>
+</tr>
+<tr>
+<td align="left"><code>vm86old</code></td>
+<td align="left">In kernel x86 real mode virtual machine. Also gated by <code>CAP_SYS_ADMIN</code>.</td>
+</tr>
+</tbody></table>
+<p>不使用seccomp</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$ docker run --rm -it --security-opt seccomp=unconfined debian:jessie \</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">    unshare --map-root-user --user sh -c whoami</span></pre></td></tr></table></figure>
+
+<h1 id="AppArmor和Selinux"><a href="#AppArmor和Selinux" class="headerlink" title="AppArmor和Selinux"></a>AppArmor和Selinux</h1><p>docker支持apparmor和selinux，默认不启用selinux，启用apparmor。 <a href="https://en.wikipedia.org/wiki/AppArmor" target="_blank" rel="noopener">AppArmor</a> 是一个 Linux 内核安全模块，可用于限制主机操作系统上运行的进程的功能。每个进程都可以拥有自己的安全配置文件。安全配置文件用来允许或禁止特定功能，例如网络访问或文件读/写/执行权限。 </p>
+<h2 id="加载和卸载profiles"><a href="#加载和卸载profiles" class="headerlink" title="加载和卸载profiles"></a>加载和卸载profiles</h2><p>加载一个新的profile</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$ apparmor_parser -r -W /path/to/your_profile</span></pre></td></tr></table></figure>
+
+<p>docker运行自定义的apparmor策略</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$ docker run --rm -it --security-opt apparmor=your_profile hello-world</span></pre></td></tr></table></figure>
+
+<p>卸载一个</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">$ apparmor_parser -R /path/to/profile</span></pre></td></tr></table></figure>
+
+<h2 id="默认策略-1"><a href="#默认策略-1" class="headerlink" title="默认策略"></a>默认策略</h2><p>Docker默认策略生成模板 <a href="https://github.com/moby/moby/blob/master/profiles/apparmor/template.go" target="_blank" rel="noopener">https://github.com/moby/moby/blob/master/profiles/apparmor/template.go</a> </p>
+<p><strong>参考：</strong></p>
+<p><a href="https://zhuanlan.zhihu.com/p/67586925" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/67586925</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/55099839" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/55099839</a></p>
+<p><a href="https://chuanleiguo.com/2018/08/05/Docker-Namespace-Cgroup/" target="_blank" rel="noopener">https://chuanleiguo.com/2018/08/05/Docker-Namespace-Cgroup/</a></p>
+<p><a href="https://cizixs.com/2017/08/25/linux-cgroup/" target="_blank" rel="noopener">https://cizixs.com/2017/08/25/linux-cgroup/</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/98920705" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/98920705</a></p>
+<p><a href="https://www.atjiang.com/limiting-risk-with-isolation-in-docker/" target="_blank" rel="noopener">https://www.atjiang.com/limiting-risk-with-isolation-in-docker/</a> </p>
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        
+
+        
+
+        
+
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://github.com/he1m4n6a" target="_blank" rel="noopener">github</a></span>
+        <span>/</span>
+        
+        <span><a href="https://weibo.com/u/1736968374" target="_blank" rel="noopener">weibo</a></span>
+        <span>/</span>
+        
+        <span><a href="#">wechat</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="/js/index.js"></script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+    <script>
+        /**
+         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+        */
+        if( '' || '')
+        var disqus_config = function () {
+            this.page.url = '';  // Replace PAGE_URL with your page's canonical URL variable
+            this.page.identifier = ''; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document, s = d.createElement('script');
+            s.src = 'https://airclouds-blog.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+
+
+
+</html>
