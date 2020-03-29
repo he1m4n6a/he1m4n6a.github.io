@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="He1m4n6a的博客">
+    <meta name="keyword"  content="腾讯">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        反入侵策略总结-提权检测 - He1m4n6a的博客 | He1m4n6a&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/aircloud.css">
+    <link rel="stylesheet" href="/css/gitment.css">
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar ">
+            <img src="/img/avatar.jpg" />
+        </div>
+        <div class="name">
+            <i>He1m4n6a</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archive">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#什么是提权"><span class="toc-text">什么是提权</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#SUID提权"><span class="toc-text">SUID提权</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#演示"><span class="toc-text">演示</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#误报排除"><span class="toc-text">误报排除</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#检测"><span class="toc-text">检测</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#内核漏洞提权"><span class="toc-text">内核漏洞提权</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#检测-1"><span class="toc-text">检测</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#进程自身提权"><span class="toc-text">进程自身提权</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#检测-2"><span class="toc-text">检测</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#进程提升capbility"><span class="toc-text">进程提升capbility</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#检测-3"><span class="toc-text">检测</span></a></li></ol></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        反入侵策略总结-提权检测
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2019-06-15 15:52:42</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#提权" title="提权">提权</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#suid" title="suid">suid</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <h1 id="什么是提权"><a href="#什么是提权" class="headerlink" title="什么是提权"></a>什么是提权</h1><p>利用里系统存在的漏洞，执行漏洞利用程序，从<strong>低权限的用户获取到一个高权限的shell。</strong></p>
+<h1 id="SUID提权"><a href="#SUID提权" class="headerlink" title="SUID提权"></a>SUID提权</h1><h2 id="演示"><a href="#演示" class="headerlink" title="演示"></a>演示</h2><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdlib.h&gt;</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="function"></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">    setuid(<span class="number">0</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">    setgid(<span class="number">0</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">    system(<span class="string">"ps"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<h2 id="误报排除"><a href="#误报排除" class="headerlink" title="误报排除"></a>误报排除</h2><p>查找suid权限</p>
+<p><code>find / -perm -u=s -type f 2&gt;/dev/null | grep -v docker</code></p>
+<p><strong>sudo误报：</strong></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">while :</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">do</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">    sleep 5</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">done</span></pre></td></tr></table></figure>
+
+<ul>
+<li><p>低权限用户运行上述脚本</p>
+</li>
+<li><p>动态监控进程<code>watch -n 1 -d &#39;ps -ef | grep passwd&#39;</code></p>
+</li>
+<li><p>观察到进程权限为root</p>
+</li>
+</ul>
+<p><img src="/images/a15/1.png" alt="img"></p>
+<p><strong>passwd误报：</strong></p>
+<p><img src="/images/a15/2.png" alt="img"></p>
+<ul>
+<li><p>使用低权限用户修改自己账号密码</p>
+</li>
+<li><p>动态监控进程<code>watch -n 1 -d &#39;ps -ef | grep passwd&#39;</code></p>
+</li>
+<li><p>观察到进程权限为root</p>
+</li>
+</ul>
+<p>其他含有suid的文件（包括docker文件，图中排除了），这些文件运行可能会触发误报。</p>
+<p><img src="/images/a15/3.png" alt="img"></p>
+<h2 id="检测"><a href="#检测" class="headerlink" title="检测"></a>检测</h2><p><strong>动态进程监控：</strong></p>
+<ol>
+<li>监控新建的进程，如果当前进程是root权限，并且父进程是低权限用户，则执行第2步</li>
+<li>排除白名单suid的误报，查看当前进程的子进程是否启动了shell进程</li>
+<li>shell进程的判断可通过<code>/proc/[pid]/exe</code>对应的具体文件判断</li>
+</ol>
+<p><strong>静态文件检测：</strong></p>
+<p>通过Inotify技术实时监控系统环境变量$PATH下可执行文件的所有者和S_ISUID、S_ISGID位的改变，主要针对通过chown、chmod等命令修改文件所有者和文件权限的行为。</p>
+<h1 id="内核漏洞提权"><a href="#内核漏洞提权" class="headerlink" title="内核漏洞提权"></a>内核漏洞提权</h1><p>内核提权过程</p>
+<p><img src="/images/a15/4.png" alt="img"></p>
+<h2 id="检测-1"><a href="#检测-1" class="headerlink" title="检测"></a>检测</h2><ol>
+<li>监控新建的进程，如果当前进程是低权限用户，而子进程的shell是高权限用户，则告警</li>
+<li>除了上述分析的误报，实际情况中可能还存在误报情况，可结合后期运营优化规则降低误报</li>
+</ol>
+<h1 id="进程自身提权"><a href="#进程自身提权" class="headerlink" title="进程自身提权"></a>进程自身提权</h1><ol>
+<li>检测进程自身权限提升的行为，即：非root进程转变成了root进程。</li>
+<li>进程将权限提升为CAP_SETUID和CAP_SETGID </li>
+</ol>
+<h2 id="检测-2"><a href="#检测-2" class="headerlink" title="检测"></a>检测</h2><p>扫描/proc下的进程UID、PID信息，保存起来作为基线。Netlink可以通过回调实时监测所有进程的PID/UID是否有修改。如果有修改，则存在提权行为。</p>
+<p>Netlink实时监测通过commit_creds、setuid、setresuid等系统API修改uid和gid的行为。提权判断规则如下：</p>
+<ul>
+<li><p>euid从非0提升为0</p>
+</li>
+<li><p>egid从非0提升为0</p>
+</li>
+</ul>
+<h1 id="进程提升capbility"><a href="#进程提升capbility" class="headerlink" title="进程提升capbility"></a>进程提升capbility</h1><p>进程将权限提升为CAP_SETUID和CAP_SETGID</p>
+<h2 id="检测-3"><a href="#检测-3" class="headerlink" title="检测"></a>检测</h2><p>主要针对通过内核模块修改进程结构体的方式提升进程的权限。通过周期性的对比proc/[pid]/status中记录的egid、euid的变化来判断进程是否被提权。proc/[pid]/status中记录了进程的基本信息，包括：pid，uid，以及CapInh，CapPrm，CapEff等信息。</p>
+<p>判断规则如下：</p>
+<ol>
+<li><p>cap_setuid是否从无效变成有效</p>
+</li>
+<li><p>uid从非0提升为0</p>
+</li>
+<li><p>euid从非0提升为0</p>
+</li>
+<li><p>egid从非0提升为0</p>
+</li>
+<li><p>父进程的euid和egid非0，但子进程的euid为0。                             </p>
+</li>
+</ol>
+<p><strong>参考：</strong></p>
+<p><a href="https://blog.csdn.net/Fly_hps/article/details/80301935" target="_blank" rel="noopener">https://blog.csdn.net/Fly_hps/article/details/80301935</a></p>
+<p><a href="https://mochazz.github.io/2018/06/09/Linux提权之SUID/#环境搭建" target="_blank" rel="noopener">https://mochazz.github.io/2018/06/09/Linux提权之SUID/#环境搭建</a></p>
+<p><a href="https://security.tencent.com/index.php/blog/msg/21" target="_blank" rel="noopener">https://security.tencent.com/index.php/blog/msg/21</a></p>
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        
+
+        
+
+        
+
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://github.com/he1m4n6a" target="_blank" rel="noopener">github</a></span>
+        <span>/</span>
+        
+        <span><a href="https://weibo.com/u/1736968374" target="_blank" rel="noopener">weibo</a></span>
+        <span>/</span>
+        
+        <span><a href="#">wechat</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="/js/index.js"></script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+    <script>
+        /**
+         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+        */
+        if( '' || '')
+        var disqus_config = function () {
+            this.page.url = '';  // Replace PAGE_URL with your page's canonical URL variable
+            this.page.identifier = ''; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document, s = d.createElement('script');
+            s.src = 'https://airclouds-blog.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+
+
+
+</html>
