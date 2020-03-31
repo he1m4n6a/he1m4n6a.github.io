@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="He1m4n6a的博客">
+    <meta name="keyword"  content="腾讯">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        反入侵策略总结-rootkit检测 - He1m4n6a的博客 | He1m4n6a&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/aircloud.css">
+    <link rel="stylesheet" href="/css/gitment.css">
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar ">
+            <img src="/img/avatar.jpg" />
+        </div>
+        <div class="name">
+            <i>He1m4n6a</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archive">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#linux进程隐藏"><span class="toc-text">linux进程隐藏</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#替换源程序"><span class="toc-text">替换源程序</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#伪造进程名"><span class="toc-text">伪造进程名</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#挂载覆盖"><span class="toc-text">挂载覆盖</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Hook系统调用"><span class="toc-text">Hook系统调用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#内核调用"><span class="toc-text">内核调用</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Linux-Hook技术"><span class="toc-text">Linux Hook技术</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Ring3中Hook技术"><span class="toc-text">Ring3中Hook技术</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#RING0-hook技术"><span class="toc-text">RING0 hook技术</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Rootkit检测"><span class="toc-text">Rootkit检测</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#什么是rootkit"><span class="toc-text">什么是rootkit</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#检测方案"><span class="toc-text">检测方案</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#rootkit-进程隐藏检测"><span class="toc-text">rootkit 进程隐藏检测</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#攻击手段"><span class="toc-text">攻击手段</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#检测方法"><span class="toc-text">检测方法</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#rootkit-应用层隐藏端口检测"><span class="toc-text">rootkit 应用层隐藏端口检测</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#攻击手段-1"><span class="toc-text">攻击手段</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#检测方法-1"><span class="toc-text">检测方法</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#rootkit应用层恶意文件检测"><span class="toc-text">rootkit应用层恶意文件检测</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#检测方法-2"><span class="toc-text">检测方法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#实现原理"><span class="toc-text">实现原理</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#病毒木马检测"><span class="toc-text">病毒木马检测</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#开源的杀毒引擎"><span class="toc-text">开源的杀毒引擎</span></a></li></ol></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        反入侵策略总结-rootkit检测
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2019-07-21 22:13:24</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#namespace" title="namespace">namespace</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#docker" title="docker">docker</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <h1 id="linux进程隐藏"><a href="#linux进程隐藏" class="headerlink" title="linux进程隐藏"></a>linux进程隐藏</h1><p>Linux 下进程隐藏手法大体上分为两种，一种是基于用户态隐藏；一种是直接操控内核进行隐藏。</p>
+<h2 id="替换源程序"><a href="#替换源程序" class="headerlink" title="替换源程序"></a>替换源程序</h2><p>检测源程序的hash</p>
+<h2 id="伪造进程名"><a href="#伪造进程名" class="headerlink" title="伪造进程名"></a>伪造进程名</h2><p><strong>a) 修改argv[0]</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="built_in">memset</span>((<span class="keyword">void</span> *)argv[<span class="number">0</span>], <span class="string">'\0'</span>, <span class="built_in">strlen</span>(argv[<span class="number">0</span>]));</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="built_in">strcpy</span>(argv[<span class="number">0</span>], <span class="string">"-"</span>);</span></pre></td></tr></table></figure>
+
+<p>检测<code>/proc/[pid]/cmdline</code>中argv[0]和<code>/proc/[pid]/stat</code>或者<code>/proc/[pid]/status</code>所对应的程序名是否一致</p>
+<p><strong>b) 使用prctl</strong></p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;stdio.h&gt;</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/prctl.h&gt;</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">int</span> argc, <span class="keyword">char</span> *argv[], <span class="keyword">char</span> *envp[])</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"><span class="function"></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">    prctl(PR_SET_NAME, <span class="string">"fuckyou\0"</span>,<span class="literal">NULL</span>,<span class="literal">NULL</span>,<span class="literal">NULL</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">    sleep(<span class="number">10000</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>修改了<code>/proc/[pid]/status</code>和<code>/proc/[pid]/stat</code>, <code>/proc/[pid]/cmdline</code>没变，所以ps，top看到的进程名还是没有改变。</p>
+<p><strong>c）使用exec</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="built_in">exec</span> -a fake_name &lt;程序&gt; &amp;</span></pre></td></tr></table></figure>
+
+<h2 id="挂载覆盖"><a href="#挂载覆盖" class="headerlink" title="挂载覆盖"></a>挂载覆盖</h2><p><code>mount --bind /tmp/empty /proc/[pid]</code></p>
+<p>检测/proc/mounts文件，解析是否有挂载到/proc/[pid]的文件夹</p>
+<p><a href="https://www.freebuf.com/articles/network/140535.html" target="_blank" rel="noopener">https://www.freebuf.com/articles/network/140535.html</a></p>
+<h2 id="Hook系统调用"><a href="#Hook系统调用" class="headerlink" title="Hook系统调用"></a>Hook系统调用</h2><ul>
+<li><p>修改内核调用，比如getdents 的源码</p>
+</li>
+<li><p>修改libc库中readdir 函数的源码</p>
+</li>
+<li><p>利用环境变量LD_PRELOAD 或者配置ld.so.preload文件 以使的恶意的动态库先于系统标准库加载，以达到架空系统标准库中相关函数的目的，最终实现对特定进程的隐藏</p>
+</li>
+</ul>
+<p><strong>检测：</strong></p>
+<ol>
+<li>查看内核版本编译的时间？</li>
+<li>监控libc文件</li>
+<li>监控环境变量LD_PRELOAD和/etc/ld.so.preload （如果是手工排查可用<code>strace</code>或者<code>sysdig</code>）</li>
+</ol>
+<h2 id="内核调用"><a href="#内核调用" class="headerlink" title="内核调用"></a>内核调用</h2><p>获取sys_call_table几种方法：<br>1）暴力破解</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (start = (<span class="keyword">unsigned</span> <span class="keyword">long</span> *)<span class="number">0xc0000000</span>; start &lt; (<span class="keyword">unsigned</span> <span class="keyword">long</span> *)<span class="number">0xffffffff</span>; start++)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">  <span class="keyword">if</span> (start[__NR_close] == (<span class="keyword">unsigned</span> <span class="keyword">long</span>)sys_close)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">return</span> start;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">  &#125;</span></pre></td></tr></table></figure>
+
+<p>2）通过/dev/kmem获取IDT address</p>
+<p>3) 通过dump获取绝对地址<br>模拟出一个<code>call *sys_call_table(,%eax,4)</code>，然后看其机器码，然后在<code>system_call</code>的附近基于这个特征进行寻找<br>4) 通过<code>kprobe</code>方式动态获取<code>kallsyms_lookup_name</code>，然后利用<code>kallsyms_lookup_name</code>获取<code>sys_call_table</code>的地址。<code>kallsyms_lookup_name()</code>可以用于获取内核导出符号表中的符号地址，而<code>sys_call_table</code>的地址也存在于内核导出符号表中，我么可以使用<code>kallsyms_lookup_name()</code>获取到<code>sys_call_table</code>的基地址。<br>5）int 80中断<br><a href="https://www.cnblogs.com/LittleHann/p/3879961.html" target="_blank" rel="noopener">https://www.cnblogs.com/LittleHann/p/3879961.html</a><br><a href="https://www.cnblogs.com/LittleHann/p/3854977.html#_lab2_3_6" target="_blank" rel="noopener">https://www.cnblogs.com/LittleHann/p/3854977.html#_lab2_3_6</a></p>
+<p><strong>检测：</strong></p>
+<p>原始的系统调用地址在<strong>内核编译阶段被指定</strong>，不会更改，通过比较原始的系统调用地址和当前内核态中的系统调用地址我们就可以发现系统调用有没有被更改。原始的系统调用地址在编译阶段被写入两个文件：</p>
+<ul>
+<li><p><strong>System.map:</strong> 该文件包含所有的符号地址，系统调用也包含在内</p>
+</li>
+<li><p><strong>vmlinux-2.4.x:</strong> 系统初始化时首先被读入内存的内核映像文件</p>
+</li>
+</ul>
+<blockquote>
+<p><strong>0x1: 获取原始内核系统调用函数地址</strong></p>
+<p><code>/boot/System.map-3.10.0-327.el7.x86_64</code></p>
+<p><strong>0x2: 获取当前内核系统调用地址</strong></p>
+<p><code>cat /proc/kallsyms</code> </p>
+<p><strong>0x3: 对比区别</strong></p>
+<p>从里面枚举sys_call_table的function point地址<br><code>/boot/System.map-3.10.0-327.el7.x86_64</code>和<code>cat /proc/kallsyms | grep sys_fork</code>进行diff对比<br><code>cat System.map-4.4.0-53-generic | grep sys_fork</code></p>
+<p>ubuntu对sys_socket相关的系统调用会进行内核地址重定位，因此需要对检测结果进行一个误报过滤，看是否所有的函数的gap都相同，如果相同，则说明是系统自己的</p>
+</blockquote>
+<h1 id="Linux-Hook技术"><a href="#Linux-Hook技术" class="headerlink" title="Linux Hook技术"></a>Linux Hook技术</h1><h2 id="Ring3中Hook技术"><a href="#Ring3中Hook技术" class="headerlink" title="Ring3中Hook技术"></a>Ring3中Hook技术</h2><p>1）通过LD_PRELOAD劫持so文件</p>
+<p>LD_PRELOAD的加载顺序由/etc/ld.so.preload确定</p>
+<p><strong>绕过方式：</strong></p>
+<ul>
+<li><p>通过静态编码绕过LD_PRELOAD机制监控</p>
+<p>通过静态链接方式编译so模块：<code>gcc -o test test.c -static</code><br>在静态链接的模式下，程序不会去搜索系统中的so文件(不同是系统默认的、还是第三方加入的)，所以也就不会调用到Hook SO模块。</p>
+</li>
+<li><p>通过内联汇编的方式绕过LD_PRELOAD机制监控 </p>
+<p>使用内嵌汇编的形式直接通过syscall指令使用系统调用功能，同样也不会调用到Glibc提供的API。<code>asm(&quot;movq $2, %%rax\n\t syscal:&quot;=a&quot;(ret));</code></p>
+</li>
+</ul>
+<p>2）通过ptrace注入 </p>
+<p>ptrace 可以让目标 pid 进程成为当前进程的子进程, 进而可以访问目标进程的内存空间, 寄存器, 并且可以向目标内存空间写内容. 需要了解 ptrace 函数的几个关键宏。参考链接  <a href="https://linux.die.net/man/2/ptrace" target="_blank" rel="noopener">https://linux.die.net/man/2/ptrace</a> :</p>
+<blockquote>
+<p><code>PTRACE_ATTACH</code> 挂载目标pid </p>
+<p><code>PTRACE_CONT</code>让子程序继续运行  </p>
+<p><code>PTRACE_PEEKTEXT</code>  读取内容  </p>
+<p><code>PTRACE_POKETEXT</code>  写入内容     </p>
+</blockquote>
+<ol>
+<li>用ptrace函数attach上目标进程  </li>
+<li>让目标进程的执行流程跳转到mmap函数来分配一小段内存空间  </li>
+<li>把一段机器码拷贝到目标进程中刚分配的内存中去  </li>
+<li>最后让目标进程的执行流程跳转到注入的代码执行  </li>
+</ol>
+<p>开启ptrace保护<br><img src="/images/a16/1.png" alt="img"></p>
+<p>利用工具地址：</p>
+<p><a href="https://jmpews.github.io/2016/12/27/pwn/linux%E8%BF%9B%E7%A8%8B%E5%8A%A8%E6%80%81so%E6%B3%A8%E5%85%A5/" target="_blank" rel="noopener">https://jmpews.github.io/2016/12/27/pwn/linux%E8%BF%9B%E7%A8%8B%E5%8A%A8%E6%80%81so%E6%B3%A8%E5%85%A5/</a></p>
+<h2 id="RING0-hook技术"><a href="#RING0-hook技术" class="headerlink" title="RING0 hook技术"></a>RING0 hook技术</h2><p>1) Kernel Inline Hook<br>传统的kernel inline hook技术就是修改内核函数的opcode，通过写入jmp或push ret等指令跳转到新的内核函数中，从而达到劫持的目的。</p>
+<p>2）劫持sys_call_table </p>
+<p>3）利用Linux内核机制kprobe机制(kprobes, jprobe和kretprobe)进行系统调用Hook<br>kprobe简介：<a href="https://www.cnblogs.com/LittleHann/p/3854977.html#_lab2_2_1" target="_blank" rel="noopener">https://www.cnblogs.com/LittleHann/p/3854977.html#_lab2_2_1</a></p>
+<p>4）LSM hook<br>LSM框架自身并不提供任何安全策略，它只是为安全模型提供了一致性接口。它使得各种不同的安全模型以内核模块的方式得到实现，而且不需改动内核源代码以及重新编译内核。目前基于LSM框架实现的最主要的安全模块主要有：<a href="https://www.cnblogs.com/LittleHann/p/3854977.html#_lab2_3_4" target="_blank" rel="noopener">https://www.cnblogs.com/LittleHann/p/3854977.html#_lab2_3_4</a><br>5）VDSO hook<br><a href="https://www.cnblogs.com/LittleHann/p/3879961.html" target="_blank" rel="noopener">https://www.cnblogs.com/LittleHann/p/3879961.html</a><br>6）LKM<br><a href="https://www.freebuf.com/articles/system/54263.html" target="_blank" rel="noopener">https://www.freebuf.com/articles/system/54263.html</a><br><a href="https://github.com/croemheld/lkm-rootkit/tree/master/src" target="_blank" rel="noopener">https://github.com/croemheld/lkm-rootkit/tree/master/src</a></p>
+<h1 id="Rootkit检测"><a href="#Rootkit检测" class="headerlink" title="Rootkit检测"></a>Rootkit检测</h1><h2 id="什么是rootkit"><a href="#什么是rootkit" class="headerlink" title="什么是rootkit"></a>什么是rootkit</h2><p>Rootkit是一种特殊的恶意软件，功能是在安全目标上隐藏自身及指定的文件、进程和网络链接等信息，通常rootkit和木马、后门等恶意程序结合使用。</p>
+<p>现在的操作系统，包括windows和Linux都是采用2层级别进行访问控制：即R0层和R3层。操作系统和驱动运行于R0层，一旦驱动加载成功，就与操作系统具有同样的权限，如果此驱动是恶意的，那么内核Rookit就植入了。用户态Rookit以普通应用程序（可能是应用层进程，或者模块，或者shellcode）形态运行在R3层。</p>
+<h2 id="检测方案"><a href="#检测方案" class="headerlink" title="检测方案"></a>检测方案</h2><p>1） 从rootkit造成的效果审计角度去检测。</p>
+<p>比如：rootkit会使得自身或者指定的进程端口等隐藏掉，无法通过常用工具查看到；</p>
+<p>2） 静态文件特征检测方式；</p>
+<p>采用特征扫描方式，首先，要找到rootkit文件在哪？大部分情况，rootkit文件/进程/驱动会隐藏起来，通过一般的查询工具查找不到。其次，找到后，进行特征扫描，特征库要及时更新，这里存在匹配覆盖率低的可能。 </p>
+<p>3） 动态行为分析检测方式。</p>
+<p>首先要锁定目标进程/驱动执行体，才能通过各种方式来捕捉其运行期的行为，再通过行为规则匹配或者大数据分析的方式进行判定。</p>
+<h3 id="rootkit-进程隐藏检测"><a href="#rootkit-进程隐藏检测" class="headerlink" title="rootkit 进程隐藏检测"></a>rootkit 进程隐藏检测</h3><h4 id="攻击手段"><a href="#攻击手段" class="headerlink" title="攻击手段"></a>攻击手段</h4><p>可以通过多种手段实现进程隐藏，比如：</p>
+<p>A)  替换掉常见的进程查看工具（比如：ps、top、lsof）等；</p>
+<p>B)   Hook系统调用，篡改常用的进程查看工具的工作流程，劫持底层调用的函数，在读取<code>/proc/pid</code>目录时，过滤掉需隐藏进程信息。</p>
+<p>C)   通过内核模块，拦截proc文件系统的回调函数，过滤掉需隐藏进程信息；</p>
+<p>D)  利用环境变量LD_PRELOAD或者配置ld.so.preload文件，以使得恶意的动态库先于系统标准库加载，架空标准库中的相关函数，实现对特定进程隐藏。 </p>
+<h4 id="检测方法"><a href="#检测方法" class="headerlink" title="检测方法"></a>检测方法</h4><ul>
+<li><p>针对直接替换工具类，通过文件校验即可检测；</p>
+</li>
+<li><p>对于hook 底层系统函数类，通过系统文件/内存完整性校验即可检测；</p>
+</li>
+<li><p>新增内核模块类，需要通过基线检查（白名单机制）发现非白名单的内核模块；</p>
+</li>
+<li><p>检查LD_PRELOAD变量和/etc/ld.so.preload文件</p>
+</li>
+</ul>
+<h3 id="rootkit-应用层隐藏端口检测"><a href="#rootkit-应用层隐藏端口检测" class="headerlink" title="rootkit 应用层隐藏端口检测"></a>rootkit 应用层隐藏端口检测</h3><h4 id="攻击手段-1"><a href="#攻击手段-1" class="headerlink" title="攻击手段"></a>攻击手段</h4><p>与进程隐藏思路类似，通过对Netstat等端口查看工具的调用过程中某个环节进行劫持，从而实现对指定端口信息的隐藏。Netstat是从/proc/net/tcp得到连接信息的。</p>
+<h4 id="检测方法-1"><a href="#检测方法-1" class="headerlink" title="检测方法"></a>检测方法</h4><p>通过libc系统调用函数bind，listen盲测端口，对比差异发现隐藏端口。</p>
+<p>具体如下：</p>
+<p>1） 从1到65535遍历端口；</p>
+<p>2） 创建一个基于TCP协议SOCK_STREAM的socket；</p>
+<p>3） 通过bind返回值和错误码探测端口状态；</p>
+<p>4） 如果被占用，通过listen错误码是EADDRINUSE确定端口占用；</p>
+<p>5） 通过ss或netstat命令过滤tcp协议，查看端口情况；</p>
+<p>6） 对比差异，确认差异的端口即为隐藏端口。</p>
+<p>7） 对系统上原本合法隐藏的端口信息等建立基线，在第6)中排除。</p>
+<p>相比tcp，udp使用SOCK_DGRAM的socket，缺少listen这步，其余检测步骤类似。</p>
+<h3 id="rootkit应用层恶意文件检测"><a href="#rootkit应用层恶意文件检测" class="headerlink" title="rootkit应用层恶意文件检测"></a>rootkit应用层恶意文件检测</h3><h4 id="检测方法-2"><a href="#检测方法-2" class="headerlink" title="检测方法"></a>检测方法</h4><p>假设能够拿到rootkit恶意文件样本，通过<strong>特征匹配</strong>的方式进行静态检测。</p>
+<h4 id="实现原理"><a href="#实现原理" class="headerlink" title="实现原理"></a>实现原理</h4><p>特征库包括：</p>
+<ul>
+<li><p>文件特征：如特征名、文件大小、目录名、文件和目录的隐藏属性；</p>
+</li>
+<li><p>字符串特征：如被篡改的二进制文件和系统启动脚本中会包含一些特征字符串；</p>
+</li>
+<li><p>内核符号表特征：通过加载内核模块而在内核符号表中留下的痕迹字符串等；</p>
+</li>
+</ul>
+<p>统计特征：对一条样本已检测出的所有特征个数进行统计，超过阈值（比如：30%）则认为是有效rootkit，否则视为疑似rootkit；</p>
+<h1 id="病毒木马检测"><a href="#病毒木马检测" class="headerlink" title="病毒木马检测"></a>病毒木马检测</h1><p>其实和rootkit检测方法差不多，因为可以把木马也属于rookit中的一种。现在很多挖矿马，一方面可以使用静态特征进行判断，也可以可以添加对cup占用的检测，如果单进程占用cup的负载很高，又不是白名单中的进程，则很有可能存在安全风险。</p>
+<p><strong>计算cup占用情况的方法：</strong></p>
+<p><code>/proc/stat</code> 存放所有CPU信息</p>
+<p><code>/proc/&lt;pid&gt;/stat</code>存放当个进程的cpu信息</p>
+<blockquote>
+<ol>
+<li><p>取一次processCpuTime1和totalCpuTime1;</p>
+</li>
+<li><p>间隔一段时间，再取一次processCpuTime2和totalCpuTime2;</p>
+</li>
+<li><p>pcpu = 100 * (processCpuTime2 – processCpuTime1)/(totalCpuTime2 - totalCpuTime1);</p>
+</li>
+</ol>
+</blockquote>
+<h2 id="开源的杀毒引擎"><a href="#开源的杀毒引擎" class="headerlink" title="开源的杀毒引擎"></a>开源的杀毒引擎</h2><p>开源杀毒引擎ClamAV的病毒库非常强大，主要有</p>
+<ol>
+<li>已知的恶意二进制文件的MD5哈希值</li>
+<li>PE(Windows 中可执行文件格式)节的MD5哈希值</li>
+<li>十六进制特征码（shellcode）</li>
+<li>存档元数据特征码</li>
+<li>已知的合法文件的白名单数据库</li>
+</ol>
+<p>我们可以将clamav的病毒库转换为yara规则，进行恶意代码识别。也可以利用开源的<strong>yara规则</strong>，进行木马病毒的检测。</p>
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        
+
+        
+
+        
+
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://github.com/he1m4n6a" target="_blank" rel="noopener">github</a></span>
+        <span>/</span>
+        
+        <span><a href="https://weibo.com/u/1736968374" target="_blank" rel="noopener">weibo</a></span>
+        <span>/</span>
+        
+        <span><a href="#">wechat</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="/js/index.js"></script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+    <script>
+        /**
+         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+        */
+        if( '' || '')
+        var disqus_config = function () {
+            this.page.url = '';  // Replace PAGE_URL with your page's canonical URL variable
+            this.page.identifier = ''; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document, s = d.createElement('script');
+            s.src = 'https://airclouds-blog.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+
+
+
+</html>

