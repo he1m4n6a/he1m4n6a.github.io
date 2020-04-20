@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="He1m4n6a的博客">
+    <meta name="keyword"  content="腾讯">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        Docker安全基线归纳 - He1m4n6a的博客 | He1m4n6a&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/aircloud.css">
+    <link rel="stylesheet" href="/css/gitment.css">
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar ">
+            <img src="/img/avatar.jpg" />
+        </div>
+        <div class="name">
+            <i>He1m4n6a</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archive">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-宿主机安全"><span class="toc-text">1 宿主机安全</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#1-1-避免生产环境使用实验功能"><span class="toc-text">1.1 避免生产环境使用实验功能</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#1-2-确认Docker软件关键文件安全性"><span class="toc-text">1.2 确认Docker软件关键文件安全性</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-容器安全"><span class="toc-text">2 容器安全</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-1-容器生命周期"><span class="toc-text">2.1 容器生命周期</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-2-容器启动安全"><span class="toc-text">2.2 容器启动安全</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-容器编排安全"><span class="toc-text">2.3 容器编排安全</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-1-docker-swarm安全"><span class="toc-text">2.3.1 docker swarm安全</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-2-docker-compose安全"><span class="toc-text">2.3.2 docker compose安全</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-3-3-kubernetes安全"><span class="toc-text">2.3.3 kubernetes安全</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-4-容器存储安全"><span class="toc-text">2.4 容器存储安全</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-5-容器网络安全"><span class="toc-text">2.5 容器网络安全</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-运行安全"><span class="toc-text">3 运行安全</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#3-1-安全机制配置"><span class="toc-text">3.1 安全机制配置</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#3-2-资源消耗"><span class="toc-text">3.2 资源消耗</span></a></li></ol></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        Docker安全基线归纳
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2020-01-16 21:22:14</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#docker" title="docker">docker</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#基线" title="基线">基线</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <h1 id="1-宿主机安全"><a href="#1-宿主机安全" class="headerlink" title="1 宿主机安全"></a>1 宿主机安全</h1><h2 id="1-1-避免生产环境使用实验功能"><a href="#1-1-避免生产环境使用实验功能" class="headerlink" title="1.1 避免生产环境使用实验功能"></a>1.1 避免生产环境使用实验功能</h2><p>docker自1.13.0版本引入<code>--experimental</code>参数用以启用实验功能。使用实验性功能应该非常谨慎，因为相关功能是未被充分测试，可能存在bug甚至安全问题 </p>
+<p><strong>测试步骤：</strong>查看配置文件是否开启实验性功能</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> vi /etc/default/docker</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">DOCKER_OPTS="--experimental=true" # 追加此行代码</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo service docker restart <span class="comment"># 重启 docker daemon</span></span></span></pre></td></tr></table></figure>
+
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> vi /etc/docker/daemon.json</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">        "experimental": true</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<h2 id="1-2-确认Docker软件关键文件安全性"><a href="#1-2-确认Docker软件关键文件安全性" class="headerlink" title="1.2 确认Docker软件关键文件安全性"></a>1.2 确认Docker软件关键文件安全性</h2><ul>
+<li>1.2.1 确认docker.service文件所有权为root:root</li>
+<li>1.2.2 确认docker.service文件权限为644或更严格</li>
+<li>1.2.3 确认docker.socket文件所有权为root:root</li>
+<li>1.2.4 确认docker.socket文件权限为644或更严格</li>
+<li>1.2.5 确认/etc/docker目录所有权为root:root</li>
+<li>1.2.6 确认/etc/docker目录权限为755或更严格</li>
+<li>1.2.7 确认镜像仓库证书文件所有权为root:root</li>
+<li>1.2.8 确认镜像仓库证书文件权限为444或更严格</li>
+<li>1.2.9 确认TLS CA证书文件所有权为root:root</li>
+<li>1.2.10 确认TLS CA证书文件权限为444或更严格</li>
+<li>1.2.11 确认docker服务端证书文件所有权为root:root</li>
+<li>1.2.12 确认docker服务端证书文件权限为444或更严格</li>
+<li>1.2.13 确认docker服务端证书密钥文件所有权为root:root</li>
+<li>1.2.14 确认docker服务端证书密钥文件权限为400或更严格</li>
+<li>1.2.15 确认docker.sock文件所有权为root:docker</li>
+<li>1.2.16 确认docker.sock文件权限为660或更严格</li>
+<li>1.2.17 确认daemon.json文件所有权为root:root</li>
+<li>1.2.18 确认daemon.json文件权限为644或更严格</li>
+<li>1.2.19 确认/etc/default/docker文件所有权为root:root</li>
+<li>1.2.20 确认/etc/default/docker文件权限为644或更严格</li>
+<li>1.2.21 确认/etc/sysconfig/docker文件所有权为root:root</li>
+</ul>
+<p><strong>测试步骤</strong>：使用linux命令查看这些文件对应的权限是否满足安全规范要求</p>
+<h1 id="2-容器安全"><a href="#2-容器安全" class="headerlink" title="2 容器安全"></a>2 容器安全</h1><h2 id="2-1-容器生命周期"><a href="#2-1-容器生命周期" class="headerlink" title="2.1 容器生命周期"></a>2.1 容器生命周期</h2><ul>
+<li><p>2.1.1 确保Docker软件更新到最新版本</p>
+</li>
+<li><p>2.1.2 检查容器内软件生命周期</p>
+</li>
+<li><p>2.1.3 避免镜像闲置冗余</p>
+</li>
+<li><p>2.1.4 避免容器闲置冗余</p>
+</li>
+<li><p>2.1.5 确保镜像仓库是最新版本</p>
+</li>
+<li><p>2.1.6 确保镜像仓库是最新版本</p>
+</li>
+</ul>
+<p><strong>测试步骤：</strong>这几项基本就是判断软件是否是最新版的检测删除未使用或旧的镜像。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 查看所有实例化image</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">sudo docker images --quiet | xargs docker inspect --format '&#123;&#123; .Id &#125;&#125;: Image=&#123;&#123; .Config.Image &#125;&#125;'</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 查看系统中存在的所有image</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">docker images</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> 删除none镜像</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">sudo docker rmi $(docker images -f dangling=true -q)</span></pre></td></tr></table></figure>
+
+<h2 id="2-2-容器启动安全"><a href="#2-2-容器启动安全" class="headerlink" title="2.2 容器启动安全"></a>2.2 容器启动安全</h2><ul>
+<li><p>2.2.1 不要以读写形式挂载相同目录到多个容器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">docker ps -a --quiet | xargs docker inspect -f <span class="string">"&#123;&#123; .Name &#125;&#125; &#123;&#123; .Mounts &#125;&#125;"</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>2.2.2 不要使用特权/用户选项的docker exec命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看是否使用特权 docker exec</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">ausearch -k docker | grep <span class="built_in">exec</span> | grep privileged</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看是否使用用户选项 docker exec</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">ausearch -k docker | grep <span class="built_in">exec</span> | grep user</span></pre></td></tr></table></figure>
+</li>
+<li><p>2.2.3 使用PIDS cgroup限制</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">docker ps --quiet --all | xargs docker inspect --format <span class="string">'&#123;&#123; .Id &#125;&#125;: PidsLimit=&#123;&#123; .HostConfig.PidsLimit &#125;&#125;'</span></span></pre></td></tr></table></figure>
+
+<p>确保PidLimit不为0或-1</p>
+</li>
+<li><p>2.2.4 不要在容器上挂载敏感的主机系统目录</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">docker ps --quiet --all | xargs docker inspect --format <span class="string">'&#123;&#123; .Id &#125;&#125;: Volumes=&#123;&#123; .Mounts &#125;&#125;'</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>2.2.5 限定容器重启次数上限(推荐5次)</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">docker ps --quiet --all | xargs docker inspect --format <span class="string">'&#123;&#123; .Id &#125;&#125;: RestartPolicyName=&#123;&#123; .HostConfig.RestartPolicy.Name &#125;&#125; MaximumRetryCount=&#123;&#123; .HostConfig.RestartPolicy.MaximumRetryCount &#125;&#125;'</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>2.2.6 不要直接将主机设备暴露给容器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">docker ps --quiet --all | xargs docker inspect --format <span class="string">'&#123;&#123; .Id &#125;&#125;: Devices=&#123;&#123; .HostConfig.Devices &#125;&#125;'</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>2.2.7 禁止以共享模式挂载卷</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">docker ps --quiet --all | xargs docker inspect --format <span class="string">'&#123;&#123; .Id &#125;&#125;: Propagation=&#123;&#123;range $mnt := .Mounts&#125;&#125; &#123;&#123;json $mnt.Propagation&#125;&#125; &#123;&#123;end&#125;&#125;'</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>2.2.8 不要将Docker socket挂载到任何容器内</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">docker ps --quiet --all | xargs docker inspect --format <span class="string">'&#123;&#123; .Id &#125;&#125;: Volumes=&#123;&#123; .Mounts &#125;&#125;'</span> | grep docker.sock</span></pre></td></tr></table></figure>
+</li>
+<li><p>2.2.9 不要使用特权容器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">docker ps --quiet -a | xargs docker inspect --format=<span class="string">'&#123;&#123;.Id&#125;&#125; &#123;&#123;.Name&#125;&#125; &#123;&#123;.HostConfig.Privileged&#125;&#125;'</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>2.2.10 创建容器的用户</p>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 为空则使用root</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">docker ps <span class="params">--quiet</span> | xargs docker inspect <span class="params">--format</span> '&#123;&#123; <span class="string">.Id</span> &#125;&#125;: User=&#123;&#123;<span class="string">.Config.User</span>&#125;&#125;</span></pre></td></tr></table></figure>
+</li>
+<li><p>2.2.11 容器使用可信的基础镜像</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">history</span> &lt;imageName&gt;</span></pre></td></tr></table></figure>
+</li>
+<li><p>2.2.12 容器内不安装非必要软件包</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> <span class="variable">$INSTANCE_ID</span> rpm –qa</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 或者 </span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> $ INSTANCE_ID dpkg –l</span></pre></td></tr></table></figure>
+</li>
+<li><p>2.2.13 启用docker内容信任</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="variable">$DOCKER_CONTENT_TRUST</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>2.2.14 不在dockerfile中单独使用更新命令</p>
+</li>
+<li><p>2.2.15 镜像中删除setuid和setgid权限</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">docker run &lt;Image_ID&gt; find / -perm +6000-type f -<span class="built_in">exec</span> ls -ld &#123;&#125; \; 2&gt; /dev/null</span></pre></td></tr></table></figure>
+</li>
+<li><p>2.2.16 在dockerfile中使用copy而不是add</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># add指令可能从远程URL下载文件并执行解包等操作</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">history</span> &lt;Image_ID&gt; </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 或者访问dockerfile</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>2.2.17 涉密信息不存储在dockerfile上</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">history</span> &lt;Image_ID&gt; </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 或者访问dockerfile</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>2.2.18 仅安装已经验证的软件包</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">history</span> &lt;Image_ID&gt; </span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 或者访问dockerfile</span></span></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="2-3-容器编排安全"><a href="#2-3-容器编排安全" class="headerlink" title="2.3 容器编排安全"></a>2.3 容器编排安全</h2><h3 id="2-3-1-docker-swarm安全"><a href="#2-3-1-docker-swarm安全" class="headerlink" title="2.3.1 docker swarm安全"></a>2.3.1 docker swarm安全</h3><ul>
+<li><p>2.3.1.1 确认swarm模式下overlay驱动开启加密功能</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 确认是否有使用overlay类型的网络驱动。如果没有返回结果，说明没有使用overlay驱动，无问题。</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">docker network ls|grep overlay</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 确认返回结果中是否每一个overlay驱动都使用了encrypted选项</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">docker network ls --quiet |xargs docker network inspect --format <span class="string">'&#123;&#123;.Name&#125;&#125; &#123;&#123;.Driver&#125;&#125; &#123;&#123;.Options&#125;&#125;'</span> |grep overlay</span></pre></td></tr></table></figure>
+</li>
+<li><p>2.3.1.2 非必要不要启用Swarm集群模式</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 如果输出包括Swarm:active，则表明集群模式在Docker引擎上激活</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">docker info | grep Swarm</span></pre></td></tr></table></figure>
+</li>
+<li><p>2.3.1.3 控制群中的管理器节点数</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">docker node ls | grep <span class="string">'Leader'</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 或者</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">docker info --format<span class="string">'&#123;&#123;.Swarm.Manager&#125;&#125;'</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>2.3.1.4 将集群服务绑定到特定网卡</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">netstat -lt | grep -i 2377</span></pre></td></tr></table></figure>
+</li>
+<li><p>2.3.1.5 使用Docker的secret管理命令来管理集群中的secret</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">docker secret ls</span></pre></td></tr></table></figure>
+</li>
+<li><p>2.3.1.6 在自动锁定模式下运行集群管理器</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 若返回 no unlock key is set，说明没有开启 autolock</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">docker swarm unlock-key</span></pre></td></tr></table></figure>
+</li>
+<li><p>2.3.1.7 定期修改集群管理器自动锁定密钥</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 可运行以下命令更换</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">Docker swarm unlock-key --rotate</span></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="2-3-2-docker-compose安全"><a href="#2-3-2-docker-compose安全" class="headerlink" title="2.3.2 docker compose安全"></a>2.3.2 docker compose安全</h3><h3 id="2-3-3-kubernetes安全"><a href="#2-3-3-kubernetes安全" class="headerlink" title="2.3.3 kubernetes安全"></a>2.3.3 kubernetes安全</h3><h2 id="2-4-容器存储安全"><a href="#2-4-容器存储安全" class="headerlink" title="2.4 容器存储安全"></a>2.4 容器存储安全</h2><ul>
+<li><p>2.4.1 为容器创建一个独立分区</p>
+<p>docker根目是/var/lib/docker的情况: </p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 存储驱动非devicemapper</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">docker info |grep <span class="string">"Storage Driver"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看docker根目录是否挂载在独立分区</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">mountpoint -- $(docker info | grep <span class="string">"Docker Root Dir"</span> | awk <span class="string">'&#123;print $4&#125;'</span>)</span></pre></td></tr></table></figure>
+
+<p>devicemapper的情况： devicemapper不需要单独配置挂载</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看是否是否devicemapper</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">docker info |grep <span class="string">"Storage Driver"</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>2.4.2 禁止使用aufs存储驱动</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看是否使用aufs驱动</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">docker info | grep -e <span class="string">"^Storage Driver:\s*aufs\s*$"</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>2.4.3 备份容器数据</p>
+</li>
+<li><p>2.4.4 避免容器闲置冗余</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 步骤 1 通过执行以下命令列出当前实例化的所有镜像 ID：</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">docker images --quiet | xargs docker inspect --format <span class="string">'&#123;&#123;.Id&#125;&#125;： Image = &#123;&#123;.Config.Image&#125;&#125;'</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 步骤 2：通过执行以下命令列出系统中存在的所有镜像： </span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">docker images</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 步骤 3：比较步骤 1 和步骤 2 中的镜像 ID 列表， 找出当前未实例化的镜像。 如果发现未使用或旧镜像，请与系统管理员讨论是否需要在系统上保留这些镜像。</span></span></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="2-5-容器网络安全"><a href="#2-5-容器网络安全" class="headerlink" title="2.5 容器网络安全"></a>2.5 容器网络安全</h2><ul>
+<li><p>2.5.1 限制容器间的网络通信</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 确认返回结果com.docker.network.bridge.enable_icc对应值是否为false</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">docker network ls --quiet | xargs docker network inspect --format <span class="string">'&#123;&#123; .Name &#125;&#125;: &#123;&#123; .Options &#125;&#125;'</span> | grep <span class="string">"default_bridge"</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>2.5.2 避免docker daemon暴露于外网网络</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 确认是否以端口形式对外开放docker api</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">ps -o user,args -e | grep docker | grep <span class="string">"tcp:"</span> 2&gt;/dev/null | sort</span></pre></td></tr></table></figure>
+</li>
+<li><p>2.5.3 禁止userland端口转发</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 启动参数中是否配置</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">ps -o user,args -e | grep dockerd | grep <span class="string">'\-\-userland-proxy'</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 配置文件中是否配置</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">ps -ef | grep docker |grep <span class="string">"\-\-config-file"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"><span class="string">"userland-proxy"</span>:<span class="literal">false</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>2.5.4 开启iptables选项</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 启动参数中是否配置</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">ps -ef |grep docker |grep iptables</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 配置文件中是否配置</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">ps -ef | grep docker |grep <span class="string">"\-\-config-file"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"><span class="string">"iptables"</span>: <span class="literal">true</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>2.5.5 不要使用Docker的默认网桥docker0</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 易受到 ARP 欺骗以及 MAC 洪泛攻击</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 运行以下命令，确保没有使用 docker0 bridge</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">docker network ls --quiet | xargs docker network inspect --format <span class="string">'&#123;&#123; .Name &#125;&#125;: &#123;&#123; .Options &#125;&#125;'</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>2.5.6 不要在容器中映射特权端口</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">docker ps --quiet | xargs docker inspect --format <span class="string">'&#123;&#123; .Id &#125;&#125;: Ports=&#123;&#123; .NetworkSettings.Ports &#125;&#125;'</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>2.5.7 不用共享host’s network命令空间</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 若返回 'NetworkMode=host'，就说明启动时加入了 '--net=host' 参数，命名空间被共享</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 应放返回 bridge 或 none 或 container:$Container_Instance</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">docker ps --quiet --all | xargs docker inspect --format <span class="string">'&#123;&#123; .Id &#125;&#125;: NetworkMode=&#123;&#123; .HostConfig.NetworkMode &#125;&#125;'</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>2.5.8 在容器中开放需要的端口</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">docker ps --quiet | xargs docker inspect --format <span class="string">'&#123;&#123; .Id &#125;&#125;: Ports=&#123;&#123; .NetworkSettings.Ports &#125;&#125;'</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>2.5.9 禁止将容器端口绑定到宿主机所有网卡</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">docker ps --quiet | xargs docker inspect --format <span class="string">'&#123;&#123; .Id &#125;&#125;: Ports=&#123;&#123; .NetworkSettings.Ports &#125;&#125;'</span></span></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h1 id="3-运行安全"><a href="#3-运行安全" class="headerlink" title="3 运行安全"></a>3 运行安全</h1><h2 id="3-1-安全机制配置"><a href="#3-1-安全机制配置" class="headerlink" title="3.1 安全机制配置"></a>3.1 安全机制配置</h2><ul>
+<li><p>3.1.1 启用live restore</p>
+<figure class="highlight angelscript"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">默认情况下，当daemon进程结束时，所有容器会被停止。自docker engine <span class="number">1.12</span>起，可以配置live-restore， 以支持当daemon不可用时，容器仍然正常运行。该功能在daemon崩溃、断电、升级时，能有效保证容器正常运行。该功能默认不会开启，需要手动配置。</span></pre></td></tr></table></figure>
+</li>
+<li><p>3.1.2 确保cgroup参数正确配置</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 如果为空，则表示容器在默认的docker cgroup 下运行,可以认为是安全的</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">docker ps --quiet --all | xargs docker inspect --format <span class="string">'&#123;&#123; .Id &#125;&#125;:CgroupParent=&#123;&#123; .HostConfig.CgroupParent &#125;&#125;'</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>3.1.3 确认默认seccomp规则正确配置</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 返回default使用默认配置，无问题</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">docker info --format=<span class="string">'&#123;&#123;.SecurityOptions&#125;&#125;'</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>3.1.4 不要禁用AppArmor文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">docker ps --quiet --all | xargs docker inspect --format <span class="string">'&#123;&#123; .Id &#125;&#125;: AppArmorProfile=&#123;&#123; .AppArmorProfile &#125;&#125;'</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>3.1.5 限制容器内的Linux Capabilities</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">docker ps --quiet --all | xargs docker inspect --format <span class="string">'&#123;&#123; .Id &#125;&#125;: CapAdd=&#123;&#123; .HostConfig.CapAdd &#125;&#125; CapDrop=&#123;&#123; .HostConfig.CapDrop &#125;&#125;'</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>3.1.6 设置SELinux选项(可选)</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">docker ps --quiet --all | xargs docker inspect --format <span class="string">'&#123;&#123; .Id &#125;&#125;: SecurityOpt=&#123;&#123; .HostConfig.SecurityOpt &#125;&#125;'</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>3.1.7不要共享宿主机process namespace</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment">#PID</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">docker ps --quiet | xargs docker inspect --format <span class="string">'&#123;&#123; .Id &#125;&#125;: PidMode=&#123;&#123; .HostConfig.PidMode &#125;&#125;'</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>3.1.8 不要共享宿主机 IPC namespace</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment">#IPC</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">docker ps --quiet | xargs docker inspect --format <span class="string">'&#123;&#123; .Id &#125;&#125;: IpcMode=&#123;&#123; .HostConfig.IpcMode &#125;&#125;'</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>3.1.9 不要共享宿主机 UTS namespace</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment">#UTS</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">docker ps --quiet | xargs docker inspect --format <span class="string">'&#123;&#123; .Id &#125;&#125;: UTSMode=&#123;&#123; .HostConfig.UTSMode &#125;&#125;'</span></span></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="3-2-资源消耗"><a href="#3-2-资源消耗" class="headerlink" title="3.2 资源消耗"></a>3.2 资源消耗</h2><ul>
+<li><p>3.2.1 设置默认的ulimit配置（可选）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 返回 &lt;no value&gt; 表示使用默认配置，没问题</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">docker ps --quiet --all | xargs docker inspect --format <span class="string">'&#123;&#123; .Id &#125;&#125;: Ulimits=&#123;&#123; .HostConfig.Ulimits &#125;&#125;'</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>3.2.2 检测是否限制容器CPU使用</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 如果命令返回0或1024，说明未限制CPU共享；如果返回一个非零值（非1024）表示已限制CPU共享。</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">docker ps --quiet --all | xargs docker inspect --format <span class="string">'&#123;&#123; .Id &#125;&#125;: CpuShares=&#123;&#123; .HostConfig.CpuShares &#125;&#125;'</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>3.2.3 检测是否限制容器内存使用</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 如果命令返回0，说明未限制容器内存使用；如果返回一个非零值，表示已限制容内存使用</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">docker ps --quiet --all | xargs docker inspect --format <span class="string">'&#123;&#123; .Id &#125;&#125;: Memory=&#123;&#123; .HostConfig.Memory &#125;&#125;'</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>3.2.4  检测是否已限制容器存储使用 </p>
+</li>
+<li><p>3.2.5  使用PIDs_cgroup_limit防止fork炸弹</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># 执行如下命令，确保PidsLimit的值不为0或-1。PidsLimit为0或-1意味着可以在容器内并发地创建任意数量的进程。</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">docker ps --quiet --all | xargs docker inspect --format <span class="string">'&#123;&#123; .Id &#125;&#125;: PidsLimit=&#123;&#123; .HostConfig.PidsLimit &#125;&#125;'</span></span></pre></td></tr></table></figure>
+
+</li>
+</ul>
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        
+
+        
+
+        
+
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://github.com/he1m4n6a" target="_blank" rel="noopener">github</a></span>
+        <span>/</span>
+        
+        <span><a href="https://weibo.com/u/1736968374" target="_blank" rel="noopener">weibo</a></span>
+        <span>/</span>
+        
+        <span><a href="#">wechat</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="/js/index.js"></script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+    <script>
+        /**
+         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+        */
+        if( '' || '')
+        var disqus_config = function () {
+            this.page.url = '';  // Replace PAGE_URL with your page's canonical URL variable
+            this.page.identifier = ''; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document, s = d.createElement('script');
+            s.src = 'https://airclouds-blog.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+
+
+
+</html>

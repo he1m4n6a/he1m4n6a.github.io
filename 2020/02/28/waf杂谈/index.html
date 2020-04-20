@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="He1m4n6a的博客">
+    <meta name="keyword"  content="腾讯">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        waf杂谈 - He1m4n6a的博客 | He1m4n6a&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/aircloud.css">
+    <link rel="stylesheet" href="/css/gitment.css">
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar ">
+            <img src="/img/avatar.jpg" />
+        </div>
+        <div class="name">
+            <i>He1m4n6a</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archive">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#waf架构"><span class="toc-text">waf架构</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#方案A：本机服务器模块模式"><span class="toc-text">方案A：本机服务器模块模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#方案B：反向代理模式"><span class="toc-text">方案B：反向代理模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#方案C：硬件防护设备"><span class="toc-text">方案C：硬件防护设备</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#方案D：服务器模块-检测云模式"><span class="toc-text">方案D：服务器模块+检测云模式</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Modsecurity-waf规则"><span class="toc-text">Modsecurity waf规则</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#参数说明"><span class="toc-text">参数说明</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#旧版规则集"><span class="toc-text">旧版规则集</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#基本规则集"><span class="toc-text">基本规则集</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SLR规则集"><span class="toc-text">SLR规则集</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#可选规则集"><span class="toc-text">可选规则集</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#实验性规则集"><span class="toc-text">实验性规则集</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#新版规则集"><span class="toc-text">新版规则集</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#应用攻击"><span class="toc-text">应用攻击</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#数据泄露"><span class="toc-text">数据泄露</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#排除误报"><span class="toc-text">排除误报</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#其他"><span class="toc-text">其他</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#如何提炼规则"><span class="toc-text">如何提炼规则</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#自研waf规则设计"><span class="toc-text">自研waf规则设计</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#案例"><span class="toc-text">案例</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#评估waf的好坏"><span class="toc-text">评估waf的好坏</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#waf评测工具"><span class="toc-text">waf评测工具</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#如何降误报"><span class="toc-text">如何降误报</span></a></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        waf杂谈
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2020-02-28 01:05:10</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#waf规则" title="waf规则">waf规则</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#modsecurity" title="modsecurity">modsecurity</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#误报优化" title="误报优化">误报优化</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <h1 id="waf架构"><a href="#waf架构" class="headerlink" title="waf架构"></a>waf架构</h1><p>waf架构章节直接引用腾讯应急响应中心的<a href="https://security.tencent.com/index.php/blog/msg/56" target="_blank" rel="noopener">《主流WAF架构分析与探索》</a></p>
+<h2 id="方案A：本机服务器模块模式"><a href="#方案A：本机服务器模块模式" class="headerlink" title="方案A：本机服务器模块模式"></a>方案A：本机服务器模块模式</h2><p><img src="/images/waf/2/1.png" alt="img"></p>
+<p>通过在Apache，IIS等Web服务器内嵌实现检测引擎，所有请求的出入流量均先经过检测引擎的检测，如果请求无问题则调用CGI处理业务逻辑，如果请求发现攻击特征，再根据配置进行相应的动作。以此对运行于Web服务器上的网站进行安全防护。著名的安全开源项目ModSecurity及naxsi防火墙就是此种模式。</p>
+<p><strong>优点：</strong></p>
+<ol>
+<li>网络结构简单，只需要部署Web服务器的安全模块</li>
+</ol>
+<p><strong>挑战：</strong></p>
+<ol>
+<li><p>维护困难。当有大规模的服务器集群时，任何更新都涉及到多台服务器。</p>
+</li>
+<li><p>需要部署操作，在面临大规模部署时成本较高。</p>
+</li>
+<li><p>无集中化的数据中心。针对安全事件的分析往往需要有集中式的数据汇总，而此种模式下用户请求数据分散在各个Web服务器上。</p>
+</li>
+</ol>
+<h2 id="方案B：反向代理模式"><a href="#方案B：反向代理模式" class="headerlink" title="方案B：反向代理模式"></a>方案B：反向代理模式</h2><p><img src="/images/waf/2/2.png" alt="img"></p>
+<p>使用这种模式的方案需要修改DNS，让域名解析到反向代理服务器。当用户向某个域名发起请求时，请求会先经过反向代理进行检测，检测无问题之后再转发给后端的Web服务器。这种模式下，反向代理除了能提供Web安全防护之外，还能充当抗DDoS攻击，内容加速（CDN）等功能。云安全厂商CloudFlare采用这种模式。</p>
+<p><strong>优点：</strong></p>
+<ol>
+<li><p>集中式的流量出入口。可以针对性地进行大数据分析。</p>
+</li>
+<li><p>部署方便。可多地部署，附带提供CDN功能。</p>
+</li>
+</ol>
+<p><strong>挑战：</strong></p>
+<ol>
+<li><p>动态的额外增加一层。会带来用户请求的网络开销等。</p>
+</li>
+<li><p>站点和后端Web服务器较多的话，转发规则等配置较复杂。</p>
+</li>
+<li><p>流量都被捕捉，涉及到敏感数据保护问题，可能无法被接受。</p>
+</li>
+</ol>
+<h2 id="方案C：硬件防护设备"><a href="#方案C：硬件防护设备" class="headerlink" title="方案C：硬件防护设备"></a>方案C：硬件防护设备</h2><p><img src="/images/waf/2/3.png" alt="img"></p>
+<p>这种模式下，硬件防护设备串在网络链路中，所有的流量经过核心交换机引流到防护设备中，在防护设备中对请求进行检测，合法的请求会把流量发送给Web服务器。当发现攻击行为时，会阻断该请求，后端Web服务器无感知到任何请求。防护设备厂商如imperva等使用这种模式。</p>
+<p><strong>优点：</strong></p>
+<ol>
+<li>对后端完全透明。</li>
+</ol>
+<p><strong>挑战：</strong></p>
+<ol>
+<li><p>部署需改变网络架构，额外的硬件采购成本。</p>
+</li>
+<li><p>如Web服务器分布在多个IDC，需在多个IDC进行部署。</p>
+</li>
+<li><p>流量一直在增加，需考虑大流量处理问题。以及流量自然增长后的升级维护成本。</p>
+</li>
+<li><p>规则依赖于厂商，无法定制化，不够灵活。 </p>
+</li>
+</ol>
+<h2 id="方案D：服务器模块-检测云模式"><a href="#方案D：服务器模块-检测云模式" class="headerlink" title="方案D：服务器模块+检测云模式"></a>方案D：服务器模块+检测云模式</h2><p><img src="/images/waf/2/4.png" alt="img"></p>
+<p>这种模式其实是方案A的增强版，也会在Web服务器上实现安全模块。不同点在于，安全模块的逻辑非常简单，只是充当桥梁的作用。检测云则承担着所有的检测发现任务。当安全模块接收到用户的请求时，会通过UDP或者TCP的方式，把用户请求的HTTP文本封装后，发送到检测云进行检测。当检测无问题时，告知安全模块把请求交给CGI处理。当请求中检测到攻击特征时，则检测云会告知安全模块阻断请求。这样所有的逻辑、策略都在检测云端。</p>
+<p>我们之所以选择这个改进方案来实现防护系统，主要是出于以下几个方面的考虑：</p>
+<p><strong>1、维护问题</strong></p>
+<p>假如使用A方案，当面临更新时，无法得到及时的响应。同时，由于安全逻辑是嵌入到Web服务器中的，任何变更都存在影响业务的风险，这是不能容忍的。</p>
+<p><strong>2、网络架构</strong></p>
+<p>如果使用方案B，则需要调动大量的流量，同时需要提供一个超大规模的统一接入集群。而为了用户就近访问提高访问速度，接入集群还需要在全国各地均有部署，对于安全团队来说，成本和维护难度难以想象。</p>
+<p><strong>使用该方案时，需要考虑如下几个主要的挑战：</strong></p>
+<p>1、 网络延时</p>
+<p>采用把检测逻辑均放在检测云的方式，相对于A来说，会增加一定的网络开销。不过，如果检测云放在内网里，这个问题就不大，99%的情况下，同城内网发送和接收一个UDP包只需要1ms。</p>
+<p>2、性能问题：</p>
+<p>由于是把全量流量均交给集中的检测云进行检测，大规模的请求可能会带来检测云性能的问题。这样在实现的时候就需要设计一个好的后端架构，必须充分考虑到负载均衡，流量调度等问题。</p>
+<p>3、 部署问题：</p>
+<p>该方案依然需要业务进行1次部署，可能会涉及到重编译web服务器等工作量，有一定的成本。并且当涉及到数千个域名时，问题变的更为复杂。可能需要区分出高危业务来对部署有一个前后顺序，并适时的通过一些事件来驱动部署。</p>
+<h1 id="Modsecurity-waf规则"><a href="#Modsecurity-waf规则" class="headerlink" title="Modsecurity waf规则"></a>Modsecurity waf规则</h1><p>modsecurity是一款知名的waf开源，并且owasp开源了一套对应的<a href="https://www.modsecurity.org/rules.html" target="_blank" rel="noopener">检测规则</a>，非常值得我们借鉴和学习。</p>
+<p>中文使用参考：  <a href="http://www.modsecurity.cn/" target="_blank" rel="noopener">http://www.modsecurity.cn/</a></p>
+<p>中文手册： <a href="http://www.modsecurity.cn/chm/index.html" target="_blank" rel="noopener">http://www.modsecurity.cn/chm/index.html</a></p>
+<h3 id="参数说明"><a href="#参数说明" class="headerlink" title="参数说明"></a>参数说明</h3><p>Modesecurity : <strong>Security Paranoia Level</strong></p>
+<p><strong>Level 1 (Default):</strong>A dequate security to protect almost all web applications from generic exploits. We recommend most users to use this level by default, to ensure minimum disruption from false positives.</p>
+<p><strong>Level 2:</strong>A slightly higher level of security to block almost all web application exploits. This may result in some false positives.</p>
+<p><strong>Level 3:</strong>A more paranoid approach to web security. You may experience a higher number of false positives.</p>
+<p><strong>Level 4 (most paranoid):</strong> The most paranoid, preventive approach to security. This mode may block quite a number legitimate requests to your site.</p>
+<p><strong>总结：</strong>Security Paranoia Level  等级越高，对应规则误报就也大。</p>
+<h2 id="旧版规则集"><a href="#旧版规则集" class="headerlink" title="旧版规则集"></a><a href="https://github.com/fabiocicerchia/OWASP-CRS" target="_blank" rel="noopener">旧版规则集</a></h2><h3 id="基本规则集"><a href="#基本规则集" class="headerlink" title="基本规则集"></a>基本规则集</h3><p>modsecurity_crs_20_protocol_violations.conf - HTTP协议规范相关规则</p>
+<p>modsecurity_crs_21_protocol_anomalies.conf - HTTP协议规范相关规则</p>
+<p>modsecurity_crs_23_request_limits.conf - HTTP协议大小长度限制相关规则</p>
+<p>modsecurity_crs_30_http_policy.conf - HTTP协议白名单相关规则</p>
+<p>modsecurity_crs_35_bad_robots.conf - 恶意扫描器与爬虫规则</p>
+<p>modsecurity_crs_40_generic_attacks.conf - 常见的攻击例如命令执行，代码执行，注入，文件包含、敏感信息泄露、会话固定、HTTP响应拆分等相关规则</p>
+<p>modsecurity_crs_41_sql_injection_attacks.conf - SQL注入相关规则（竟然有一条MongoDB注入的规则，很全）</p>
+<p>modsecurity_crs_41_xss_attacks.conf - XSS相关规则</p>
+<p>modsecurity_crs_42_tight_security.conf - 目录遍历相关规则</p>
+<p>modsecurity_crs_45_trojans.conf - webshell相关规则</p>
+<p>modsecurity_crs_47_common_exceptions.conf - Apache异常相关规则</p>
+<p>modsecurity_crs_49_inbound_blocking.conf - 协同防御相关规则</p>
+<p>modsecurity_crs_50_outbound.conf - 检测response_body中的错误信息，警告信息，列目录信息</p>
+<p>modsecurity_crs_59_outbound_blocking.conf - 协同防御相关规则</p>
+<p>modsecurity_crs_60_correlation.conf - 协同防御相关规则</p>
+<h3 id="SLR规则集"><a href="#SLR规则集" class="headerlink" title="SLR规则集"></a>SLR规则集</h3><p>来自确定APP的PoC，不会误报，检测方法是先检查当前请求的文件路径是否出现在data文件中，若出现再进行下一步测试，否则跳过该规则集的检测</p>
+<p>modsecurity_crs_46_slr_et_joomla_attacks.conf -JOOMLA应用的各种漏洞规则</p>
+<p>modsecurity_crs_46_slr_et_lfi_attacks.conf - 各种APP的本地文件包含相关规则</p>
+<p>modsecurity_crs_46_slr_et_phpbb_attacks.conf - PHPBB应用的各种漏洞规则</p>
+<p>modsecurity_crs_46_slr_et_rfi_attacks.conf - 各种APP的远程文件包含相关规则</p>
+<p>modsecurity_crs_46_slr_et_sqli_attacks.conf - 各种APP的SQL注入相关规则</p>
+<p>modsecurity_crs_46_slr_et_wordpress_attacks.conf - WORDPRESS应用的各种漏洞规则</p>
+<p>modsecurity_crs_46_slr_et_xss_attacks.conf - 各种APP的XSS相关规则</p>
+<h3 id="可选规则集"><a href="#可选规则集" class="headerlink" title="可选规则集"></a>可选规则集</h3><p>modsecurity_crs_10_ignore_static.conf - 静态文件不过WAF检测的相关规则</p>
+<p>modsecurity_crs_11_avs_traffic.confAVS -（授权的漏洞扫描器）的IP白名单规则</p>
+<p>modsecurity_crs_13_xml_enabler.conf - 请求体启用XML解析处理</p>
+<p>modsecurity_crs_16_authentication_tracking.conf - 记录登陆成功与失败的请求</p>
+<p>modsecurity_crs_16_session_hijacking.conf - 会话劫持检测</p>
+<p>modsecurity_crs_16_username_tracking.conf - 密码复杂度检测</p>
+<p>modsecurity_crs_25_cc_known.conf - CreditCard验证</p>
+<p>modsecurity_crs_42_comment_spam.conf - 垃圾评论检测</p>
+<p>modsecurity_crs_43_csrf_protection.conf与modsecurity_crs_16_session_hijacking.conf - 联合检测，使用内容注入动作append注入CSRF Token</p>
+<p>modsecurity_crs_46_av_scanning.conf - 使用外部脚本扫描病毒</p>
+<p>modsecurity_crs_47_skip_outbound_checks.conf - modsecurity_crs_10_ignore_static.conf的补充</p>
+<p>modsecurity_crs_49_header_tagging.conf - 将WAF规则命中情况配合Apache RequestHeader指令注入到请求头中，以供后续应用进一步处理</p>
+<p>modsecurity_crs_55_marketing.conf - 记录MSN/Google/Yahoorobot情况</p>
+<h3 id="实验性规则集"><a href="#实验性规则集" class="headerlink" title="实验性规则集"></a>实验性规则集</h3><p>modsecurity_crs_11_brute_force.conf - 防御暴力破解相关规则</p>
+<p>modsecurity_crs_11_dos_protection.conf - 防DoS攻击相关规则</p>
+<p>modsecurity_crs_11_proxy_abuse.conf检测X-Forwarded-For是否是恶意代理IP，IP黑名单</p>
+<p>modsecurity_crs_11_slow_dos_protection.conf - Slow HTTP DoS攻击规则</p>
+<p>modsecurity_crs_25_cc_track_pan.conf - 检测响应体credit card信息</p>
+<p>modsecurity_crs_40_http_parameter_pollution.conf - 检测参数污染</p>
+<p>modsecurity_crs_42_csp_enforcement.conf - CSP安全策略设置</p>
+<p>modsecurity_crs_48_bayes_analysis.conf - 使用外部脚本采取贝叶斯分析方法分析HTTP请求，区分正常与恶意请求</p>
+<p>modsecurity_crs_55_response_profiling.conf - 使用外部脚本将响应体中的恶意内容替换为空</p>
+<p>modsecurity_crs_56_pvi_checks.conf - 使用外部脚本检测REQUEST_FILENAME是否在osvdb漏洞库中</p>
+<p>modsecurity_crs_61_ip_forensics.conf - 使用外部脚本收集IP的域名、GEO等信息</p>
+<p>modsecurity_crs_40_appsensor_detection_point_2.0_setup.conf - APPSENSOR检测设置文</p>
+<h2 id="新版规则集"><a href="#新版规则集" class="headerlink" title="新版规则集"></a><a href="https://github.com/SpiderLabs/owasp-modsecurity-crs/tree/v3.3/dev/rules" target="_blank" rel="noopener">新版规则集</a></h2><h3 id="应用攻击"><a href="#应用攻击" class="headerlink" title="应用攻击"></a>应用攻击</h3><blockquote>
+<p>常见的web攻击方法，例如sql、xss、rce等</p>
+</blockquote>
+<p><strong>REQUEST-930-APPLICATION-ATTACK-LFI.conf - 本地文件包含攻击</strong></p>
+<ul>
+<li>Directory Traversal Attacks - 目录遍历攻击</li>
+<li>OS File Access - 系统文件检测 ，通过lfi-os-files.data定义文件集</li>
+<li>Restricted File Access - 受限文件检测，通过restricted-files.data定义文件集</li>
+</ul>
+<p><strong>REQUEST-931-APPLICATION-ATTACK-RFI.conf - 远程文件包含攻击</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="comment"># [检测逻辑]</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">	- URL Contains an IP Address					url包含一个地址ip</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">	- The PHP <span class="string">"include()"</span> Function 					include()等函数</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">	- RFI Data Ends with Question Mark(s) (?)		参数以？结尾</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">	- RFI Host Doesn\<span class="string">'t Match Local Host				host不匹配本地host</span></span></pre></td></tr></table></figure>
+
+<p><strong>REQUEST-932-APPLICATION-ATTACK-RCE.conf - 远程代码执行攻击</strong></p>
+<ul>
+<li><p>Unix command injection - unix命令执行</p>
+</li>
+<li><p>Windows command injection - windows命令执行</p>
+</li>
+<li><p>Windows PowerShell, cmdlets and options - windows powershell命令检测，由windows-powershell-commands.data定义命令集</p>
+</li>
+<li><p>Unix shell expressions - unix shell表达式</p>
+</li>
+<li><p>Windows FOR, IF commands - windows for, if命令集</p>
+</li>
+<li><p>Unix direct remote command execution - unix 直接执行远程命令 </p>
+</li>
+<li><p>Unix shell snippets - unix常见攻击序列检测，由unix-shell.data定义序列集 </p>
+</li>
+<li><p>Shellshock vulnerability - shellshock漏洞检测</p>
+</li>
+<li><p>Restricted File Upload - 受限文件上传，通过restricted-upload.data定义文件集</p>
+</li>
+</ul>
+<p><strong>REQUEST-933-APPLICATION-ATTACK-PHP.conf - PHP攻击</strong></p>
+<ul>
+<li>PHP Injection Attacks - php注入攻击<ul>
+<li>PHP Open Tag Found - php 标志检测</li>
+<li>PHP Script Uploads - php 脚本上传</li>
+<li>PHP Configuration Directives - php配置指令检测，由php-config-directives.data定义指令集 </li>
+<li>PHP Variables - php变量检测，由php-variables.data定义变量集</li>
+<li>PHP I/O Streams - php io流检测</li>
+<li>PHP Wrappers - php包装检测，eg: <code>phar://</code></li>
+<li>PHP Functions - php函数检测</li>
+<li>PHP Object Injection - php对象注入</li>
+<li><strong>…snip…</strong> -  php函数调用，变量的变形检测等</li>
+</ul>
+</li>
+</ul>
+<p><strong>REQUEST-934-APPLICATION-ATTACK-NODEJS.conf - NODEJS攻击</strong></p>
+<ul>
+<li>Insecure unserialization / generic RCE signatures - 不安全的序列化/通用的rce指纹</li>
+</ul>
+<p><strong>REQUEST-941-APPLICATION-ATTACK-XSS.conf - XSS攻击</strong></p>
+<ul>
+<li>Libinjection - XSS Detection - 使用<a href="https://github.com/client9/libinjection" target="_blank" rel="noopener">libinjection</a>引擎进行XSS检测</li>
+<li>XSS Filters - Category 1 - 基于脚本标签的XSS向量</li>
+<li>XSS Filters - Category  2 - 基于onerror、onload等事件的XSS向量</li>
+<li>XSS Filters - Category 3 -  regexp-941130.data上定义的正则，可使用<code>regexp-assemble.pl</code>编译成一条正则</li>
+<li>XSS Filters - Category 4 -  利用javascript uri和标签的XSS矢量</li>
+<li>NoScript XSS Filters - 无script标签检测<ul>
+<li>[NoScript InjectionChecker] HTML injection regexp-941160.data上定义的正则，可使用<code>regexp-assemble.pl</code>编译成一条正则</li>
+<li>[NoScript InjectionChecker] Attributes injection 属性检测</li>
+<li>[Blacklist Keywords from Node-Validator] - 来自Node-Validator的黑名单关键字</li>
+</ul>
+</li>
+<li>XSS Filters from IE - 来自IE的XSS过滤器</li>
+<li>XSS Filters - Category 5  - src, style 和href 属性检测</li>
+</ul>
+<p><strong>REQUEST-942-APPLICATION-ATTACK-SQLI.conf - SQL攻击</strong></p>
+<ul>
+<li>LibInjection Check  - 使用<a href="https://github.com/client9/libinjection" target="_blank" rel="noopener">libinjection</a>引擎进行SQL检测</li>
+<li>Detect DB Names - 检测数据库名字，regexp-942140.data上定义的正则，可使用<code>regexp-assemble.pl</code>编译成一条正则</li>
+<li><a href="https://raw.github.com/PHPIDS/PHPIDS/master/lib/IDS/default_filter.xml" target="_blank" rel="noopener">PHPIDS</a> - Converted SQLI Filters -使用PHPIDS规则检测，包括union,sleep注入等</li>
+<li>Detect MySQL in-line comments - 检测mysql内联注释</li>
+<li>String Termination/Statement Ending Injection Testing - 字符串终止/声明截止注入测试</li>
+<li>SQL Operators - sql操作符检测，eg: like、in、between等</li>
+<li>SQL Function Names - sql函数名检测</li>
+<li>SQL Injection Probings - sql注入探测检测</li>
+<li>SQL Injection Character Anomaly Usage  - SQL注入字符异常用法 </li>
+<li>Detect SQL Comment Sequences - 检测sql注释序列</li>
+<li>SQL Hex Evasion Methods - 六十进制规避方法检测</li>
+<li>Detect SQLi bypass: backticks - 检测反引号绕过</li>
+<li>Repetitive Non-Word Characters - 重复的非单词检测</li>
+<li>Detect SQLi bypass: quotes - 检测sql引号绕过</li>
+</ul>
+<p><strong>REQUEST-943-APPLICATION-ATTACK-SESSION-FIXATION.conf - 会话固定攻击</strong></p>
+<ul>
+<li>在html中包含有设置cookie变量值的内容</li>
+<li>参数中jsessionid等变量的http值和referer的host不相等</li>
+<li>参数中jsessionid等变量请求没referer</li>
+</ul>
+<p><strong>REQUEST-943-APPLICATION-ATTACK-JAVA.conf - JAVA应用攻击</strong></p>
+<ul>
+<li>java远程命令执行payload检测</li>
+<li>java序列化函数检测</li>
+<li>java class检测，由java-classes.data定义class集</li>
+<li>java反序列化特定字符检测</li>
+<li>java反序列化特定字符base64编码检测</li>
+<li>java远程命令执行函数base64编码检测</li>
+</ul>
+<h3 id="数据泄露"><a href="#数据泄露" class="headerlink" title="数据泄露"></a>数据泄露</h3><p>以下几个规则是对phase4（http响应阶段）的检测，检测响应中是否存在数据泄露：</p>
+<ul>
+<li>RESPONSE-950-DATA-LEAKAGES.conf</li>
+<li>RESPONSE-951-DATA-LEAKAGES-SQL.conf</li>
+<li>RESPONSE-952-DATA-LEAKAGES-JAVA.conf</li>
+<li>RESPONSE-953-DATA-LEAKAGES-PHP.conf</li>
+<li>RESPONSE-954-DATA-LEAKAGES-IIS.conf</li>
+</ul>
+<h3 id="排除误报"><a href="#排除误报" class="headerlink" title="排除误报"></a>排除误报</h3><p>以下几个都是排除特定cms安装时的误报：</p>
+<ul>
+<li>REQUEST-903.9001-DRUPAL-EXCLUSION-RULES.conf</li>
+<li>REQUEST-903.9002-WORDPRESS-EXCLUSION-RULES.conf</li>
+<li>REQUEST-903.9003-NEXTCLOUD-EXCLUSION-RULES.conf</li>
+<li>REQUEST-903.9004-DOKUWIKI-EXCLUSION-RULES.conf</li>
+<li>REQUEST-903.9005-CPANEL-EXCLUSION-RULES.conf</li>
+<li>REQUEST-903.9006-XENFORO-EXCLUSION-RULES.conf</li>
+</ul>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p>文件结构很清晰，大家可以自行分析。</p>
+<ul>
+<li>dos攻击检测阻断</li>
+<li>扫描器检测阻断</li>
+<li>恶意ip检测阻断</li>
+<li>http协议攻击检测（包括http请求夹带攻击、http拆分响应攻击等）</li>
+</ul>
+<h2 id="如何提炼规则"><a href="#如何提炼规则" class="headerlink" title="如何提炼规则"></a>如何提炼规则</h2><p>modsecurity中包含了许多非常有价值的waf规则，我们自研waf可能需要筛选和整合modsecurity的规则，那如何提炼modsecurity的规则呢，我给出一点小建议：</p>
+<ul>
+<li><p><strong><a href="http://www.modsecurity.cn/chm/" target="_blank" rel="noopener">规则说明文档</a>：</strong>modsecurity配置文件中包含许多指令，遇到不懂再去文档里查，不需要上来就把文档看个遍。</p>
+</li>
+<li><p><strong>检测位置：</strong>提炼出该规则检测的http请求哪部分，比如body,url,还是请求参数等</p>
+</li>
+<li><p><strong>分析正则：</strong>直接出conf文件中提炼出正则表达式，如果是字符匹配，直接提取特征字符。</p>
+</li>
+<li><p><strong>测试理解：</strong>有些正则很复杂，可以通过以下一些方法进行分析：</p>
+<ul>
+<li><p>可以使用<a href="http://www.regexbuddy.com/" target="_blank" rel="noopener">regexbuddy</a>这款工具进行分析，在线分析可以使用<a href="https://regex101.com/" target="_blank" rel="noopener">regex101</a>。</p>
+<p><img src="/images/waf/2/5.png" alt=""></p>
+</li>
+<li><p>crs中有很多规则是使用<a href="https://metacpan.org/release/Regexp-Assemble" target="_blank" rel="noopener">Regexp::Assemble</a>把文件中的正则集生成一条正则的，我们也可以分析文件中的每条规则然后理解整个正则的含义。</p>
+</li>
+<li><p>crs中每个正则都有对应测试文件，也可能根据测试文件的payload来大概了解</p>
+<p><img src="/images/waf/2/6.png" alt=""></p>
+</li>
+</ul>
+</li>
+<li><p><strong>生成对应的规则：</strong>自研的waf规则可能是一个json文件，就把上述提取的检测位置和正则提取到json文件中，如果一些规则不会用到就精简掉，一些规则有绕过则补充进去。</p>
+</li>
+</ul>
+<h1 id="自研waf规则设计"><a href="#自研waf规则设计" class="headerlink" title="自研waf规则设计"></a>自研waf规则设计</h1><p>modsecurity规则很强大，但是对于新开发的waf系统来说过于臃肿，自研waf前期功能不需要那么复杂的规则和字段，但是最基础的字段是必须具备的：</p>
+<ul>
+<li><p><strong>动作</strong> ：deny, view  观察还是阻断</p>
+</li>
+<li><p><strong>检测参数：</strong> ARGS_NAMES, URI, BODY….  具体类型可以参考modsecurity</p>
+</li>
+<li><p><strong>*阶段：</strong>这个字段是可选字段，如果只考虑请求阻断，而不做响应阶段的数据泄露检测，此字段可以不用。</p>
+</li>
+</ul>
+<p>正则效率评估：<a href="http://www.regexbuddy.com/" target="_blank" rel="noopener">regexbuddy</a>或者<a href="https://regex101.com/" target="_blank" rel="noopener">regex101</a>进行评估，该工具可以匹配正则匹配具体执行了多少步，执行步数越长，代表正则效率越低。</p>
+<ul>
+<li><strong>*解码：</strong>此字段也是可选。虽然解码是waf检测中比不可少的（通过解码可以减少很多变形规则的编写），但是解码可以通过类型直接定义在代码中，或者通过配置文件自定义。推荐通过第二种方法进行操作，这种灵活性更强。</li>
+</ul>
+<h2 id="案例"><a href="#案例" class="headerlink" title="案例"></a>案例</h2><p>规则检测类型不需要根据modsecurity来分类命名，我们可以自己按照自己的攻击理解进行分类命名并精简规则。贴出两个自研waf的sql注入规则案例。</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="attr">name:</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">	<span class="string">sqli1(sqli条件和字符注入)</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="attr">rule:</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">	<span class="string">(?:\)\s*when\s*\d+\s*then)|(?:"\s*(?:#|--|&#123;))|(?:\/\*!\s?\d+)|(?:ch(?:a)?r\s*\(\s*\d)|(?:(?:(n?and|x?or|not)\s+|\|\||\&amp;\&amp;)\s*\w+\()</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"><span class="attr">action:</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">	<span class="string">deny</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="attr">tanserfer:</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">	<span class="string">urlDecodeUni</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line"><span class="attr">name:</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">	<span class="string">classic_sqli</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line"><span class="attr">rule:</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">	<span class="string">(?:"\s*or\s*"?\d)|(?:\\x(?:23|27|3d))|(?:^.?"$)|(?:(?:^["\\]*(?:[\d"]+|[^"]+"))+\s+(?:n?and|x?or|not|\|\||\&amp;\&amp;)\s+[\w"[+&amp;!@(),.-])|(?:[^\w\s]\w+\s*[|-]\s*"\s*\w)|(?:@\w+\s+(and|or)\s*["\d]+)|(?:@[\w-]+\s(and|or)\s*[^\w\s])|(?:\Winformation_schema|table_name\W)</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line"><span class="attr">action:</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">	<span class="string">view</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line"><span class="attr">tanserfer:</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">	<span class="string">urlDecodeUni</span></span></pre></td></tr></table></figure>
+
+<h1 id="评估waf的好坏"><a href="#评估waf的好坏" class="headerlink" title="评估waf的好坏"></a>评估waf的好坏</h1><p>一般来说评估waf的好坏无外乎两方面，误报率和漏报率。（当然还有waf系统占用率以及waf系统的响应速，不过这两条作为waf系统最基本项要求，如果这两项都不达标，影响了业务，业务是不可能让你上waf的）。</p>
+<p>误报率，漏报率这两个指标其实是自相矛盾的。所以在安全和效率(业务)的博弈中，没有完美，只有适配。对于业务来说，误报拦截对他们的影响大于漏报，所以waf在尽可能覆盖全漏洞的情况下，误报的优化优先级应该大于漏报。</p>
+<h2 id="waf评测工具"><a href="#waf评测工具" class="headerlink" title="waf评测工具"></a>waf评测工具</h2><p><a href="https://github.com/tanjiti/WAFTest" target="_blank" rel="noopener">https://github.com/tanjiti/WAFTest</a> </p>
+<p><a href="https://github.com/khalilbijjou/WAFNinja" target="_blank" rel="noopener">https://github.com/khalilbijjou/WAFNinja</a></p>
+<p><a href="https://github.com/fastly/ftw" target="_blank" rel="noopener">https://github.com/fastly/ftw</a></p>
+<p><a href="https://github.com/f5devcentral/f5-waf-tester" target="_blank" rel="noopener">https://github.com/f5devcentral/f5-waf-tester</a></p>
+<h1 id="如何降误报"><a href="#如何降误报" class="headerlink" title="如何降误报"></a>如何降误报</h1><p>waf需要有至少两个模式<strong>观察模式</strong>（仅记录不拦截）和<strong>阻断模式</strong>。新规则上线前，需要在生产上进行一周到一个月的观察模式。通过持续的观察误拦截情况，动态调整该规则的策略，待策略稳定后正式切换到阻断模式。</p>
+<p>当然还可以以旁路模式部署waf，这样相当于一个离线分析系统，不会对线上业务造成影响，同样可以测试优化规。</p>
+<p>规则的优化（大部分就是正则误报的优化），需要大量的实践优化会得出比较好的结果。大公司就是有这方面的优势，天天被黑客盯着，能搜集到很多意想不到的规则。而针对中小长要搜集到大量的攻击场景不容易，一方面小厂商需要做好最基础的几项的误报和检测，如果想进一步优化和补充，可以搭建开源蜜罐进行搜集测试。</p>
+<p><strong>参考：</strong></p>
+<p><a href="https://www.netnea.com/cms/apache-tutorial-8_handling-false-positives-modsecurity-core-rule-set/" target="_blank" rel="noopener">https://www.netnea.com/cms/apache-tutorial-8_handling-false-positives-modsecurity-core-rule-set/</a> </p>
+<p><a href="https://www.modsecurity.org/CRS/Documentation/making.html" target="_blank" rel="noopener">https://www.modsecurity.org/CRS/Documentation/making.html</a></p>
+<p><a href="https://cloud.tencent.com/developer/article/1484151" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1484151</a></p>
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        
+
+        
+
+        
+
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://github.com/he1m4n6a" target="_blank" rel="noopener">github</a></span>
+        <span>/</span>
+        
+        <span><a href="https://weibo.com/u/1736968374" target="_blank" rel="noopener">weibo</a></span>
+        <span>/</span>
+        
+        <span><a href="#">wechat</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="/js/index.js"></script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+    <script>
+        /**
+         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+        */
+        if( '' || '')
+        var disqus_config = function () {
+            this.page.url = '';  // Replace PAGE_URL with your page's canonical URL variable
+            this.page.identifier = ''; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document, s = d.createElement('script');
+            s.src = 'https://airclouds-blog.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+
+
+
+</html>

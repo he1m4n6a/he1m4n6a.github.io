@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="He1m4n6a的博客">
+    <meta name="keyword"  content="腾讯">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        正则表达式优化总结 - He1m4n6a的博客 | He1m4n6a&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/aircloud.css">
+    <link rel="stylesheet" href="/css/gitment.css">
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar ">
+            <img src="/img/avatar.jpg" />
+        </div>
+        <div class="name">
+            <i>He1m4n6a</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archive">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#什么是正在表达式"><span class="toc-text">什么是正在表达式</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#回溯"><span class="toc-text">回溯</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#贪婪匹配和非贪婪匹配"><span class="toc-text">贪婪匹配和非贪婪匹配</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#捕获和断言"><span class="toc-text">捕获和断言</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#正则优化"><span class="toc-text">正则优化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#a-合理使用括号"><span class="toc-text">a) 合理使用括号</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#b-使用非贪婪模式"><span class="toc-text">b) 使用非贪婪模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#c）使用字符组代替分支条件"><span class="toc-text">c）使用字符组代替分支条件</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#d-谨慎用点号元字符，尽可能不用星号和加号这样的任意量词"><span class="toc-text">d) 谨慎用点号元字符，尽可能不用星号和加号这样的任意量词</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#e）提取多选结构开头的相同字符"><span class="toc-text">e）提取多选结构开头的相同字符</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#f）使用占有优先量词和固化分组"><span class="toc-text">f）使用占有优先量词和固化分组</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#g）始、行描点优化"><span class="toc-text">g）始、行描点优化</span></a></li></ol></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        正则表达式优化总结
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2020-02-11 00:53:16</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#正则" title="正则">正则</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#回溯" title="回溯">回溯</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#贪婪算法" title="贪婪算法">贪婪算法</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <h2 id="什么是正在表达式"><a href="#什么是正在表达式" class="headerlink" title="什么是正在表达式"></a>什么是正在表达式</h2><p>正则表达式(regular expression)描述了一种字符串匹配的模式（pattern），可以用来检查一个串是否含有某种子串、将匹配的子串替换或者从某个串中取出符合某个条件的子串等。</p>
+<p>正则表达式快速入门可参考：<a href="https://www.w3cschool.cn/regex_rmjc/。正则表达式里包括普通字符（例如，a" target="_blank" rel="noopener">https://www.w3cschool.cn/regex_rmjc/。正则表达式里包括普通字符（例如，a</a> 到 z 之间的字母）和特殊字符（称为”元字符”）。简单的基础不用多讲，讲几个正则中重要又稍微难懂的概念。</p>
+<h3 id="回溯"><a href="#回溯" class="headerlink" title="回溯"></a>回溯</h3><p>正则引擎主要可以分为基本不同的两大类：一种是DFA(确定性有穷自动机），另一种是NFA（非确定性有穷自动机）。在NFA中由于表达式主导的串行匹配方式，所以用到了回溯（backtracking），这个是NFA最重要的部分，每一次某个分支的匹配失败都会导-致一次回溯。</p>
+<p>回溯法也称试探法，它的基本思想是：从问题的某一种状态（初始状态）出发，搜索从这种状态出发所能达到的所有“状态”，当一条路走到“尽头”的时候（不能再前进），再后退一步或若干步，从另一种可能“状态”出发，继续搜索，直到所有的“路径”（状态）都试探过。这种不断“前进”、不断“回溯”寻找解的方法，就称作“回溯法”。</p>
+<p>举个例子更能直观说明。正则是 <strong>/ab{1,3}c/</strong> ，其可视化形式是：</p>
+<p><img src="/images/waf/1/1.png" alt="img"></p>
+<p>而当目标字符串是”abbbc”时，就没有所谓的“回溯”。其匹配过程是：</p>
+<p><img src="/images/waf/1/2.png" alt="img"> </p>
+<p>如果目标字符串是”abbc”，中间就有回溯。</p>
+<p><img src="/images/waf/1/3.png" alt="img"></p>
+<h3 id="贪婪匹配和非贪婪匹配"><a href="#贪婪匹配和非贪婪匹配" class="headerlink" title="贪婪匹配和非贪婪匹配"></a>贪婪匹配和非贪婪匹配</h3><p>当正则表达式中包含能接受重复的限定符时，通常的行为是（在使整个表达式能得到匹配的前提下）<strong>匹配尽可能多的字符</strong>。以这个表达式为例： <strong>a.*b</strong> ，它将会匹配最长的以a开始，以b结束的字符串。如果用它来搜索 aabab 的话，它会匹配整个字符串 aabab。这被称为贪婪匹配。</p>
+<p>非贪婪匹配就是尽可能少的匹配。一下几个是非贪婪匹配常见的用法。</p>
+<p><img src="/images/waf/1/4.png" alt="img"></p>
+<p>以 a.*?b 为例，用它来搜索 aabab 的话，他它会匹配 aab（第一到第三个字符）和 ab（第四到第五个字符）</p>
+<p><img src="/images/waf/1/5.png" alt="img"></p>
+<h3 id="捕获和断言"><a href="#捕获和断言" class="headerlink" title="捕获和断言"></a>捕获和断言</h3><p><img src="/images/waf/1/6.png" alt="img"></p>
+<p><strong>捕获：</strong>当我们使用小括号指定一个子表达式之后，就要对这个子表达式的文本进行匹配，即此分组捕获的内容，可以在表达式或其它程序中作进一步的处理。一般情况下，每个分组都会自动拥有一个组号，它的规则是：从左到右以分组的左括号作为标志，把第一次出现的分组的组号定为1，第二个即2，以此类推下去。</p>
+<p><strong>后向引用</strong>：用于重复搜索前面某个分组匹配的文本。例如，\1代表分组1匹配的文本。我们根据示例来深刻理解： <strong>\b(\w+)\b\s+\1\b</strong> 可以用来匹配重复的单词，像go go。</p>
+<p><strong>非捕获组</strong>：第三个 <strong>(?:exp)</strong> 不会改变正则表达式的处理方式，只是这样的组匹配的内容不会像前两种那样被捕获到某个组里面，也不会拥有组号。</p>
+<p><strong>零宽断言：</strong>用于查找在某些内容的之前或之后的东西，但是有不包含这些内容本身的时候，零宽断言就起到作用了。</p>
+<p><strong>(?=exp) ：</strong>也叫零宽度正预测先行断言，它断言自身出现的位置的后面能匹配表达式exp。比如 <strong>\b\w+(?=ing\b)</strong>，匹配以ing结尾的单词的前面部分(除了ing以外的部分)，如查找I’m singing while you’re dancing.时，它会匹配sing和danc。</p>
+<p><strong>(?&lt;=exp) ：</strong>也叫零宽度正回顾后发断言，它断言自身出现的位置的前面能匹配表达式exp。比如 <strong>(?&lt;=\bre)\w+\b</strong> 会匹配以re开头的单词的后半部分(除了re以外的部分)，例如在查找reading a book时，它匹配ading。</p>
+<h2 id="正则优化"><a href="#正则优化" class="headerlink" title="正则优化"></a>正则优化</h2><p>正则在安全领域中最常见的用途是用来编写安全策略，比如WAF的拦截策略以及HIDS对应的webshell检测策略等。以下归纳了几点正则优化的策略：</p>
+<h3 id="a-合理使用括号"><a href="#a-合理使用括号" class="headerlink" title="a) 合理使用括号"></a>a) 合理使用括号</h3><p>当要捕获组的时候，使用非捕获型括号(?:)，这是写策略正则最常用的优化方法，因为使用(?:)可以匹配想要的内容，但不捕获到组里，可以节省资源，提高效率。</p>
+<h3 id="b-使用非贪婪模式"><a href="#b-使用非贪婪模式" class="headerlink" title="b) 使用非贪婪模式"></a>b) 使用非贪婪模式</h3><p>尽量使用非贪婪模式，因为贪婪模式情况下，容易造成回溯。如果不确定使用哪种模式，优先考虑</p>
+<h3 id="c）使用字符组代替分支条件"><a href="#c）使用字符组代替分支条件" class="headerlink" title="c）使用字符组代替分支条件"></a>c）使用字符组代替分支条件</h3><p>使用[a-d]表示a~d之间的字母，而不是使用(a|b|c|d)</p>
+<h3 id="d-谨慎用点号元字符，尽可能不用星号和加号这样的任意量词"><a href="#d-谨慎用点号元字符，尽可能不用星号和加号这样的任意量词" class="headerlink" title="d) 谨慎用点号元字符，尽可能不用星号和加号这样的任意量词"></a>d) 谨慎用点号元字符，尽可能不用星号和加号这样的任意量词</h3><p>例子： 要匹配 &lt;12345&gt;，其中&lt;&gt;中间是1-5位的数字</p>
+<p><strong>正常写法：</strong> &lt;\d*&gt;</p>
+<p><strong>优化写法：</strong> &lt;\d{1,5}&gt;</p>
+<h3 id="e）提取多选结构开头的相同字符"><a href="#e）提取多选结构开头的相同字符" class="headerlink" title="e）提取多选结构开头的相同字符"></a>e）提取多选结构开头的相同字符</h3><p>例如 the|this 改成th(?:e|is)</p>
+<h3 id="f）使用占有优先量词和固化分组"><a href="#f）使用占有优先量词和固化分组" class="headerlink" title="f）使用占有优先量词和固化分组"></a>f）使用占有优先量词和固化分组</h3><p><strong>占有优先量词：</strong></p>
+<blockquote>
+<p>?+ *+ ++ {m,n}+</p>
+</blockquote>
+<p>占有优先量词与匹配优先量词很相似，只是它们从来不会交还已经匹配的字符。</p>
+<p><strong>固化分组：</strong></p>
+<blockquote>
+<p>(?&gt;…)   …是指具体内容</p>
+</blockquote>
+<p>固化分组的内容与正常的匹配并无区别，只是当匹配完括号中的内容后，括号中的备用状态会全部舍去。</p>
+<h3 id="g）始、行描点优化"><a href="#g）始、行描点优化" class="headerlink" title="g）始、行描点优化"></a>g）始、行描点优化</h3><p>能确定起止位置，使用^能提高匹配的速度。同理，使用$标记结尾，正则引擎则会从符合条件的长度处开始匹配，略过目标字符串中许多可能的字符。在写正则表达式时，应该将描点独立出来，例如“^(?:abc|123)”比“^123|^abc”效率高，而“^(abc)”比“(^abc)”效率更高。</p>
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        
+
+        
+
+        
+
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://github.com/he1m4n6a" target="_blank" rel="noopener">github</a></span>
+        <span>/</span>
+        
+        <span><a href="https://weibo.com/u/1736968374" target="_blank" rel="noopener">weibo</a></span>
+        <span>/</span>
+        
+        <span><a href="#">wechat</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="/js/index.js"></script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+    <script>
+        /**
+         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+        */
+        if( '' || '')
+        var disqus_config = function () {
+            this.page.url = '';  // Replace PAGE_URL with your page's canonical URL variable
+            this.page.identifier = ''; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document, s = d.createElement('script');
+            s.src = 'https://airclouds-blog.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+
+
+
+</html>
