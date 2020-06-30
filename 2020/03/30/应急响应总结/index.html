@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="He1m4n6a的博客">
+    <meta name="keyword"  content="腾讯">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        应急响应总结 - He1m4n6a的博客 | He1m4n6a&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/aircloud.css">
+    <link rel="stylesheet" href="/css/gitment.css">
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar ">
+            <img src="/img/avatar.jpg" />
+        </div>
+        <div class="name">
+            <i>He1m4n6a</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archive">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#安全事件分类"><span class="toc-text">安全事件分类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安全事件分级"><span class="toc-text">安全事件分级</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#安全响应执行流程"><span class="toc-text">安全响应执行流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#被入侵的主机排查流程"><span class="toc-text">被入侵的主机排查流程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#被入侵的主机排查方法"><span class="toc-text">被入侵的主机排查方法</span></a></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        应急响应总结
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2020-03-30 22:55:42</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#应急响应" title="应急响应">应急响应</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#linux命令" title="linux命令">linux命令</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <p>当企业发生黑客入侵、系统崩溃或其它影响业务正常运行的安全事件时，急需第一时间进行处理，使企业的网络信息系统在最短时间内恢复正常工作。进一步查找入侵来源，还原入侵事故过程，同时给出解决方案与防范措施，为企业挽回或减少经济损失。</p>
+<h2 id="安全事件分类"><a href="#安全事件分类" class="headerlink" title="安全事件分类"></a>安全事件分类</h2><ol>
+<li>Web入侵:挂马、篡改、Webshell</li>
+<li>系统入侵:系统异常、RDP爆破、SSH爆破、主机漏洞</li>
+<li>病毒木马:远控、后门、勒索软件</li>
+<li>信息泄漏:脱裤、数据库登录（弱口令）</li>
+<li>网络流量:频繁发包、批量请求、DDOS攻击</li>
+</ol>
+<p>首先是对入侵的安全事件进行分类，确认安全事件属于哪类入侵，然后用相应的方法应急。</p>
+<h2 id="安全事件分级"><a href="#安全事件分级" class="headerlink" title="安全事件分级"></a>安全事件分级</h2><p><strong>I 级事件 – 特别重大突发事件</strong></p>
+<ol>
+<li>网络大面积中断</li>
+<li>主要业务大规模瘫痪</li>
+<li>大规模用户/业务数据泄漏</li>
+</ol>
+<p><strong>II 级事件 – 重大突发事件</strong></p>
+<ol>
+<li>大规模主机入侵</li>
+<li>大规模业务数据损坏</li>
+<li>小规模数据泄漏</li>
+<li>政治敏感事件:官网挂黑页</li>
+</ol>
+<p><strong>III 级事件 – 较大突发事件</strong></p>
+<ol>
+<li>部分业务系统遭受入侵</li>
+<li>主要业务遭受DDOS</li>
+</ol>
+<p><strong>IV 级事件 – 一般突发事件</strong></p>
+<ol>
+<li>部分业务系统宕机</li>
+<li>部分业务系统异常/无法访问</li>
+</ol>
+<p>通过对安全事件的定级，确认属于什么级别的事故，采取相应的应急预案和紧急程度的确认。</p>
+<h2 id="安全响应执行流程"><a href="#安全响应执行流程" class="headerlink" title="安全响应执行流程"></a>安全响应执行流程</h2><ol>
+<li>事件发生（运维监控人员、客服审核人员等），发现问题的开始，及时通报</li>
+<li>事件确认:判断事件的严重性，评估出问题的严重等级，是否向上进行汇报等</li>
+<li>事件响应:各部门通力合作，处理安全问题，具体解决阶段</li>
+<li>事件关闭:处理完事件之后，需要关闭事件，并写出安全应急处理分析报告，完成整个应急过程</li>
+</ol>
+<h2 id="被入侵的主机排查流程"><a href="#被入侵的主机排查流程" class="headerlink" title="被入侵的主机排查流程"></a>被入侵的主机排查流程</h2><ol>
+<li>定位被入侵的主机并且立即对该主机进行断网隔离</li>
+<li>确定攻击类型</li>
+<li>确定被入侵的时间范围</li>
+<li>定位恶意文件和入侵痕迹</li>
+<li>溯源入侵来源</li>
+<li>清理恶意文件/修复漏洞</li>
+<li>事件复盘</li>
+</ol>
+<p>其实这是web安全工作人员最常见的排查流程，因为例如ddos这类的事件可能托管在运维侧，而安全工程师常常是应急网站被入侵后的安全事件。</p>
+<h2 id="被入侵的主机排查方法"><a href="#被入侵的主机排查方法" class="headerlink" title="被入侵的主机排查方法"></a>被入侵的主机排查方法</h2><p>1.检测补丁情况:看看有没有打了最新的补丁,看看是不是用漏洞搞进来的</p>
+<ul>
+<li>systeminfo | uname -a</li>
+</ul>
+<p>2.日志分析:定位入侵路线,是系统配置出了问题(ssh 弱口令,域管理员hash 泄漏)还是WEB 服务出了问题(传马,WEB 漏洞利用)</p>
+<ul>
+<li>eventvwr | /var/log , .bash_history</li>
+<li>access.log mysql_log.log</li>
+</ul>
+<p>3.账户信息:先看看是不是帐户有弱口令,再看看用户的登录时间,也观察一下有没有给留后门账户</p>
+<ul>
+<li>quser | who last</li>
+</ul>
+<p>4.进程分析:定位一下看看有没有运行恶意进程</p>
+<ul>
+<li>procxp , pchunter | ps -aux , chkrootkit , rkhunter</li>
+</ul>
+<p>5.文件分析:找找Shell 和后门,看看这个是什么样的Shell</p>
+<ul>
+<li>lchangedfiles | find / -ctime -1 -print</li>
+</ul>
+<p>6.系统分析:计划任务,自启动服务等<br><strong>Linux :</strong></p>
+<ul>
+<li>history (cat /root/.bash_history) 查看执行过的命令,排查和溯源</li>
+<li>/etc/passwd 分析用户</li>
+<li>awk -F: ‘{if($3==0)print $1}’ /etc/passwd 查看UID 为0 的帐号</li>
+<li>cat /etc/passwd | grep -E “/bin/bash$” 查看可以登录的帐号</li>
+<li>crontab /etc/cron* 查看计划任务</li>
+<li>rc.local /etc/init.d chkconfig 查看Linux 自启动程序</li>
+<li>last 查看最近用户登录信息</li>
+<li>lastb 查看最近用户登录错误信息</li>
+<li>$PATH 系统路径环境变量</li>
+<li>strings 提取字符串</li>
+</ul>
+<p><strong>Windows :</strong></p>
+<ul>
+<li>查看系统变量</li>
+<li>Windows 计划任务</li>
+<li>Windows 帐号信息</li>
+<li>SAM 文件</li>
+<li>Windows-Exploit-Suggester</li>
+</ul>
+<p>附上常用应急命令：</p>
+<p><img src="/images/yjxy/1.png" alt="img"></p>
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        
+
+        
+
+        
+
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://github.com/he1m4n6a" target="_blank" rel="noopener">github</a></span>
+        <span>/</span>
+        
+        <span><a href="https://weibo.com/u/1736968374" target="_blank" rel="noopener">weibo</a></span>
+        <span>/</span>
+        
+        <span><a href="#">wechat</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="/js/index.js"></script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+    <script>
+        /**
+         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+        */
+        if( '' || '')
+        var disqus_config = function () {
+            this.page.url = '';  // Replace PAGE_URL with your page's canonical URL variable
+            this.page.identifier = ''; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document, s = d.createElement('script');
+            s.src = 'https://airclouds-blog.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+
+
+
+</html>

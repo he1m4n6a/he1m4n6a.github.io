@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="He1m4n6a的博客">
+    <meta name="keyword"  content="腾讯">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        红蓝对抗浅谈 - He1m4n6a的博客 | He1m4n6a&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/aircloud.css">
+    <link rel="stylesheet" href="/css/gitment.css">
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar ">
+            <img src="/img/avatar.jpg" />
+        </div>
+        <div class="name">
+            <i>He1m4n6a</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archive">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#什么是红蓝对抗"><span class="toc-text">什么是红蓝对抗</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#红蓝对抗的目的"><span class="toc-text">红蓝对抗的目的</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#红蓝对抗关注点"><span class="toc-text">红蓝对抗关注点</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#中小型互联网红蓝对抗"><span class="toc-text">中小型互联网红蓝对抗</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#大型互联网红蓝对抗"><span class="toc-text">大型互联网红蓝对抗</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#制定目标，梳理攻击线路图"><span class="toc-text">制定目标，梳理攻击线路图</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#实施目标"><span class="toc-text">实施目标</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#攻击手段参考"><span class="toc-text">攻击手段参考</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#红蓝对抗测试的方法"><span class="toc-text">红蓝对抗测试的方法</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#红蓝对抗注意事项"><span class="toc-text">红蓝对抗注意事项</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#红蓝对抗所需技术"><span class="toc-text">红蓝对抗所需技术</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        红蓝对抗浅谈
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2020-04-30 23:27:44</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#红蓝对抗" title="红蓝对抗">红蓝对抗</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#攻击手段" title="攻击手段">攻击手段</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <h1 id="什么是红蓝对抗"><a href="#什么是红蓝对抗" class="headerlink" title="什么是红蓝对抗"></a>什么是红蓝对抗</h1><p>在军事领域，演习是专指军队进行大规模的实兵演习，演习中通常分为红军、蓝军，演习多以红军守、蓝军进攻为主。类似于军事领域的红蓝军对抗，网络安全中，红蓝军对抗则是一方扮演黑客（蓝军），一方扮演防御者（红军）。在国外的话，进行渗透攻击的团队经常称做红队，在国内称为蓝队实际上应该是比较准确的叫法。</p>
+<h1 id="红蓝对抗的目的"><a href="#红蓝对抗的目的" class="headerlink" title="红蓝对抗的目的"></a>红蓝对抗的目的</h1><p>安全是一个整体，正如木桶定律，最短的木板是评估木桶品质的标准，安全最薄弱环节也是决定系统好坏的关键。而网络红蓝军对抗的目的就是用来评估企业安全性，有助于找出企业安全中最脆弱的环节，提升企业安全能力的建设。</p>
+<h1 id="红蓝对抗关注点"><a href="#红蓝对抗关注点" class="headerlink" title="红蓝对抗关注点"></a>红蓝对抗关注点</h1><p>其实红蓝对抗点没有统一的标准，因为很多会涉及到业务以及内网攻击的场景，所以个人认为红蓝团队比较适合甲方团队自己组建，这样信息资源比较可控，做的也会更细致。</p>
+<h2 id="中小型互联网红蓝对抗"><a href="#中小型互联网红蓝对抗" class="headerlink" title="中小型互联网红蓝对抗"></a>中小型互联网红蓝对抗</h2><p>例如曾经在中小型互联网公司做的红蓝对抗点：</p>
+<ol>
+<li>外网web安全</li>
+<li>办公网安全</li>
+<li>IDC主机安全</li>
+<li>DB专项</li>
+</ol>
+<p>这边web安全的关注点会不同于渗透测试的团队，例如红蓝团队就会关注一些敏感文件泄漏、管理后台暴露、waf有效性、waf防御效果、违规使用的框架等。再例如办公网安全红蓝团队还会关注安全助手的一些问题，也就是说红蓝团队关注的不仅是应用服务的漏洞，各个安全组件的效果、漏洞都会关注到。</p>
+<h2 id="大型互联网红蓝对抗"><a href="#大型互联网红蓝对抗" class="headerlink" title="大型互联网红蓝对抗"></a>大型互联网红蓝对抗</h2><p>上面都是按照一个个大项来进行，其实还有的红蓝团队是按项目来分，比如说xx支付业务红蓝对抗，给你域名或者ip，让你自由发挥，不限方法拿到目标flag（例如xx支付的数据或者机器权限等），这个过程不要求<strong>测的全，以结果为导向</strong>。然后红队（防御方）尽可能复盘补漏，把不完善的地方都补齐。后面可以继续进行对抗演练，继续找出薄弱点，这边很考验红队的技术和业务的了解程度，能从蓝队的攻击链路中，找出尽可能多的脆弱点，做出防御策略。所以，我觉得红蓝对抗还是得根据公司的规模、安全人员的比例、技术人员的素养做制定，都按同一套标准是不会适用所有公司的。我的建议就是中小规模公司的红蓝对抗点尽可能覆盖全，尽可能找出全量的脆弱点让红队的人员进行修复后进行新一轮对抗。而大公司就可以不用考虑面面俱到，以夺取目标结果为导向，脆弱点由红队自己发现，红队自己修复，而后周期的进行红蓝对抗。可以看出大公司的红蓝对抗更类似于APT攻击，这也正是大公司蓝队喜欢招APT人员的关系。</p>
+<h3 id="制定目标，梳理攻击线路图"><a href="#制定目标，梳理攻击线路图" class="headerlink" title="制定目标，梳理攻击线路图"></a>制定目标，梳理攻击线路图</h3><p>大型互联网一般以单项进行红蓝对抗，典型的案例包括云上的红蓝对抗等。梳理攻击线路这部分很关键，尽可能全的梳理出所有的攻击路径，每个路径去尝试突破。</p>
+<p><strong>目标：</strong>攻击云上OM区（堡垒机、运维机）</p>
+<p><strong>梳理攻击线路图样例：</strong></p>
+<ol>
+<li>利用社工获取运维人员电脑权限-&gt;接入运维网络-&gt;OM区</li>
+<li>利用VPN漏洞、弱口令-&gt;接入运维网络-&gt;OM区</li>
+<li>利用POD区域服务漏洞-&gt;OM区</li>
+<li>利用DMZ服务漏洞占领服务主机-&gt;通过console和API网关漏洞-&gt;OM区</li>
+<li>利用租户漏洞占领租户主机-&gt;逃逸漏洞至主机-&gt;OM区</li>
+<li>CDN节点-&gt;DMZ区-&gt;OM区</li>
+</ol>
+<h3 id="实施目标"><a href="#实施目标" class="headerlink" title="实施目标"></a>实施目标</h3><p>实施目标就按照上面梳理出的路径逐条攻破，在这个过程中以占领最终的目标为导向即可。攻击线路中可能会用到很多不同技术和脆弱点，不必面面俱到。因为这一部分和红军复盘时候，会有所补充。而且红蓝的对抗是个持续的过程，不是一轮就能发现暴露所有问题，需要不定期的安全演练持续的促进安全。 </p>
+<h3 id="攻击手段参考"><a href="#攻击手段参考" class="headerlink" title="攻击手段参考"></a>攻击手段参考</h3><p><img src="/images/hldk/1.png" alt=""></p>
+<h1 id="红蓝对抗测试的方法"><a href="#红蓝对抗测试的方法" class="headerlink" title="红蓝对抗测试的方法"></a>红蓝对抗测试的方法</h1><p>如果是中小型的互联网企业的话，我的方法是先预先讨论好并记录下脑图，然后</p>
+<ol>
+<li>按专项测试</li>
+<li>每个专项包含很多点，按点排期测试</li>
+<li>报告撰写，漏洞闭环</li>
+<li>例行扫描</li>
+<li>持续跟进，复盘测试</li>
+</ol>
+<p>因为中小型企业个人认为还是以全为主，尽可能把漏洞修复完。大型公司可以大量的人力投入，业务也繁多，还是以结果导向，漏洞的薄弱点由红队确认，所以方法就没有统一的标准。</p>
+<h1 id="红蓝对抗注意事项"><a href="#红蓝对抗注意事项" class="headerlink" title="红蓝对抗注意事项"></a>红蓝对抗注意事项</h1><ol>
+<li>测试前提前报备</li>
+<li>有可能会影响到业务的操作时候务必提前沟通</li>
+<li>漏洞的确认按照公司的规范制度制定</li>
+<li>漏洞和业务沟通确认后再发工单修复</li>
+<li>漏洞闭环</li>
+</ol>
+<p>这边需要注意的是测试需要提前报备，免得事后被业务捅，更要注意的是测试千万不要影响到业务。 还有经常有点大家会忽略的是，一定要进行漏洞闭环，发现漏洞而不去解决漏洞等于无效漏洞。</p>
+<h1 id="红蓝对抗所需技术"><a href="#红蓝对抗所需技术" class="headerlink" title="红蓝对抗所需技术"></a>红蓝对抗所需技术</h1><p>红蓝对抗不同于渗透测试，红蓝对抗测试的范围很广泛，不仅需要渗透技术，还需要逆向、脚本编程、各种绕过黑魔法等。所以，红蓝对抗不仅需要渗透测试的人才，也需要逆向的工程师，甚至是区块链安全工程师、数据安全方向的工程师等，所以说其实在大公司更容易开展红蓝对抗，因为大公司人才更加齐全。红蓝对抗也需要团队的协作，一个人是比较难完成的，更好的方式，不同的团队进行红蓝对抗，每个团队攻击的方法思路也不尽相同，更能模拟真实的场景攻击，对于红队查缺补漏也更有帮助。如下，是用到的一小部分工具：</p>
+<ol>
+<li>Python</li>
+<li>IDA</li>
+<li>JEB</li>
+<li>Masscan</li>
+<li>Nmap</li>
+<li>Metasploit</li>
+<li>搜集的各类样本</li>
+</ol>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>红蓝对抗一定要区别于渗透测试，渗透测试这是每个公司的标配。红蓝对抗的价值在于挖掘渗透测试不关注的漏洞或者渗透测试无法覆盖的点，并且持续的对抗，不断帮助业务提升安全能力，完善自己的安全防御。根据自己做的红蓝对抗经验来说，我们发现办公安全助手的漏洞、waf的部署缺和绕过缺陷以及HIDS一些缺陷等。其实这些东西渗透测试很少会去涉及和考虑，而红蓝对抗的作用就显现，这些风险的发现对于自身的安全防御是有很大的帮助的，因为你挖漏洞只是修修补补，而做这些红蓝对抗发现的问题，则是解决一类的问题。对于这种方式的对抗，老大也认可，自己也有很有满足感，所以对于红蓝对抗，其实是很适合互联网安全团队去尝试组建的。</p>
+<p> <img src="/images/hldk/2.png" alt="img"> </p>
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        
+
+        
+
+        
+
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://github.com/he1m4n6a" target="_blank" rel="noopener">github</a></span>
+        <span>/</span>
+        
+        <span><a href="https://weibo.com/u/1736968374" target="_blank" rel="noopener">weibo</a></span>
+        <span>/</span>
+        
+        <span><a href="#">wechat</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="/js/index.js"></script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+    <script>
+        /**
+         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+        */
+        if( '' || '')
+        var disqus_config = function () {
+            this.page.url = '';  // Replace PAGE_URL with your page's canonical URL variable
+            this.page.identifier = ''; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document, s = d.createElement('script');
+            s.src = 'https://airclouds-blog.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+
+
+
+</html>
