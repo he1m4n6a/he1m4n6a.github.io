@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="He1m4n6a的博客">
+    <meta name="keyword"  content="腾讯">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        SDL浅谈 - He1m4n6a的博客 | He1m4n6a&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/aircloud.css">
+    <link rel="stylesheet" href="/css/gitment.css">
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar ">
+            <img src="/img/avatar.jpg" />
+        </div>
+        <div class="name">
+            <i>He1m4n6a</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archive">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#SDL阶段"><span class="toc-text">SDL阶段</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#SDL流程推动"><span class="toc-text">SDL流程推动</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#参与人员"><span class="toc-text">参与人员</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#方式"><span class="toc-text">方式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#文档"><span class="toc-text">文档</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#具体流程实现"><span class="toc-text">具体流程实现</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#立项"><span class="toc-text">立项</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#安全需求分析"><span class="toc-text">安全需求分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#威胁建模"><span class="toc-text">威胁建模</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安全规范"><span class="toc-text">安全规范</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#安全培训"><span class="toc-text">安全培训</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#实施"><span class="toc-text">实施</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#编码规范检测"><span class="toc-text">编码规范检测</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#代码白盒安全扫描平台"><span class="toc-text">代码白盒安全扫描平台</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#测试"><span class="toc-text">测试</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#渗透测试"><span class="toc-text">渗透测试</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#自动化扫描"><span class="toc-text">自动化扫描</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#运维"><span class="toc-text">运维</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#发布前检测"><span class="toc-text">发布前检测</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#发布后运营"><span class="toc-text">发布后运营</span></a></li></ol></li></ol></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        SDL浅谈
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2020-05-11 00:18:37</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#SDL" title="SDL">SDL</a>
+        <span>/</span>
+        
+        <a class="tag" href="/tags/#自动化" title="自动化">自动化</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <p> SDL浅谈</p>
+<p>SDL简介 SDL security development lifecycle（安全开发生命周期），是微软提出的从安全角度指导软件开发过程的管理模式。SDL是一个安全保证的过程，起重点是软件开发，它在开发的所有阶段都引入了安全和隐私的原则。自2004年起，SDL一直都是微软在全公司实施的强制性策略。 </p>
+<h1 id="SDL阶段"><a href="#SDL阶段" class="headerlink" title="SDL阶段"></a>SDL阶段</h1><p>微软把SDL分为10多个阶段，太多冗余繁琐，并不利于我们在快速迭代的互联网中推动， 为了快速推动落地可以把SDL从流程维度分为五个阶段：需求、设计、实施、测试、上线、运维。</p>
+<p> <img src="/images/sdl/1.png" alt="img">  </p>
+<h1 id="SDL流程推动"><a href="#SDL流程推动" class="headerlink" title="SDL流程推动"></a>SDL流程推动</h1><h2 id="参与人员"><a href="#参与人员" class="headerlink" title="参与人员"></a>参与人员</h2><p>主要参与人员有开发、测试、运维、安全、产品经理等人员，开发包括项目经理、架构师、开发人员等。</p>
+<h2 id="方式"><a href="#方式" class="headerlink" title="方式"></a>方式</h2><p>推动方式是指沟通方式，有会议交流、邮件交流、面对面交流、甚至有电话沟通。</p>
+<h2 id="文档"><a href="#文档" class="headerlink" title="文档"></a>文档</h2><p>安全人员推动过程中制定为研发、测试、运维提供理论、培训、规范的文档，包括不限于：安全意识培训PPT文档、安全需求CHECKLIST EXCEL表格、安全编码规范WORD文档、漏洞修复培训PPT文档、各类基线EXCEL表格、入侵检测CHECKLIST EXECEL表格等，这些文档在FREEBUF等安全媒体平台上可以获取到。</p>
+<h1 id="具体流程实现"><a href="#具体流程实现" class="headerlink" title="具体流程实现"></a>具体流程实现</h1><h2 id="立项"><a href="#立项" class="headerlink" title="立项"></a>立项</h2><h3 id="安全需求分析"><a href="#安全需求分析" class="headerlink" title="安全需求分析"></a>安全需求分析</h3><p>明确数据安全目标和合规目标，产品经理是主要责任人，安全部提供赋能培训、演练与试点辅导等服务。同时安全部提供一系列的安全服务，协助产品经理实现安全闭环。 </p>
+<h3 id="威胁建模"><a href="#威胁建模" class="headerlink" title="威胁建模"></a>威胁建模</h3><p>常用的是微软STRIDE威胁分析模型。</p>
+<p><img src="/images/sdl/2.png" alt="img"> </p>
+<p>威胁建模一定要简单，以暴露面为主，核心就是认证授权和数据处理等红线。</p>
+<h3 id="安全规范"><a href="#安全规范" class="headerlink" title="安全规范"></a>安全规范</h3><p><strong>安全设计：</strong>为主要场景下的安全措施设计提供一致的文本参考标准和检查标准，安全部提供推广培训、简易CheckList和合规审核等服务。 </p>
+<p><strong>安全组件与平台</strong>：为安全设计规范合规提供标准化的技术实现，降低安全措施的设计与实施的门槛。安全部负责安全组件与平台的需求收集、设计与推广服务，协助其他部门开发。安全部提供桥梁服务，将个别产品线的优秀安全组件或服务推广到其他产品线。 </p>
+<p><strong>安全编码规范</strong>：为安全设计规范合规提供标准化的技术实现，降低安全措施的设计与实施的门槛。安全部负责安全组件与平台的需求收集、设计与推广服务，协助其他部门开发。安全部提供桥梁服务，将个别产品线的优秀安全组件或服务推广到其他产品线。 </p>
+<h3 id="安全培训"><a href="#安全培训" class="headerlink" title="安全培训"></a>安全培训</h3><p>线下形式有PPT演讲，线上形式有安全视频培训，真实案例分享等。笔者还开发基于真实案例的训战平台，通过docker容器作为漏洞靶场的形式，夺取flag，在做题过程中帮助大家学习漏洞原理，提高安全意识。</p>
+<h2 id="实施"><a href="#实施" class="headerlink" title="实施"></a>实施</h2><h3 id="编码规范检测"><a href="#编码规范检测" class="headerlink" title="编码规范检测"></a>编码规范检测</h3><p> 安全编码规范条目不宜过多，互联网从业者总结的经验是10条左右，条目过多容易分散学习者和审计者的精力，难以达到预期的效果。  安全编码规范不能简单等同于安全编码知识库，了解到的一些单位，其安全编码规范通常是从网络、兄弟单位或标准化机构借用过来的常见漏洞的解决方案，缺乏针对性，我们建议针对一个轮次中（比如一年）代码人工审计和工具扫描的结果进行统计排序，排名靠前并且风险重大的安全编码漏洞及其解决方案建议写入安全编码规范，并且在新一轮年度工作中作为安全编码检查重点，重点消除这些安全编码漏洞。</p>
+<h3 id="代码白盒安全扫描平台"><a href="#代码白盒安全扫描平台" class="headerlink" title="代码白盒安全扫描平台"></a>代码白盒安全扫描平台</h3><p><img src="/images/sdl/3.png" alt="img"> </p>
+<p>可以通过配置，自动连接代码仓库。在DevOps平台中自动执行上线前的代码审计扫描，扫描报告发送到安全团队邮箱进行报告复核。开源的可以使用<code>Findbugs+SonarRQube</code>进行代码审计，商业的可以使用<code>fortify</code>。</p>
+<h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><h3 id="渗透测试"><a href="#渗透测试" class="headerlink" title="渗透测试"></a>渗透测试</h3><p>推动渗透测试人员与产品经理、开发经理合作，获取并理解需求，获取代码更新比对信息，在持续迭代过程中，渗透测试资源倾斜到那些新增或变更数据、功能和接口上，将资源聚焦，避免重复测试，将渗透测试由黑盒转变为灰白盒。</p>
+<h3 id="自动化扫描"><a href="#自动化扫描" class="headerlink" title="自动化扫描"></a>自动化扫描</h3><p>黑盒就是被动方式，收集各个地方的流量，测试环境、线上流量都有覆盖，然后清洗入库再消费，加上 payload 重放，不过线上环境很小心，要兼顾 qps 和去ticket，避免造成生成事故。 一般大型互联网都是自研扫描器，前期投入比较有限，可以使用wvs扫描器或其他开源扫描器。</p>
+<h2 id="运维"><a href="#运维" class="headerlink" title="运维"></a>运维</h2><h3 id="发布前检测"><a href="#发布前检测" class="headerlink" title="发布前检测"></a>发布前检测</h3><p>包括上线前的三方库检测，项目部署所在系统的安全加固，以及上线前发布系统恶意软件引入的检测等。</p>
+<h3 id="发布后运营"><a href="#发布后运营" class="headerlink" title="发布后运营"></a>发布后运营</h3><p>主机入侵检测hids必不可少的，前期可以使用开源框架驭龙，后期组建起安全团队可以自己研发或者基于开源做二次开发。做好hids后，最重要的工作就是运营hids，跟进入侵事件，并且不断研究新case补充hids策略。</p>
+<p>如果公司资源够，也可以组建SRC团队，主要负责应急响应和集合白帽子的力量挖掘公司的漏洞。这期间需要开发的项目就包括漏洞管理平台和SRC平台。这两个平台也都有开源产品，可以使用开源产品进行二次改造，尤其是漏洞管理平台，应该要复用或者对接自动化扫描的漏洞管理平台，能有效的对接公司的工单系统，保证漏洞能发送到责任人并做相应的闭环。</p>
+<p><strong>参考：</strong></p>
+<p><a href="https://www.freebuf.com/articles/security-management/233899.html" target="_blank" rel="noopener">https://www.freebuf.com/articles/security-management/233899.html</a> </p>
+<p><a href="https://zhuanlan.zhihu.com/p/137766604" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/137766604</a></p>
+<p><a href="https://www.secrss.com/articles/8784" target="_blank" rel="noopener">https://www.secrss.com/articles/8784</a></p>
+<p><a href="https://www.secrss.com/articles/8784" target="_blank" rel="noopener">https://www.secrss.com/articles/8784</a> </p>
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        
+
+        
+
+        
+
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://github.com/he1m4n6a" target="_blank" rel="noopener">github</a></span>
+        <span>/</span>
+        
+        <span><a href="https://weibo.com/u/1736968374" target="_blank" rel="noopener">weibo</a></span>
+        <span>/</span>
+        
+        <span><a href="#">wechat</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="/js/index.js"></script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+    <script>
+        /**
+         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+        */
+        if( '' || '')
+        var disqus_config = function () {
+            this.page.url = '';  // Replace PAGE_URL with your page's canonical URL variable
+            this.page.identifier = ''; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document, s = d.createElement('script');
+            s.src = 'https://airclouds-blog.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+
+
+
+</html>
