@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="google-site-verification" content="xBT4GhYoi5qRD5tr338pgPM5OWHHIDR6mNg1a3euekI" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="He1m4n6a的博客">
+    <meta name="keyword"  content="腾讯">
+    <link rel="shortcut icon" href="/img/favicon.ico">
+
+    <title>
+        
+        对抗rootkits - He1m4n6a的博客 | He1m4n6a&#39;s Blog
+        
+    </title>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/aircloud.css">
+    <link rel="stylesheet" href="/css/gitment.css">
+    <!--<link rel="stylesheet" href="https://imsun.github.io/gitment/style/default.css">-->
+    <link href="//at.alicdn.com/t/font_620856_pl6z7sid89qkt9.css" rel="stylesheet" type="text/css">
+    <!-- ga & ba script hoook -->
+    <script></script>
+</head>
+
+<body>
+
+<div class="site-nav-toggle" id="site-nav-toggle">
+    <button>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+        <span class="btn-bar"></span>
+    </button>
+</div>
+
+<div class="index-about">
+    <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+</div>
+
+<div class="index-container">
+    
+    <div class="index-left">
+        
+<div class="nav" id="nav">
+    <div class="avatar-name">
+        <div class="avatar ">
+            <img src="/img/avatar.jpg" />
+        </div>
+        <div class="name">
+            <i>He1m4n6a</i>
+        </div>
+    </div>
+    <div class="contents" id="nav-content">
+        <ul>
+            <li >
+                <a href="/">
+                    <i class="iconfont icon-shouye1"></i>
+                    <span>主页</span>
+                </a>
+            </li>
+            <li >
+                <a href="/tags">
+                    <i class="iconfont icon-biaoqian1"></i>
+                    <span>标签</span>
+                </a>
+            </li>
+            <li >
+                <a href="/archive">
+                    <i class="iconfont icon-guidang2"></i>
+                    <span>存档</span>
+                </a>
+            </li>
+            <li >
+                <a href="/about/">
+                    <i class="iconfont icon-guanyu2"></i>
+                    <span>关于</span>
+                </a>
+            </li>
+            
+            <li>
+                <a id="search">
+                    <i class="iconfont icon-sousuo1"></i>
+                    <span>搜索</span>
+                </a>
+            </li>
+            
+        </ul>
+    </div>
+    
+        <div id="toc" class="toc-article">
+    <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#简介"><span class="toc-text">简介</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#内核态Rootkits"><span class="toc-text">内核态Rootkits</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Rootkit常见功能"><span class="toc-text">Rootkit常见功能</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#Rookit检测"><span class="toc-text">Rookit检测</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Hidden-Module"><span class="toc-text">Hidden Module</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Syscall-Interrupt-Descriptor-Table-Hooking"><span class="toc-text">Syscall/Interrupt Descriptor Table Hooking</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Netfilter-Hooking"><span class="toc-text">Netfilter Hooking</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Network-Protocol-Hooking"><span class="toc-text">Network Protocol Hooking</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Process-File-Operations-Hooking"><span class="toc-text">Process File Operations Hooking</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Zeroed-Process-Inodes"><span class="toc-text">Zeroed Process Inodes</span></a></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#总结"><span class="toc-text">总结</span></a></li></ol>
+</div>
+    
+</div>
+
+
+<div class="search-field" id="search-field">
+    <div class="search-container">
+        <div class="search-input">
+            <span id="esc-search"> <i class="icon-fanhui iconfont"></i></span>
+            <input id="search-input"/>
+            <span id="begin-search">搜索</span>
+        </div>
+        <div class="search-result-container" id="search-result-container">
+
+        </div>
+    </div>
+</div>
+
+        <div class="index-about-mobile">
+            <i> 路漫漫其修远兮，吾将上下而求索。 </i>
+        </div>
+    </div>
+    
+    <div class="index-middle">
+        <!-- Main Content -->
+        
+
+
+<div class="post-container">
+    <div class="post-title">
+        对抗rootkits
+    </div>
+
+    <div class="post-meta">
+        <span class="attr">发布于：<span>2020-07-16 22:11:10</span></span>
+        
+        <span class="attr">标签：/
+        
+        <a class="tag" href="/tags/#rootkits" title="rootkits">rootkits</a>
+        <span>/</span>
+        
+        
+        </span>
+        <span class="attr">访问：<span id="busuanzi_value_page_pv"></span>
+</span>
+</span>
+    </div>
+    <div class="post-content ">
+        <h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>可加载内核模块，简称LKM ，是Linux内核的一个模块。通常， LKM用于添加对新硬件（作为设备驱动程序）或文件系统的支持，或者添加其他系统调用。如果没有LKM ，操作系统就必须包括所有可能预期的功能。当开发一个平台，用于智能手机以及服务器等各种设备时，这是几乎不可能做到的。LKM为内核和计算机用户提供了额外的功能，并且可以在需要或不需要时安全地添加或删除。不幸的是，这个功能可能会被滥用来创建恶意软件，即内核模式rootkit。Linux内核模式rootkit在正确执行时比大多数其他恶意软件更难检测，因为它们提供的功能会隐藏或者伪造返回的信息。因此，开发多种检测更高级rootkit的方法将有益于全球的系统管理员。</p>
+<h1 id="内核态Rootkits"><a href="#内核态Rootkits" class="headerlink" title="内核态Rootkits"></a>内核态Rootkits</h1><p>为什么恶意软件的作者会想开发一个在内核态的Rootkit？Rootkit可以位于user-land或kernel-land中。图1详细描述了与user-land和kernel-land相关的理论特权环。User-land表示特权环3,kernel-land表示特权环0。内核负责处理用户系统的许多功能，无论是浏览本地文件还是使用Web浏览器浏览Internet。这通过实现系统调用（在内核上下文中运行的低级函数）来实现。</p>
+<p><img src="/images/anti_rootkit/1.png" alt=""></p>
+<p>例如，像printf这样的库函数最终总是调用write来将任何信息写入您要发送到的外设。现在您可能会问，“但是如果写在内核中，我的输入如何进入内核运行代码？”在程序集中，当syscall被设置为执行时，<code>int80</code>指令从编译器发出。指令<code>int 0x80</code>触发一个可屏蔽中断，该中断将控制权从用户传送到内核（ring 3到ring 0）。为需要注意的是这不再是标准方法（现在存在SYSENTER/SYSEXIT和SYSCALL），但概念是一样的。用户希望内核处理这个调用并返回正确的结果。当rootkit成为内核的一部分时，它们能够实时修改用户收到的信息。</p>
+<h1 id="Rootkit常见功能"><a href="#Rootkit常见功能" class="headerlink" title="Rootkit常见功能"></a>Rootkit常见功能</h1><p>Rootkit通常具有相似的核心功能。最常见的rootkit功能包括隐藏攻击者的恶意文件、进程或网络连接、为将来的事件（后门）提供未经授权的访问、部署键盘记录程序以及删除将揭示攻击者存在的系统日志。在下一节中，我们将讨论设计内核模块rootkit函数所需的特定于实现的细节。</p>
+<h1 id="Rookit检测"><a href="#Rookit检测" class="headerlink" title="Rookit检测"></a>Rookit检测</h1><h2 id="Hidden-Module"><a href="#Hidden-Module" class="headerlink" title="Hidden Module"></a>Hidden Module</h2><p>Sysfs包含许多kset(kernel sets)，这些kset又包含多个kobject(kernel objects)。sysfs中的kset <code>module_kset</code>保存对所有加载的内核模块的kobject引用。通过遍历此列表，我们可以将每个kobject解析回其包含对象（其引用的内核模块）。与<code>find_module(kobj-&gt;mod-&gt;name)</code>中的当前模块列表条目相比，我们可以从列表中发现那些解除了自身链接的模块。有关ksets和kobject之间关系的更多细节，请参见图2。</p>
+<p><img src="/images/anti_rootkit/2.png" alt=""></p>
+<p>查找隐藏模块伪代码</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">list_for_each_entry_safe(cur, tmp, &amp;mod_kset-&gt;<span class="built_in">list</span>, entry)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">  <span class="keyword">if</span> (!kobject_name(tmp))</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">break</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">  kobj = container_of(tmp, struct module_kobject, kobj);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">  <span class="keyword">if</span> (kobj &amp;&amp; kobj-&gt;mod &amp;&amp; kobj-&gt;mod-&gt;name)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">    mutex_lock(&amp;module_mutex);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">    <span class="keyword">if</span>(!find_module(kobj-&gt;mod-&gt;name))</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">      ALERT(<span class="string">"Module [%s] hidden.\n"</span>, kobj-&gt;mod-&gt;name);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">    mutex_unlock(&amp;module_mutex);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">  &#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<h2 id="Syscall-Interrupt-Descriptor-Table-Hooking"><a href="#Syscall-Interrupt-Descriptor-Table-Hooking" class="headerlink" title="Syscall/Interrupt Descriptor Table Hooking"></a>Syscall/Interrupt Descriptor Table Hooking</h2><p>搜索syscall表，查看是否有任何函数指向kernel text section。如果它们没有指向kernel text section，那么它们很可能已经被hook，但是为了验证这一点，我们搜索所有加载的模块来验证这一点。图3描述了x86_64的内核的内存映射。<a href="https://www.kernel.org/doc/Documentation/x86/x86_64/mm.txt" target="_blank" rel="noopener">可以参考这里</a>。<strong>在这里我们可以看到内核文本映射驻留在它自己的区域中，内核模块被映射到它们正上方的空间中。</strong>使用此方法，我们可以确定函数地址所在的位置，并对其是否已挂接进行判断调用。</p>
+<p><img src="/images/anti_rootkit/3.png" alt=""></p>
+<p>下面是内核用来检查地址是否位于此文本映射中的代码。<code>_stext</code>和<code>_etext</code>分别表示文本映射的开始和结束。<a href="https://elixir.bootlin.com/linux/v4.15/source/kernel/extable.c#L75" target="_blank" rel="noopener">参考这里。</a></p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> notrace</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">core_kernel_text(<span class="keyword">unsigned</span> <span class="keyword">long</span> addr)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">if</span> (addr &gt;= (<span class="keyword">unsigned</span> <span class="keyword">long</span>)_stext &amp;&amp; addr &lt; (<span class="keyword">unsigned</span> <span class="keyword">long</span>)_etext)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">		<span class="keyword">return</span> <span class="number">1</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">if</span> (system_state &lt; SYSTEM_RUNNING &amp;&amp; init_kernel_text(addr))</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">		<span class="keyword">return</span> <span class="number">1</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>通过迭代syscall表，并利用这个函数来验证syscall表的完整性。<code>sct[i]</code>表示第<code>i</code>个系统调用。<code>get_module_from_addr</code>尝试检索与<code>hook address</code>关联的内核模块。如果返回NULL，则隐藏该模块。在这种情况下，我们使用另一种方法来解析隐藏模块。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">for (i = 0; i &lt; NR_syscalls; i++)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">		addr = sct[i];</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">		if (!ckt(addr))&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">			mutex_lock(&amp;module_mutex);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">			mod = get_module_from_addr(addr);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">			if (mod)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">				ALERT("Module [%s] hooked syscall [%d].\n", mod-&gt;name, i);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">			&#125; else &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">				mod_name = find_hidden_module(addr);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">				if (mod_name)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">					ALERT("Hidden module [%s] hooked syscall [%d].\n", mod_name, i);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">			&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">			mutex_unlock(&amp;module_mutex);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">		&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">	&#125;</span></pre></td></tr></table></figure>
+
+<h2 id="Netfilter-Hooking"><a href="#Netfilter-Hooking" class="headerlink" title="Netfilter Hooking"></a>Netfilter Hooking</h2><p>搜索所有可能的Netfilter hook组合，并报告所有具有活动Netfilter hook的模块。Netfilter钩子有合法用途，但是它们不可能出现在iptables、ebtables和friends之外。它们通常用于内核模式的rootkit中，通过截获用于端口验证身份验证的数据包来创建后门。如果您想了解更多关于在内核中实现Netfilter钩子的信息，可以参考<a href="https://www.netfilter.org/documentation/HOWTO/netfilter-hacking-HOWTO-3.html" target="_blank" rel="noopener">这里</a>。</p>
+<p>涉及的代码相当繁琐，因为Netfilter函数最近经常更改。访问此信息的另一个问题是没有友好的API。例如，以下所有三个代码块都执行相同的操作-在netfilter hook数组上迭代。</p>
+<p>对于内核版本≥ 4.14 ，我们可以窃取<code>nf_hook_entry_head</code>函数，因为将来的函数依赖于相同的原型，它将返回<code>struct nf_hook_entries</code> ，直到4.19 （到目前为止）为止。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">nf_hook_entries</span> __<span class="title">rcu</span> ** </span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="title">nf_hook_entry_head</span>(<span class="title">struct</span> <span class="title">net</span> *<span class="title">net</span>, <span class="title">int</span> <span class="title">pf</span>, <span class="title">unsigned</span> <span class="title">int</span> <span class="title">hooknum</span>, <span class="title">struct</span> <span class="title">net_device</span> *<span class="title">dev</span>)</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="class">&#123;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">if</span> (pf != NFPROTO_NETDEV)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">		<span class="keyword">return</span> net-&gt;nf.hooks[pf]+hooknum;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">if</span> (hooknum == NF_NETDEV_INGRESS)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">		<span class="keyword">if</span> (dev &amp;&amp; dev_net(dev) == net)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">			<span class="keyword">return</span> &amp;dev-&gt;nf_hooks_ingress;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">	&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">return</span> <span class="literal">NULL</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">analyze_netfilter</span><span class="params">(<span class="keyword">void</span>)</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line"><span class="function"></span>&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">int</span> i, j;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">nf_hook_entries</span> *<span class="title">p</span>;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">nf_hook_entries</span> __<span class="title">rcu</span> **<span class="title">pp</span>;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; NFPROTO_NUMPROTO; i++)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">		<span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; NF_MAX_HOOKS; j++)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">			pp = nf_hook_entry_head(&amp;init_net, i, j, <span class="literal">NULL</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line">			<span class="keyword">if</span> (!pp)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line">				<span class="keyword">return</span> -EINVAL;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">24</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">25</span></pre></td><td class="code"><pre><span class="line">			p = nf_entry_dereference(*pp);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">26</span></pre></td><td class="code"><pre><span class="line">			<span class="keyword">if</span> (!p)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">27</span></pre></td><td class="code"><pre><span class="line">				<span class="keyword">continue</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">28</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">29</span></pre></td><td class="code"><pre><span class="line">			search_hooks(p);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">30</span></pre></td><td class="code"><pre><span class="line">		&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">31</span></pre></td><td class="code"><pre><span class="line">	&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">32</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">33</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">34</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>内核版本&lt; 4.14，则没有<code>struct nf_hook_entries</code>。我们必须使用内核的内置列表机制<code>struct list_head</code>。这意味着，我们的差异不会仅仅停留在对netfilter挂接进行迭代上，而是继续研究我们如何访问这些数据。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="class"><span class="keyword">struct</span> <span class="title">nf_hook_entries</span> __<span class="title">rcu</span> **</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="title">nf_hook_entry_head</span>(<span class="title">struct</span> <span class="title">net</span> *<span class="title">net</span>, <span class="title">int</span> <span class="title">pf</span>, <span class="title">unsigned</span> <span class="title">int</span> <span class="title">hooknum</span>, <span class="title">struct</span> <span class="title">net_device</span> *<span class="title">dev</span>)</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="class">&#123;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">if</span> (pf != NFPROTO_NETDEV)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">		<span class="keyword">return</span> net-&gt;nf.hooks[pf]+hooknum;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">if</span> (hooknum == NF_NETDEV_INGRESS)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">		<span class="keyword">if</span> (dev &amp;&amp; dev_net(dev) == net)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">			<span class="keyword">return</span> &amp;dev-&gt;nf_hooks_ingress;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">	&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">return</span> <span class="literal">NULL</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">analyze_netfilter(<span class="keyword">void</span>)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">int</span> i, j;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">nf_hook_entries</span> *<span class="title">p</span>;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">nf_hook_entries</span> __<span class="title">rcu</span> **<span class="title">pp</span>;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; NFPROTO_NUMPROTO; i++)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">		<span class="keyword">for</span> (j = <span class="number">0</span>; j &lt; NF_MAX_HOOKS; j++)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line">			pp = nf_hook_entry_head(&amp;init_net, i, j, <span class="literal">NULL</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">23</span></pre></td><td class="code"><pre><span class="line">			<span class="keyword">if</span> (!pp)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">24</span></pre></td><td class="code"><pre><span class="line">				<span class="keyword">return</span> -EINVAL;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">25</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">26</span></pre></td><td class="code"><pre><span class="line">			p = nf_entry_dereference(*pp);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">27</span></pre></td><td class="code"><pre><span class="line">			<span class="keyword">if</span> (!p)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">28</span></pre></td><td class="code"><pre><span class="line">				<span class="keyword">continue</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">29</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">30</span></pre></td><td class="code"><pre><span class="line">			search_hooks(p);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">31</span></pre></td><td class="code"><pre><span class="line">		&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">32</span></pre></td><td class="code"><pre><span class="line">	&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">33</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">34</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">35</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>现在，我们仍然有两个访问它们的权限，这需要更多内核版本特定的代码。这就是支持多个内核版本的成本。 对于≥ 4.14，我们需要迭代一个struct nf_hook_entries *。这很简单，因为结构体内部是一个称为num_hook_entries的整数。然后，我们可以使用同一结构内的钩子数组来获取每个钩子的地址，并对照 <code>kernel text mapping</code>检查它。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">void</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">search_hooks(<span class="keyword">const</span> struct nf_hook_entries *e)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">int</span> i;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">const</span> <span class="keyword">char</span> *mod_name;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">unsigned</span> <span class="keyword">long</span> addr;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">module</span> *<span class="title">mod</span>;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; e-&gt;num_hook_entries; i++)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">		addr = (<span class="keyword">unsigned</span> <span class="keyword">long</span>)e-&gt;hooks[i].hook;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">		mutex_lock(&amp;module_mutex);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">		mod = get_module_from_addr(addr);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">		<span class="keyword">if</span> (mod)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">			ALERT(<span class="string">"Module [%s] controls a Netfilter hook.\n"</span>, mod-&gt;name);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">		&#125; <span class="keyword">else</span> &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">			mod_name = find_hidden_module(addr);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">			ALERT(<span class="string">"Module [%s] controls a Netfilter hook.\n"</span>, mod_name);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">		&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">		mutex_unlock(&amp;module_mutex);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">	&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>对于&lt; 4.14，我们需要迭代内核列表。这可以通过<code>list_for_each_entry</code>或<code>list_for_each_entry_safe</code>完成。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> <span class="keyword">void</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">search_hooks(<span class="keyword">const</span> struct list_head *hook_list)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">const</span> <span class="keyword">char</span> *mod_name;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">unsigned</span> <span class="keyword">long</span> addr;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">module</span> *<span class="title">mod</span>;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">nf_hook_ops</span> *<span class="title">elem</span>;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">	list_for_each_entry(elem, hook_list, <span class="built_in">list</span>)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">		addr = (<span class="keyword">unsigned</span> <span class="keyword">long</span>)elem-&gt;hook;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">		mutex_lock(&amp;module_mutex);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">		mod = get_module_from_addr(addr);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">		<span class="keyword">if</span> (mod)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">			ALERT(<span class="string">"Module [%s] controls a Netfilter hook.\n"</span>, mod-&gt;name);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">		&#125; <span class="keyword">else</span> &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">			mod_name = find_hidden_module(addr);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">			ALERT(<span class="string">"Module [%s] controls a Netfilter hook.\n"</span>, mod_name);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">		&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">		mutex_unlock(&amp;module_mutex);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line">	&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<h2 id="Network-Protocol-Hooking"><a href="#Network-Protocol-Hooking" class="headerlink" title="Network Protocol Hooking"></a>Network Protocol Hooking</h2><p>通过抓取<code>init_net.proc_net</code>进程目录条目（在您的文件系统上，这相当于<code>/proc/net/</code>），并遍历红黑树中的每个子目录，查找名为tcp的子目录tcp6、udp、udp6、udplite和udplite6。一旦我们获取了特定网络协议的目录条目，就可以获取<code>seq_fops</code>和<code>seq_ops</code>的函数指针，即我们正在寻找<code>seq_fops-&gt;llseek</code>, <code>seq_fops-&gt;read</code>, <code>seq_fops-&gt;release</code>和<code>seq_ops-&gt;show</code>。这样做，我们可以验证网络协议的操作函数指针仍然在<code>core kernel text section</code>，而不是被 <code>kernel module</code>操作。这些端口通常被hook，以隐藏网络流量或暴露的端口，使其不被netstat和其他用户接口使用。</p>
+<p>为了迭代多个接口并检查相同的操作，我设计了一个简单的结构<code>net_entry</code>。此结构保存我们正在搜索的条目的名称，一旦找到，则保存<code>/proc</code>目录条目。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">net_entry</span> &#123;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">const</span> <span class="keyword">char</span> *name;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">proc_dir_entry</span> *<span class="title">entry</span>;</span>	</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">&#125;;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">net_entry</span> <span class="title">net</span>[<span class="title">NUM_NET_ENTRIES</span>] = &#123;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">	&#123;<span class="string">"tcp"</span>,			<span class="literal">NULL</span>&#125;,</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">	&#123;<span class="string">"tcp6"</span>,		<span class="literal">NULL</span>&#125;,</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">	&#123;<span class="string">"udp"</span>,			<span class="literal">NULL</span>&#125;,</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">	&#123;<span class="string">"udp6"</span>,		<span class="literal">NULL</span>&#125;,</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">	&#123;<span class="string">"udplite"</span>,		<span class="literal">NULL</span>&#125;,</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">	&#123;<span class="string">"udplite6"</span>,	<span class="literal">NULL</span>&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">&#125;;</span></pre></td></tr></table></figure>
+
+<p>下面的代码在红黑树上迭代（在本例中为<code>/proc/net</code>的rb-tree），并搜索具有目标字符串名称的条目。我们可以使用它来找到我们的目标net entry，并分配相应的<code>struct proc_dir_entry</code>。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">struct</span> <span class="title">proc_dir_entry</span> *</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="title">find_subdir</span>(<span class="title">struct</span> <span class="title">rb_root</span> *<span class="title">tree</span>, <span class="title">const</span> <span class="title">char</span> *<span class="title">str</span>)</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="class">&#123;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">rb_node</span> *<span class="title">node</span> = <span class="title">rb_first</span>(<span class="title">tree</span>);</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">	<span class="class"><span class="keyword">struct</span> <span class="title">proc_dir_entry</span> *<span class="title">e</span> = <span class="title">NULL</span>;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">while</span> (node)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">		e = rb_entry(node, struct proc_dir_entry, subdir_node);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">		<span class="keyword">if</span> (<span class="built_in">strcmp</span>(e-&gt;name, str) == <span class="number">0</span>)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">			<span class="keyword">return</span> e;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">		node = rb_next(node);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">	&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">return</span> <span class="literal">NULL</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>现在我们可以遍历每个net entry并获取它们的<code>seq_ops</code>和<code>seq_fops</code>。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">unsigned</span> <span class="keyword">long</span> op_addr[<span class="number">4</span>];</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">seq_operations</span> *<span class="title">seq_ops</span>;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="class"><span class="keyword">struct</span> <span class="title">file_operations</span> *<span class="title">seq_fops</span>;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="keyword">char</span> *mod_name, *op_string[<span class="number">4</span>] = &#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">	<span class="string">"llseek"</span>, <span class="string">"read"</span>, <span class="string">"release"</span>, <span class="string">"show"</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">&#125;;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (i = <span class="number">0</span>; i &lt; NUM_NET_ENTRIES; i++)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">	net[i].entry = find_subdir(&amp;init_net.proc_net-&gt;subdir, net[i].name);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">if</span> (!net[i].entry)</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">		<span class="keyword">continue</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">	seq_ops = net[i].entry-&gt;seq_ops;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">	seq_fops = net[i].entry-&gt;proc_fops;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">16</span></pre></td><td class="code"><pre><span class="line">	op_addr[<span class="number">0</span>] = *(<span class="keyword">unsigned</span> <span class="keyword">long</span> *)seq_fops-&gt;llseek;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">17</span></pre></td><td class="code"><pre><span class="line">	op_addr[<span class="number">1</span>] = *(<span class="keyword">unsigned</span> <span class="keyword">long</span> *)seq_fops-&gt;<span class="built_in">read</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">18</span></pre></td><td class="code"><pre><span class="line">	op_addr[<span class="number">2</span>] = *(<span class="keyword">unsigned</span> <span class="keyword">long</span> *)seq_fops-&gt;<span class="built_in">release</span>;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">19</span></pre></td><td class="code"><pre><span class="line">	op_addr[<span class="number">3</span>] = *(<span class="keyword">unsigned</span> <span class="keyword">long</span> *)seq_ops-&gt;show;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">20</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">21</span></pre></td><td class="code"><pre><span class="line">	<span class="comment">/* Code to check if all of op_addr is in kernel text mapping */</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">22</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<h2 id="Process-File-Operations-Hooking"><a href="#Process-File-Operations-Hooking" class="headerlink" title="Process File Operations Hooking"></a>Process File Operations Hooking</h2><p>通过打开<code>/proc</code>文件指针，并检查是否有文件操作（即iterate）指向 core kernel text section。这个文件指针可以被一个rootkit hook，通过检查每个目录项和它想要隐藏的进程列表来隐藏恶意进程。如果它找到一个目录项，它就可以简单地跳过该目录项，就好像它从未存在过，导致它不会被报告回用户。</p>
+<p>下面的代码创建一个指向<code>/proc</code>的文件指针，并检查<code>iterate</code>或<code>readdir</code>是否已由模块hook。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">fp = filp_open(<span class="string">"/proc"</span>, O_RDONLY, S_IRUSR);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">if</span> LINUX_VERSION_CODE &gt;= KERNEL_VERSION(3,11,0)</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">	addr = (<span class="keyword">unsigned</span> <span class="keyword">long</span>)fp-&gt;f_op-&gt;iterate;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">else</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">	addr = (<span class="keyword">unsigned</span> <span class="keyword">long</span>)fp-&gt;f_op-&gt;readdir;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">endif</span></span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (!ckt(addr))&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">	mod = get_module_from_addr(addr);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">if</span> (mod)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line">		ALERT(<span class="string">"Module [%s] hijacked /proc fops.\n"</span>, mod-&gt;name);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">	&#125; ...</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<h2 id="Zeroed-Process-Inodes"><a href="#Zeroed-Process-Inodes" class="headerlink" title="Zeroed Process Inodes"></a>Zeroed Process Inodes</h2><p>通过<code>/proc</code>搜索所有<code>linux_dirent</code>结构，并检查<code>inode</code> ，以找到任何设置为零的设置。目录清单中通常忽略一个为零的<code>inode</code>，这使得它成为rootkits将目录设置为以隐藏其文件的良好候选对象。 </p>
+<p>下面的代码在<code>linux_dirent</code>结构（本质上是一个1-D数组）上迭代，以查找<code>inode</code>为<code>0</code>的任何目录条目。图中未显示的是一个自定义的filldir函数，它是填充<code>linux_dirent</code>结构所必需的。这虽然具有挑战性/令人讨厌，但对理解检测并不重要。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">while</span> (<span class="built_in">size</span> &gt; <span class="number">0</span>)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line">	<span class="keyword">if</span> (d-&gt;d_ino == <span class="number">0</span>)&#123;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">		<span class="built_in">buffer</span> = kzalloc(d-&gt;d_namlen+<span class="number">1</span>, GFP_KERNEL);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line">		<span class="built_in">memcpy</span>(<span class="built_in">buffer</span>, d-&gt;d_name, d-&gt;d_namlen);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">		ALERT(<span class="string">"Hidden Process [/proc/%s].\n"</span>, <span class="built_in">buffer</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line">		kfree(<span class="built_in">buffer</span>);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">	&#125;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line">	reclen = ALIGN(<span class="keyword">sizeof</span>(*d) + d-&gt;d_namlen, <span class="keyword">sizeof</span>(u64));</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">	d = (struct linux_dirent *)((<span class="keyword">char</span> *)d + reclen);</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line">	<span class="built_in">size</span> -= reclen;</span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>1.隐藏模块的检测是通比较kobject和find_module的模块。</p>
+<p>2.其他模块的检测都是通过找相应操作函数的地址，判断地址是否在 kernel text section来判断是否被劫持。</p>
+<p><strong>参考：</strong></p>
+<p><a href="https://www.freebuf.com/articles/system/54263.html" target="_blank" rel="noopener">https://www.freebuf.com/articles/system/54263.html</a></p>
+<p><a href="https://github.com/EBWi11/AgentSmith-HIDS/blob/master/doc/AgentSmith-HIDS-Quick-Start-zh_CN.md" target="_blank" rel="noopener">https://github.com/EBWi11/AgentSmith-HIDS/blob/master/doc/AgentSmith-HIDS-Quick-Start-zh_CN.md</a></p>
+<p><a href="https://github.com/nbulischeck/tyton" target="_blank" rel="noopener">https://github.com/nbulischeck/tyton</a></p>
+<p><a href="https://blog.csdn.net/jasonchen_gbd/article/details/78013643" target="_blank" rel="noopener">https://blog.csdn.net/jasonchen_gbd/article/details/78013643</a></p>
+<p><a href="https://www.freebuf.com/articles/system/54263.html" target="_blank" rel="noopener">https://www.freebuf.com/articles/system/54263.html</a></p>
+
+        
+            <div class="donate-container">
+    <div class="donate-button">
+        <button id="donate-button">赞赏</button>
+    </div>
+    <div class="donate-img-container hide" id="donate-img-container">
+        <img id="donate-img" src="" data-src="/img/donate.jpg">
+        <p> 感谢鼓励 </p>
+    </div>
+</div>
+        
+        <br />
+        <div id="comment-container">
+        </div>
+        <div id="disqus_thread"></div>
+
+        <div id="lv-container">
+        </div>
+
+    </div>
+</div>
+
+    </div>
+</div>
+
+
+<footer class="footer">
+    <ul class="list-inline text-center">
+        
+        
+
+        
+
+        
+
+        
+
+        
+
+    </ul>
+    
+    <p>
+        <span>/</span>
+        
+        <span><a href="https://github.com/he1m4n6a" target="_blank" rel="noopener">github</a></span>
+        <span>/</span>
+        
+        <span><a href="https://weibo.com/u/1736968374" target="_blank" rel="noopener">weibo</a></span>
+        <span>/</span>
+        
+        <span><a href="#">wechat</a></span>
+        <span>/</span>
+        
+    </p>
+    
+    <p>
+        <span id="busuanzi_container_site_pv">
+            <span id="busuanzi_value_site_pv"></span>PV
+        </span>
+        <span id="busuanzi_container_site_uv">
+            <span id="busuanzi_value_site_uv"></span>UV
+        </span>
+        Created By <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>  Theme <a href="https://github.com/aircloud/hexo-theme-aircloud" target="_blank" rel="noopener">AirCloud</a></p>
+</footer>
+
+
+
+
+</body>
+
+<script>
+    // We expose some of the variables needed by the front end
+    window.hexo_search_path = "search.json"
+    window.hexo_root = "/"
+    window.isPost = true
+</script>
+<script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+<script src="/js/index.js"></script>
+<script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+    <script>
+        /**
+         *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+         *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables
+        */
+        if( '' || '')
+        var disqus_config = function () {
+            this.page.url = '';  // Replace PAGE_URL with your page's canonical URL variable
+            this.page.identifier = ''; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+        };
+
+        (function() { // DON'T EDIT BELOW THIS LINE
+            var d = document, s = d.createElement('script');
+            s.src = 'https://airclouds-blog.disqus.com/embed.js';
+            s.setAttribute('data-timestamp', +new Date());
+            (d.head || d.body).appendChild(s);
+        })();
+    </script>
+
+
+
+</html>
