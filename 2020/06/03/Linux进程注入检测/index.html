@@ -144,23 +144,23 @@
         <h1 id="LD-PRELOAD"><a href="#LD-PRELOAD" class="headerlink" title="LD_PRELOAD"></a>LD_PRELOAD</h1><p>LD_PRELOAD是启动时在进程中加载共享库的最简单，最流行的方法。该环境变量可以配置有指向共享库的路径，该路径要在任何其他共享对象之前加载。</p>
 <p>对于文中大多数案例，我们将使用<a href="https://github.com/gaffe23/linux-inject" target="_blank" rel="noopener">此处列出的GitHub中</a>可用的示例。让我们使用sample-target作为<a href="https://github.com/gaffe23/linux-inject/blob/master/sample-target.c" target="_blank" rel="noopener">目标流程</a>并使用<a href="https://github.com/gaffe23/linux-inject/blob/master/sample-library.c" target="_blank" rel="noopener">sample-library</a>作为我们将要注入的共享库。</p>
 <p>我们可以使用ldd工具检查加载到进程中的共享库。如果我们使用ldd执行样本目标二进制文件，则可以看到该信息。</p>
-<p>![](/images/linux inject/1.png)</p>
+<p><img src="/images/linux_inject/1.png" alt=""></p>
 <p>Linux-vdso.so.1是一个<a href="http://man7.org/linux/man-pages/man7/vdso.7.html" target="_blank" rel="noopener">虚拟的动态共享对象</a>，内核在每个进程中自动将其映射到地址空间。根据不同的体系架构，它可以具有其他名称。</p>
-<p>![](/images/linux inject/2.png)</p>
+<p><img src="/images/linux_inject/2.png" alt=""></p>
 <p>Libc.so.6是样本目标需要运行的动态库之一，而<a href="https://linux.die.net/man/8/ld-linux.so" target="_blank" rel="noopener">ld-linux.so.2</a>负责查找和加载共享库。通过使用readelf，我们可以看到如何在样本目标ELF文件中定义它。</p>
-<p>![](/images/linux inject/3.png)</p>
+<p><img src="/images/linux_inject/3.png" alt=""></p>
 <p>现在，让我们设置LD_PRELOAD环境变量以通过执行来加载我们的库。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">export LD_PRELOAD = /home/ubuntu/linux-inject/sample-library.so; ldd /home/ubuntu/linux-inject/sample-target</span></pre></td></tr></table></figure>
 
-<p>![](/images/linux inject/4.png)</p>
+<p><img src="/images/linux_inject/4.png" alt=""></p>
 <p>我们可以看到现在正在加载示例库。通过设置LD_DEBUG环境变量，我们还可以获得更多详细信息。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">export DEBUG = filename</span></pre></td></tr></table></figure>
 
-<p>![](/images/linux inject/5.png)</p>
+<p><img src="/images/linux_inject/5.png" alt=""></p>
 <p>通过Osquery搜索恶意LD_PRELOAD用法的一种简单方法是查询<a href="https://osquery.io/schema/3.3.2#process_envs" target="_blank" rel="noopener">process_envs</a>表并查找设置了LD_PRELOAD环境变量的进程。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> process_envs.pid <span class="keyword">as</span> source_process_id, process_envs.key <span class="keyword">as</span> environment_variable_key, process_envs.value <span class="keyword">as</span> environment_variable_value, processes.name <span class="keyword">as</span> source_process, processes.path <span class="keyword">as</span> file_path, processes.cmdline <span class="keyword">as</span> source_process_commandline, processes.cwd <span class="keyword">as</span> current_working_directory, <span class="string">'T1055'</span> <span class="keyword">as</span> event_attack_id, <span class="string">'Process Injection'</span> <span class="keyword">as</span> event_attack_technique, <span class="string">'Defense Evasion, Privilege Escalation'</span> <span class="keyword">as</span> event_attack_tactic <span class="keyword">FROM</span> process_envs <span class="keyword">join</span> processes <span class="keyword">USING</span> (pid) <span class="keyword">WHERE</span> <span class="keyword">key</span> = <span class="string">'LD_PRELOAD'</span>;</span></pre></td></tr></table></figure>
 
-<p>![](/images/linux inject/6.png)</p>
+<p><img src="/images/linux_inject/6.png" alt=""></p>
 <p>由于某些监视和安全软件出于良性目的使用LD_PRELOAD，因此您必须使用LD_PRELOAD创建环境中已知进程的基准。</p>
 <p>我们在使用LD_PRELOAD时遇到的一些良性示例包括以下内容。</p>
 <ul>
@@ -174,16 +174,16 @@
 <p>让我们看<a href="https://github.com/gaffe23/linux-inject/blob/master/slides_BHArsenal2015.pdf" target="_blank" rel="noopener">一下它</a>是<a href="https://github.com/gaffe23/linux-inject/blob/master/slides_BHArsenal2015.pdf" target="_blank" rel="noopener">如何工作的</a>。首先，我们使用<a href="https://github.com/gaffe23/linux-inject/blob/master/inject-x86_64.c#L254" target="_blank" rel="noopener">ptrace</a>()附加到目标进程，并注入加载库的代码。然后，<a href="https://github.com/gaffe23/linux-inject/blob/master/inject-x86_64.c#L26" target="_blank" rel="noopener">加载程序代码</a>使用malloc()分配内存，将共享库的路径复制到缓冲区，然后调用__libc_dlopen_mode()来加载共享库。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">./inject -n sample-target sample-library.so</span></pre></td></tr></table></figure>
 
-<p>![](/images/linux inject/7.png)</p>
+<p><img src="/images/linux_inject/7.png" alt=""></p>
 <p>失败了！发生了什么？</p>
 <p>它的源头是一个称为<a href="https://linux-audit.com/protect-ptrace-processes-kernel-yama-ptrace_scope/" target="_blank" rel="noopener">Yamaha</a>的Linux安全模块，该模块为特定的内核功能（例如ptrace）实现了自主访问控制（DAC）。你可以通过查看<code>/proc/sys/kernel/yama/ptrace_scope</code>或使用<code>systemctl</code>来检查当前状态。</p>
-<p>![](/images/linux inject/8.png)</p>
+<p><img src="/images/linux_inject/8.png" alt=""></p>
 <p>正如你可以在看<a href="https://linux-audit.com/protect-ptrace-processes-kernel-yama-ptrace_scope/" target="_blank" rel="noopener">文档</a>，当ptrace_scope设置为1，只有一个父进程可以调试（这是在Ubuntu 18.04.2默认值）。设置为3时，无法使用ptrace调试任何进程，并且需要重新启动才能更改该值。</p>
 <p>从防御者的角度来看，这实际上很棒，因为这意味着攻击者必须在使用ptrace之前修改ptrace_scope的值。</p>
 <p>我们可以利用此优势，并利用Osquery的<a href="https://osquery.io/schema/3.3.2#system_controls" target="_blank" rel="noopener">system_controls</a>表查询ptrace_scope的当前配置值。</p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">osquery&gt; select * from system_controls WHERE name =='kernel.yama.ptrace_scope';</span></pre></td></tr></table></figure>
 
-<p>![山仁](C:\Users\y00507312\Desktop\img\linux inject\9.png)</p>
+<p><img src="C:%5CUsers%5Cy00507312%5CDesktop%5Cimg%5Clinux_inject%5C9.png" alt="山仁"></p>
 <p>您还可以在Osquery中利用以下计划的查询来监视ptrace_scope的更改。</p>
 <figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="string">“</span> <span class="string">detection_ptrace_scope_changed”：&#123;</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">2</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">3</span></pre></td><td class="code"><pre><span class="line">      <span class="string">“</span> <span class="string">platform”：“</span> <span class="string">linux”，</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">4</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">5</span></pre></td><td class="code"><pre><span class="line">      <span class="string">“</span> <span class="string">description”：“检测对kernel.yama.ptrace_scope的更改”，</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">6</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">7</span></pre></td><td class="code"><pre><span class="line">      <span class="string">“</span> <span class="string">query”：“从system_controls中选择名称，current_value，config_value</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">8</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">9</span></pre></td><td class="code"><pre><span class="line">  <span class="string">WHERE</span> <span class="string">name</span> <span class="string">=='kernel.yama.ptrace_scope';“，</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">10</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">11</span></pre></td><td class="code"><pre><span class="line">      <span class="string">“时间间隔”：3600，</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">12</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">13</span></pre></td><td class="code"><pre><span class="line">      <span class="string">“已删除”：false</span></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">14</span></pre></td><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="gutter"><pre><span class="line">15</span></pre></td><td class="code"><pre><span class="line"><span class="string">&#125;</span></span></pre></td></tr></table></figure>
 
@@ -200,41 +200,41 @@
 <p>在Osquery中，以下查询可用于监视此特定的syslog消息。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> * <span class="keyword">from</span> syslog <span class="keyword">WHERE</span> tag =<span class="string">'kernel'</span><span class="keyword">AND</span> message <span class="keyword">like</span><span class="string">'％ptrace attach％'</span>;</span></pre></td></tr></table></figure>
 
-<p>![](/images/linux inject/10.png)</p>
+<p><img src="/images/linux_inject/10.png" alt=""></p>
 <p>好的，现在让我们回到linux-inject工具。为了使ptrace起作用，攻击者需要将ptrace_scope设置为0。</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line">echo 0 | sudo tee /proc/sys/kernel/yama/ptrace_scope</span></pre></td></tr></table></figure>
 
 <p><img src="https://marvel-b1-cdn.bc0a.com/f00000000037663/cdn-cybersecurity.att.com/blog-content/Blog-Images/linux_inject.jpg" alt="linux注入ptrace工作"></p>
-<p>![](/images/linux inject/11.png)</p>
+<p><img src="/images/linux_inject/11.png" alt=""></p>
 <p>让我们使用Osquery的<a href="https://osquery.io/schema/3.3.2#process_memory_map" target="_blank" rel="noopener">process_memory_map</a>表查看进程内存。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> process_memory_map.*, pid <span class="keyword">as</span> mpid <span class="keyword">from</span> process_memory_map <span class="keyword">WHERE</span> pid <span class="keyword">in</span> (<span class="keyword">select</span> PID <span class="keyword">from</span> processes <span class="keyword">where</span> <span class="keyword">name</span> <span class="keyword">LIKE</span> <span class="string">'%sample-target'</span>);</span></pre></td></tr></table></figure>
 
-<p>![](/images/linux inject/12.png)</p>
+<p><img src="/images/linux_inject/12.png" alt=""></p>
 <p>在其他公共内存区域中，我们可以看到一些我们已经熟悉的共享库（libc，ld等）。除此之外，还存在注入的库sample-library.so。</p>
 <p>我们知道我们正在寻找具有执行许可权的内存区域，我们也可以丢弃原始图像和标记为伪的区域。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">count</span>(<span class="keyword">distinct</span>(process_memory_map.pid)) <span class="keyword">from</span> process_memory_map <span class="keyword">LEFT</span> <span class="keyword">JOIN</span> processes <span class="keyword">USING</span> (pid) <span class="keyword">WHERE</span> process_memory_map.path <span class="keyword">LIKE</span> <span class="string">'/%'</span> <span class="keyword">and</span> process_memory_map.pseudo != <span class="number">1</span> <span class="keyword">AND</span> process_memory_map.path != processes.path <span class="keyword">AND</span> process_memory_map.permissions <span class="keyword">LIKE</span> <span class="string">'%x%'</span>;</span></pre></td></tr></table></figure>
 
-<p>![](/images/linux inject/13.png)</p>
+<p><img src="/images/linux_inject/13.png" alt=""></p>
 <p>该查询仍然过于广泛。让我们检查一下共享库最常见的路径是什么。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="keyword">split</span>(process_memory_map.path, <span class="string">'/'</span>, <span class="number">0</span>) <span class="keyword">AS</span> folder, <span class="keyword">count</span>(*) <span class="keyword">as</span> cnt <span class="keyword">from</span> process_memory_map <span class="keyword">LEFT</span> <span class="keyword">JOIN</span> processes <span class="keyword">USING</span> (pid) <span class="keyword">WHERE</span> process_memory_map.path <span class="keyword">LIKE</span> <span class="string">'/%'</span> <span class="keyword">AND</span> process_memory_map.pseudo != <span class="number">1</span> <span class="keyword">AND</span> process_memory_map.path != processes.path <span class="keyword">AND</span> process_memory_map.permissions <span class="keyword">LIKE</span> <span class="string">'%x%'</span> <span class="keyword">GROUP</span> <span class="keyword">by</span> folder <span class="keyword">order</span> <span class="keyword">by</span> cnt <span class="keyword">desc</span>;</span></pre></td></tr></table></figure>
 
-<p>![](/images/linux inject/14.png)</p>
+<p><img src="/images/linux_inject/14.png" alt=""></p>
 <p>这就说得通了; 我们可以创建一个忽略公共路径的查询。这将帮助我们寻找从非标准位置加载的共享库。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> process_memory_map.*, pid <span class="keyword">as</span> mpid <span class="keyword">from</span> process_memory_map <span class="keyword">LEFT</span> <span class="keyword">JOIN</span> processes <span class="keyword">USING</span> (pid) <span class="keyword">WHERE</span> process_memory_map.path <span class="keyword">LIKE</span> <span class="string">'/%'</span> <span class="keyword">and</span> process_memory_map.pseudo != <span class="number">1</span> <span class="keyword">AND</span> process_memory_map.path <span class="keyword">NOT</span> <span class="keyword">LIKE</span> <span class="string">'/lib/%'</span> <span class="keyword">AND</span> process_memory_map.path <span class="keyword">NOT</span> <span class="keyword">LIKE</span> <span class="string">'/usr/lib%'</span> <span class="keyword">AND</span> process_memory_map.path != processes.path <span class="keyword">AND</span> process_memory_map.permissions <span class="keyword">LIKE</span> <span class="string">'%x%'</span>;</span></pre></td></tr></table></figure>
 
-<p>![](/images/linux inject/16.png)</p>
+<p><img src="/images/linux_inject/16.png" alt=""></p>
 <p>在许多情况下，攻击者在加载文件后会从磁盘上删除文件，从而使分析更加困难并避免检测。如果删除注入的.so文件，则可以使用以下查询进行验证，利用该查询来检测何时从磁盘删除了共享库。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> process_memory_map.pid, process_memory_map.start, process_memory_map.end, process_memory_map.permissions, process_memory_map.offset, process_memory_map.path <span class="keyword">from</span> process_memory_map <span class="keyword">LEFT</span> <span class="keyword">join</span> <span class="keyword">file</span> <span class="keyword">USING</span> (<span class="keyword">path</span>) <span class="keyword">where</span> pseudo != <span class="number">1</span> <span class="keyword">AND</span> process_memory_map.path <span class="keyword">NOT</span> <span class="keyword">LIKE</span> <span class="string">'/lib/%'</span> <span class="keyword">AND</span> process_memory_map.path <span class="keyword">NOT</span> <span class="keyword">LIKE</span> <span class="string">'/usr/lib%'</span> <span class="keyword">AND</span> process_memory_map.permissions <span class="keyword">LIKE</span> <span class="string">'%x%'</span> <span class="keyword">AND</span> filename <span class="keyword">IS</span> <span class="literal">NULL</span> <span class="keyword">and</span> process_memory_map.inode !=<span class="number">0</span> <span class="keyword">AND</span> process_memory_map.permissions = <span class="string">'r-xp'</span>;</span></pre></td></tr></table></figure>
 
-<p>![](/images/linux inject/17.png)</p>
+<p><img src="/images/linux_inject/17.png" alt=""></p>
 <p>在检测<a href="https://github.com/gaffe23/linux-inject/blob/master/inject-x86_64.c#L26" target="_blank" rel="noopener">目标进程中注入</a>的代码方面，我们可以使用以下Yara规则。</p>
-<p>![](/images/linux inject/18.png)</p>
+<p><img src="/images/linux_inject/18.png" alt=""></p>
 <h1 id="ReflectiveSOInjection"><a href="#ReflectiveSOInjection" class="headerlink" title="ReflectiveSOInjection"></a>ReflectiveSOInjection</h1><p>有趣的是，当我在Virustotal中搜索与这些模式匹配的ELF文件时，我很快发现流行的<a href="https://github.com/n1nj4sec/pupy" target="_blank" rel="noopener">Pupy RAT</a>实际上在Linux客户端中<a href="https://github.com/n1nj4sec/pupy/blob/unstable/client/sources-linux/pupy.c#L21" target="_blank" rel="noopener">使用Linux注入</a>。</p>
 <p><a href="https://github.com/infosecguerrilla/ReflectiveSOInjection" target="_blank" rel="noopener">ReflectiveSOInjection</a>是基于linux-inject的工具。主要区别在于共享对象的注入方式。在linux-inject中，shellcode使用<a href="https://github.com/gaffe23/linux-inject/blob/master/inject-x86.c#L52" target="_blank" rel="noopener">__libc_dlopen_mode</a>加载共享对象。ReflectiveSOInjection <a href="https://github.com/infosecguerrilla/ReflectiveSOInjection/blob/master/inject/src/inject.c#L40" target="_blank" rel="noopener">将共享库映射到内存</a>，然后强制主程序调用ReflectiveLoader导出。所述<a href="https://github.com/infosecguerrilla/ReflectiveSOInjection/blob/master/so/src/ReflectiveLoader.c" target="_blank" rel="noopener">ReflectiveLoader</a>负责解析功能，负载所需的库和节目段映射到存储器中。</p>
 <p>让我们在与linux-inject一起使用的相同样本目标上使用ReflectiveSOInjection。</p>
-<p>![](/images/linux inject/19.png)</p>
+<p><img src="/images/linux_inject/19.png" alt=""></p>
 <p>如果我们看一下内存映射，我们可以看到有一个新的内存<a href="https://github.com/infosecguerrilla/ReflectiveSOInjection/blob/master/inject/src/inject.c#L56" target="_blank" rel="noopener">部分标记为rwxp</a>且具有空路径。</p>
-<p>![](/images/linux inject/20.png)</p>
+<p><img src="/images/linux_inject/20.png" alt=""></p>
 <p>此方法的优点是注入的共享对象不必在磁盘上。我们可以使用以下查询来搜寻此活动。</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> processes.name, process_memory_map.*, pid <span class="keyword">as</span> mpid <span class="keyword">from</span> process_memory_map <span class="keyword">join</span> processes <span class="keyword">USING</span> (pid) <span class="keyword">WHERE</span> process_memory_map.permissions = <span class="string">'rwxp'</span> <span class="keyword">AND</span> process_memory_map.path = <span class="string">''</span>;</span></pre></td></tr></table></figure>
 
@@ -243,9 +243,9 @@
 
 <h1 id="GDB调试"><a href="#GDB调试" class="headerlink" title="GDB调试"></a>GDB调试</h1><p>我们要探索的最后一种方法是使用Gnu Project Debugger <a href="https://www.gnu.org/software/gdb/" target="_blank" rel="noopener">GDB</a>加载共享对象。从攻击者的角度来看，GDB可能已经安装在目标系统中，并且噪音不如自带工具。使用GDB方法的优点是我们可以利用它。</p>
 <p>在幕后，这种方法几乎与linux-inject完全相同。GDB使用ptrace附加到进程，然后调用我们熟悉的相同的__libc_dlopen_mode()函数来加载共享对象。</p>
-<p>![使用ptrace的gdb](/images/linux inject/23.png)</p>
+<p><img src="/images/linux_inject/23.png" alt="使用ptrace的gdb"></p>
 <p>结果与linux-inject相同，我们可以使用相同的查询来寻找。</p>
-<p>![](/images/linux inject/21.png)</p>
+<p><img src="/images/linux_inject/21.png" alt=""></p>
 <p>总之，我们分析了攻击者可以通过多种方式将共享对象注入正在运行的进程中，并且共享了不同的Osquery查询和检测想法，蓝队可以使用这些查询和检测想法来在其环境中寻找这种行为。</p>
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>监控方法归纳成两种，一种是上文归纳的监控主机文件和map的变化：</p>
 <ul>
@@ -255,7 +255,7 @@
 <li>检测<code>/proc/[pid]/maps</code>中path中so文件路径为非常规的路径（或者有deleted标志），<code>dpkg -S [so_path]</code>或者<code>rpm -qf [so_path]</code>可以判断是否是系统的包，需要注意的是<code>LD_PRELOAD</code>和<code>/etc/ld.so.*</code>定义的白名单可能会导致误报。</li>
 </ul>
 <p>第二种方法可通过监控内核<code>ptrace</code>事件，当然<code>pdb</code>调试时候也会产生相应的事件，但是生产环境就不应该有调试的动作，所以正常情况不是误报，如果有特殊情况再特殊对待。</p>
-<p>![](/images/linux inject/22.png)</p>
+<p><img src="/images/linux_inject/22.png" alt=""></p>
 <p><strong>参考：</strong></p>
 <p><a href="https://www.trustedsec.com/blog/linux-hows-my-memory/" target="_blank" rel="noopener">https://www.trustedsec.com/blog/linux-hows-my-memory/</a></p>
 <p><a href="https://cybersecurity.att.com/blogs/labs-research/hunting-for-linux-library-injection-with-osquery" target="_blank" rel="noopener">https://cybersecurity.att.com/blogs/labs-research/hunting-for-linux-library-injection-with-osquery</a></p>
